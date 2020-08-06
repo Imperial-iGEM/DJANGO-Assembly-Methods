@@ -2,7 +2,7 @@
 
 A django restframework with 2 endpoints `/Basic` and `/Moclo` to provide OT2 lab automation python scripts for the respective asembly methods from formatted CSV files
 
-### getting set up 👨‍💻
+## getting set up 👨‍💻
 
 Open your command line and create a directory in which you would like to work
 
@@ -16,7 +16,7 @@ change directory into your new directory
 
 clone our repositry
 
-`$ git clone git@github.com:Imperial-iGEM/DJANGO-Assembly-Methods.git`
+`$ git clone https://github.com/Imperial-iGEM/DJANGO-Assembly-Methods.git`
 
 create a venv inside root folder
 
@@ -36,9 +36,13 @@ Install our repositry dependencies inside requirements.txt
 
 Run server
 
-`$ python manage.py makemigrations`
-
 `$ python manage.py migrate`
 
 `$ python manage.py runserver`
+
+## testing the RESTAPI 🧬
+
+once our server in running as we left our machine in the previous state we can use the GUI django rest framework provides to test out two end points work!
+
+> Basic DNA Assembly
 

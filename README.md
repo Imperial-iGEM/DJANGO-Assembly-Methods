@@ -46,9 +46,9 @@ Run server
 
 ## testing the RESTAPI 🧬
 
-once our server in running as we left our machine in the previous state we can use the GUI django rest framework provides to test out two end points work!
+once your server in running as we left our machine in the previous stage, we can use the GUI django rest framework provides to test out our two end points!
 
-### Basic DNA Assembly
+### Basic DNA Assembly 🦠
 You can acess the root of the end point on your local machine when the server is running by navigating to the link
 > http://127.0.0.1:8000/
 
@@ -60,5 +60,35 @@ Whilst here you can post a request to our backend with the test parameters
 `ethanol_well_for_stage_2 = "A11"`
 
 `deep_well_plate_stage_4 = "A1"`
+
+`input_construct_path = ...` file can be downloaded from https://cutt.ly/kdF6sHw
+
+`output_sources_paths = ...` file can be downloaded from https://cutt.ly/jdF6k15
+
+Once these four attributes of the GUI's post request are filled we can submit the post request by clicking post in the bottom left corner. The object is returned with 4 additional attributes containing the output OT2 opentrons python API scripts
+
+### Moclo DNA Assembly 🧑‍🔬
+You can acess the root of the end point on your local machine when the server is running by navigating to the link
+> http://127.0.0.1:8000/Moclo
+
+and click on the `/Basic` end point or alternatively navigate directly to
+> http://127.0.0.1:8000/Moclo/Moclo
+
+Whilst here you can post a request to our backend with the test parameters
+
+`combinations_limit = "single"`
+
+`dna_plate_map_file = ...` file can be downloaded from https://cutt.ly/kdF59QR
+
+`combinations file = ...` file can be downloaded from https://cutt.ly/PdF6qNP
+
+Once these four attributes of the GUI's post request are filled we can submit the post request by clicking post in the bottom left corner. The object is returned with 2 additional attributes containing the output OT2 opentrons python API script as well as agar plate locations csv file
+
+## Interested in Contributing 🤔💡
+
+We welcome everyone interested in contrubuting if your a seasoned open source professional or interested in learning something new fell free to open issues and pull requests.
+
+If you have any specific questions feel free to send an email to the 2020 imperial igem team 🚀
+> imperialigem2020@gmail.com
 
 

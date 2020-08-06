@@ -44,5 +44,13 @@ Run server
 
 once our server in running as we left our machine in the previous state we can use the GUI django rest framework provides to test out two end points work!
 
-> Basic DNA Assembly
+### Basic DNA Assembly
+You can acess the root of the end point on your local machine when the server is running by navigating to the link
+> http://127.0.0.1:8000/
+
+and click on the `/Basic` end point or alternatively navigate directly to
+> http://127.0.0.1:8000/Basic
+
+Whilst here you can post a request to our backend with the test parameters
+> 
 

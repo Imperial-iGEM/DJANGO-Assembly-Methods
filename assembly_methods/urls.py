@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 from basic_assembly import views
+from moclo_assembly import views
 
 urlpatterns = [
     path('', include('basic_assembly.urls')),
+    path('Moclo/', include('moclo_assembly.urls')),
     path('admin/', admin.site.urls),
 ]

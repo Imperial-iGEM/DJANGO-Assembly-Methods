@@ -1,5 +1,9 @@
 # DJANGO-Assembly-Methods 🔬
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Imperial-iGEM/DJANGO-Assembly-Methods/Django%20CI)
+![GitHub repo size](https://img.shields.io/github/repo-size/Imperial-iGEM/DJANGO-Assembly-Methods)
+![GitHub search hit counter](https://img.shields.io/github/search/Imperial-iGEM/DJANGO-Assembly-Methods/goto)
+
 A django restframework with 2 endpoints `/Basic` and `/Moclo` to provide OT2 lab automation python scripts for the respective asembly methods from formatted CSV files
 
 ## getting set up 👨‍💻
@@ -52,5 +56,9 @@ and click on the `/Basic` end point or alternatively navigate directly to
 > http://127.0.0.1:8000/Basic
 
 Whilst here you can post a request to our backend with the test parameters
-> 
+
+`ethanol_well_for_stage_2 = "A11"`
+
+`deep_well_plate_stage_4 = "A1"`
+
 

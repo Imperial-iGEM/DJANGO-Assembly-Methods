@@ -23,10 +23,11 @@ clone our repositry
 `$ git clone https://github.com/Imperial-iGEM/DJANGO-Assembly-Methods.git`
 
 create a venv inside root folder
-
-`$ cd ..`
-
-`$ virtualenv -p $(which python3.7) venv`
+```
+$ cd ..
+$ pip3 install virtualenv
+$ virtualenv -p $(which python3.7) venv
+```
 
 activate the virtual enviroment
 

@@ -44,6 +44,14 @@ Run server
 
 `$ python manage.py runserver`
 
+## Continuous Intergration and Unittests ✅
+
+For our Ci we use Github Actions, to check progress of you pull request click on the actions folder. Every push request is tested against a build on python 3.6, 3.7 and 3.8.
+
+For out unit tests we use Django's built in offering, before making a pull request trying running this command in the root folder to initiate unit tests
+
+`python manage.py test`
+
 ## testing the RESTAPI 🧬
 
 once your server in running as we left our machine in the previous stage, we can use the GUI django rest framework provides to test out our two end points!

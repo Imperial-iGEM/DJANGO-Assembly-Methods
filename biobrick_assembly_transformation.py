@@ -4,10 +4,11 @@
 #  * @create date 2020-08-15 12:12:36
 #  * @modify date 2020-08-15 12:12:36
 #  * @desc [Transformation protocol for BioBrick assembly
-#  as described in Method 3.1 "DNA Cloning and Assembly Methods" by 
+#  as described in Method 3.1 "DNA Cloning and Assembly Methods" by
 #  Svein Valla, Rahmi Lale.]
 #  */
 from opentrons import protocol_api
+from typing import List
 
 
 """ Location of reagents and volumes in slot SOURCE_PLATE_POSITION """
@@ -73,40 +74,56 @@ def run(protocol: protocol_api.ProtocolContext):
         # Transfer DNA to competent cells
         cell_vol_transfered = 0
         idx_current_cells = 0  # index for the wells of the current cells
-        for i, cell in enumerate(target_wells['cells']):
-            
-            will_empty_cells = ((cell_vol_transfered+target_cell_vol) >= source_wells['cells'][idx_current_cells][1])
-            vol_remaining_cells = source_wells['cells'][idx_current_cells][1] - cell_vol_transfered+target_cell_vol
+
+        def transfer_cells(source_wells: List[List],
+                           target_wells: List,
+                           cell_vol_transfered: int,
+                           idx_current_cells: int,
+                           index_target_wells: int):
+            would_empty_cells = ((cell_vol_transfered+target_cell_vol) >= source_wells[idx_current_cells][1])
+            vol_remaining_cells = source_wells[idx_current_cells][1] - cell_vol_transfered+target_cell_vol
             
             # Distribute source cells into wells
-            if (vol_remaining_cells < target_cell_vol) or will_empty_cells:
+            if (vol_remaining_cells < target_cell_vol) or would_empty_cells:  # full volume across cells
                 pipette.transfer(vol_remaining_cells,
-                                 source_wells['cells'][idx_current_cells][0],
-                                 target_wells['cells'][i])
+                                 source_wells[idx_current_cells][0],
+                                 target_wells[index_target_wells])
                 cell_vol_transfered += vol_remaining_cells
 
                 idx_current_cells += 1
+                vol_to_transfer = target_cell_vol - vol_remaining_cells
+                pipette.transfer(vol_to_transfer,
+                                 source_wells[idx_current_cells][0],
+                                 target_wells[index_target_wells])
+                cell_vol_transfered += vol_to_transfer
+            else:  # pipetting full volume from same cell
                 pipette.transfer(target_cell_vol,
-                                 source_wells['cells'][idx_current_cells][0],
-                                 target_wells['cells'][i])
+                                 source_wells[idx_current_cells][0],
+                                 target_wells[index_target_wells])
                 cell_vol_transfered += target_cell_vol
-            else:
-                pipette.transfer(target_cell_vol,
-                                 source_wells['cells'][idx_current_cells][0],
-                                 target_wells['cells'][i])
-                cell_vol_transfered += target_cell_vol
+
+        for i_cell, _ in enumerate(target_wells['cells']):
+
+            # Distribute source cells into wells
+            transfer_cells(source_wells['cells'],
+                           target_wells['cells'],
+                           cell_vol_transfered,
+                           idx_current_cells,
+                           i_cell)
 
             # Put specific DNA part into well with cells
             pipette.transfer(DNA_VOL,
                              source_wells['cells'][idx_current_cells][0],
-                             target_wells['cells'][i])
-        
+                             target_wells['cells'][i_cell])
+
         # Controls: Transfer dH2O to control competent cells
-        for i, cell in enumerate(target_wells['control_cells']):
+        for i_cell, _ in enumerate(target_wells['control_cells']):
             # Distribute source cells into wells
-            pipette.transfer(target_cell_vol,
-                             source_wells['cells'][0],
-                             target_wells['control_cells'][i])
+            transfer_cells(source_wells['cells'],
+                           target_wells['control_cells'],
+                           cell_vol_transfered,
+                           idx_current_cells,
+                           i_cell)
 
         # Calculate volumes
         upstream_vol = math.ceil(PART_AMOUNT*(1/source['upstream'][2]))

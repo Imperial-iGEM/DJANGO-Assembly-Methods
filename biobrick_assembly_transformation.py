@@ -11,12 +11,14 @@ from opentrons import protocol_api
 
 
 """ Location of reagents and volumes in slot SOURCE_PLATE_POSITION """
-source_wells = {'cells': ['A1', 500],
-                'control_cells': ['A2', 500],
-                'dna': ['B1', 500]}
+source_wells = {'cells': [['A1', 500], ['A3', 200]],
+                'control_cells': [['A2', 500]],
+                'dna': [['B1', 500]],
+                'dH2O': [['A3', 500]]}
 
 """ Target location of reagents and volumes in slot SOURCE_PLATE_POSITION """
-target = {'cells': ['A1', 'B2', 'B3', 'C4']}
+target_wells = {'cells': ['A1', 'B2', 'B3', 'C4'],
+                'control_cells': ['A2', 'B4', 'C5']}
 
 
 ## Constants
@@ -62,11 +64,41 @@ def run(protocol: protocol_api.ProtocolContext):
                                            tip_racks=[tip_rack])
 
         # Calculate vols
-        cell_vol = total_cell_volume / num_dna_parts
+        target_cell_vol = total_cell_volume / num_dna_parts
+        """ Volume of target wells that the source competent cells will be transfered into """
 
-        # Transfer DNA to cells
-        for cell in source['cells']:
-            pipette.transfer(cell_vol)
+        # Transfer DNA to competent cells
+        cell_vol_transfered = 0
+        idx_current_cells = 0  # index for the wells of the current cells
+        for i, cell in enumerate(target_wells['cells']):
+            # Distribute source cells into wells
+            is_empty_cells = ((cell_vol_transfered+target_cell_vol) >= source_wells['cells'][idx_current_cells][1])
+            vol_remaining_cells = source_wells['cells'][idx_current_cells][1] - cell_vol_transfered+target_cell_vol
+            if vol_remaining_cells > target_cell_vol:
+            if is_empty_cells:
+                pipette.transfer(target_cell_vol,
+                                 source_wells['cells'][idx_current_cells][0],
+                                 target_wells['cells'][i])
+                cell_vol_transfered += target_cell_vol
+            else:
+                idx_current_cells += 1
+
+                pipette.transfer(target_cell_vol,
+                                 source_wells['cells'][idx_current_cells][0],
+                                 target_wells['cells'][i])
+                cell_vol_transfered += target_cell_vol
+
+            # Put specific DNA part into well with cells
+            pipette.transfer(DNA_VOL,
+                             source_wells['dna'][0],
+                             target_wells['cells'][i])
+        
+        # Controls: Transfer dH2O to control competent cells
+        for i, cell in enumerate(target_wells['control_cells']):
+            # Distribute source cells into wells
+            pipette.transfer(target_cell_vol,
+                             source_wells['cells'][0],
+                             target_wells['control_cells'][i])
 
         # Calculate volumes
         upstream_vol = math.ceil(PART_AMOUNT*(1/source['upstream'][2]))

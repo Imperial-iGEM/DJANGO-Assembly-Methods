@@ -5,6 +5,7 @@ import math
 import pandas as pd
 
 TEMPLATE_DIR_NAME = 'template'
+OUTPUT_DIR_NAME = 'output'
 REAGENTS_TUBE_MAX_VOL = 1500
 DEFAULT_CONCENTRATION = 500  # 500 ng/uL
 PART_AMOUNT = 500
@@ -22,10 +23,11 @@ def main():
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
     template_path = os.path.join(template_dir_path,
                                  'bbassembly10template.py')
-    output_path = generator_dir
-    constructs, dest_well_list = get_constructs(os.path.join(generator_dir,
-                                                             'constructs.csv'))
-    parts = get_parts(os.path.join(generator_dir, 'parts.csv'), constructs)
+    output_path = os.path.join(generator_dir, OUTPUT_DIR_NAME)
+    constructs, dest_well_list = get_constructs(
+        os.path.join(generator_dir, 'examples/constructs.csv'))
+    parts = get_parts(os.path.join(generator_dir, 'examples/parts.csv'),
+                      constructs)
     reagents, reagents_well_list = get_reagents_wells(constructs, parts)
     digest_loc, parts_df = get_digests(constructs, parts, reagents_well_list,
                                        dest_well_list, reagents)

@@ -21,7 +21,7 @@ def main():
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
     template_path = os.path.join(template_dir_path,
-                                 'bbassembly10templatev2.py')
+                                 'bbassembly10template.py')
     output_path = generator_dir
     constructs, dest_well_list = get_constructs(os.path.join(generator_dir,
                                                              'constructs.csv'))
@@ -295,18 +295,19 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
     reagent_to_digest['B2'] = []
 
     for i, digest in digests.iterrows():
-        for j, part in parts.iterrows():
-            if part['name'] in digest['part']:
-                if str(digest['source_well']) not in source_to_digest.keys():
-                    source_to_digest[str(digest['source_well'])] = [
-                        (digest['dest_well'], int(part['part_vol']))]
-                else:
-                    source_to_digest[str(digest['source_well'])].append((
-                              digest['dest_well'], int(part['part_vol'])))
+        part_idx = parts[parts['name'] == digest['part']].index.values
+        if len(part_idx) > 0:
+            idx = part_idx[0]
+            if str(digest['source_well']) not in source_to_digest.keys():
+                source_to_digest[str(digest['source_well'])] = [
+                    (digest['dest_well'], int(parts['part_vol'][idx]))]
+            else:
+                source_to_digest[str(digest['source_well'])].append((
+                        digest['dest_well'], int(parts['part_vol'][idx])))
 
-                reagent_to_digest['A1'].append((digest['dest_well'],
-                                                int(part['water_vol'])))
-                break
+            reagent_to_digest['A1'].append((digest['dest_well'],
+                                            int(parts['water_vol'][idx])))
+
         if digest['role'] == 'upstream':
             reagent_to_digest['A5'].append((digest['dest_well'], int(ENZ_VOL)))
             reagent_to_digest['A6'].append((digest['dest_well'], int(ENZ_VOL)))
@@ -345,9 +346,6 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
 def create_protocol(template_path, output_path, source_to_digest,
                     reagent_to_digest, digest_to_storage, digest_to_construct,
                     reagent_to_construct):
-
-    # Get the contents of colony_pick_template.py, which contains the body of
-    # the protocol.
     with open(template_path) as template_file:
         template_string = template_file.read()
     with open(os.path.join(output_path, 'bb_assembly_protocol.py'),

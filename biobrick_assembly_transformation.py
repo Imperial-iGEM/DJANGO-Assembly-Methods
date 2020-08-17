@@ -75,14 +75,16 @@ def run(protocol: protocol_api.ProtocolContext):
                            target_wells: List,
                            cell_vol_transfered: int,
                            idx_current_cells: int,
-                           index_target_wells: int):
+                           index_target_wells: int) -> (int, int):
+            """ Helper function to transfer 'cells' from 1 source well to
+            target wells """
             would_empty_cells = ((cell_vol_transfered+target_cell_vol) >= source_wells[idx_current_cells][1])
             vol_remaining_cells = source_wells[idx_current_cells][1] - cell_vol_transfered+target_cell_vol
             
             # Distribute source cells into wells
             if (vol_remaining_cells < target_cell_vol) or would_empty_cells:  # full volume across cells
                 pipette.transfer(vol_remaining_cells,
-                                 source_wells[idx_current_cells][0],
+                                 source_wells[idx_current_cells][0],  # well name
                                  target_wells[index_target_wells])
                 cell_vol_transfered += vol_remaining_cells
 
@@ -117,16 +119,19 @@ def run(protocol: protocol_api.ProtocolContext):
                              source_wells['cells'][idx_current_cells][0],
                              target_wells['cells'][i_cell])
 
+            pipette.drop_tip()
+                             
+
         # Controls: Transfer dH2O to control competent cells
         ctrl_vol_transfered = 0
         idx_current_ctrl = 0
-        for i_cell, _ in enumerate(target_wells['control_cells']):
+        for i_ctrl, _ in enumerate(target_wells['control_cells']):
             # Distribute source cells into wells
             ctrl_vol_transfered, idx_current_ctrl = transfer_cells(source_wells['cells'],
                                                                    target_wells['control_cells'],
                                                                    ctrl_vol_transfered,
                                                                    idx_current_ctrl,
-                                                                   i_cell)
+                                                                   i_ctrl)
 
 
     # "main"

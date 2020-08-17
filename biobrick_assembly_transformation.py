@@ -71,10 +71,6 @@ def run(protocol: protocol_api.ProtocolContext):
         The cells in the source will be treated as one well for pipetting and split volumes when
         one container would become empty. """
 
-        # Transfer DNA to competent cells
-        cell_vol_transfered = 0
-        idx_current_cells = 0  # index for the wells of the current cells
-
         def transfer_cells(source_wells: List[List],
                            target_wells: List,
                            cell_vol_transfered: int,
@@ -102,14 +98,19 @@ def run(protocol: protocol_api.ProtocolContext):
                                  target_wells[index_target_wells])
                 cell_vol_transfered += target_cell_vol
 
+            return cell_vol_transfered, idx_current_cells
+
+        # Transfer DNA to competent cells
+        cell_vol_transfered = 0
+        idx_current_cells = 0  # index for the wells of the current cells
         for i_cell, _ in enumerate(target_wells['cells']):
 
             # Distribute source cells into wells
-            transfer_cells(source_wells['cells'],
-                           target_wells['cells'],
-                           cell_vol_transfered,
-                           idx_current_cells,
-                           i_cell)
+            cell_vol_transfered, idx_current_cells = transfer_cells(source_wells['cells'],
+                                                                    target_wells['cells'],
+                                                                    cell_vol_transfered,
+                                                                    idx_current_cells,
+                                                                    i_cell)
 
             # Put specific DNA part into well with cells
             pipette.transfer(DNA_VOL,
@@ -117,33 +118,15 @@ def run(protocol: protocol_api.ProtocolContext):
                              target_wells['cells'][i_cell])
 
         # Controls: Transfer dH2O to control competent cells
+        ctrl_vol_transfered = 0
+        idx_current_ctrl = 0
         for i_cell, _ in enumerate(target_wells['control_cells']):
             # Distribute source cells into wells
-            transfer_cells(source_wells['cells'],
-                           target_wells['control_cells'],
-                           cell_vol_transfered,
-                           idx_current_cells,
-                           i_cell)
-
-        # Calculate volumes
-        upstream_vol = math.ceil(PART_AMOUNT*(1/source['upstream'][2]))
-        downstream_vol = math.ceil(PART_AMOUNT*(1/source['downstream'][2]))
-        plasmid_vol = math.ceil(PART_AMOUNT*(1/source['plasmid'][2]))
-        vols = [upstream_vol, downstream_vol, plasmid_vol]
-
-        # Part transfers to digest tubes
-        pipette.transfer(upstream_vol,
-                         source_plate.wells_by_name()[source['upstream'][1]],
-                         dest_plate.wells_by_name()[dest['upstream']],
-                         blow_out=True)
-        pipette.transfer(downstream_vol,
-                         source_plate.wells_by_name()[source['downstream'][1]],
-                         dest_plate.wells_by_name()[dest['downstream']],
-                         blow_out=True)
-        pipette.transfer(plasmid_vol,
-                         source_plate.wells_by_name()[source['plasmid'][1]],
-                         dest_plate.wells_by_name()[dest['plasmid']],
-                         blow_out=True)
+            ctrl_vol_transfered, idx_current_ctrl = transfer_cells(source_wells['cells'],
+                                                                   target_wells['control_cells'],
+                                                                   ctrl_vol_transfered,
+                                                                   idx_current_ctrl,
+                                                                   i_cell)
 
 
     # "main"

@@ -1,0 +1,4 @@
+Construct,Well,upstream,downstream,plasmid
+construct1,A1,BBa_B0034,BBa_C0040,BBa_pSB1AK3
+construct2,A2,BBa_B0034,BBa_C0012,BBa_pSB1AK3
+construct3,A3,BBa_C0012,BBa_B0015,BBa_pSB1AK3

@@ -3,10 +3,8 @@ import pytest
 import pandas as pd
 import os
 import numpy as np
-from pandas.util import testing as tm
-# newpath = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/biobricks_assembly/biobrick10'
-#sys.path.append(newpath)
-from ..biobricks10 import bbinput
+from pandas import testing as tm
+from .. import bbinput
 
 
 constructs_file = [
@@ -168,8 +166,7 @@ def test_process_construct(construct, result):
 
 
 def test_get_constructs():
-    df, dest_wells = bbinput.get_constructs(os.path.join(newpath,
-                                            'examples/constructs.csv'))
+    df, dest_wells = bbinput.get_constructs('testfiles/constructs.csv')
     tm.assert_frame_equal(df, constructs_df)
 
     assert dest_wells == constructs_wells
@@ -204,8 +201,7 @@ def test_process_part(part, result):
 
 
 def test_get_parts():
-    df = bbinput.get_parts(os.path.join(newpath,
-                                        'examples/parts.csv'), constructs_df)
+    df = bbinput.get_parts('testfiles/parts.csv', constructs_df)
     tm.assert_frame_equal(df, parts_df)
 
 

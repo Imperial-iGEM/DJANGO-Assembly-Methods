@@ -6,7 +6,7 @@ import numpy as np
 from pandas.util import testing as tm
 # newpath = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/biobricks_assembly/biobrick10'
 #sys.path.append(newpath)
-from .biobricks10 import bbinput
+from ..biobricks10 import bbinput
 
 
 constructs_file = [

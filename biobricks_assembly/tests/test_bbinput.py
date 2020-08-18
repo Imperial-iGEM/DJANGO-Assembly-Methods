@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import numpy as np
 from pandas.util import testing as tm
-newpath = os.path.join(os.pardir, 'biobricks10')
+newpath = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/biobricks_assembly/biobrick10'
 sys.path.append(newpath)
 import bbinput
 

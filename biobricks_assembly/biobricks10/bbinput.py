@@ -49,16 +49,6 @@ def get_constructs(path):
     '''
         Returns list of construct dictionaries from csv file
     '''
-    def process_construct(construct_entry):
-        '''
-            Returns construct dictionary from row in csv file
-        '''
-        construct_dict = {'name': [construct_entry[0]],
-                          'well': [construct_entry[1]], 'upstream':
-                          [construct_entry[2]], 'downstream':
-                          [construct_entry[3]], 'plasmid': [
-                                          construct_entry[4]]}
-        return construct_dict
     constructs_list = []
     dest_well_list = []
     with open(path, 'r') as csvfile:
@@ -72,9 +62,21 @@ def get_constructs(path):
                     construct_dict = process_construct(construct)
                     construct_df = pd.DataFrame.from_dict(construct_dict)
                     constructs_list.append(construct_df)
-                    dest_well_list.append(construct_dict['well'])
+                    dest_well_list.append(construct_dict['well'][0])
     merged_constructs_list = pd.concat(constructs_list, ignore_index=True)
     return merged_constructs_list, dest_well_list
+
+
+def process_construct(construct_entry):
+    '''
+        Returns construct dictionary from row in csv file
+    '''
+    construct_dict = {'name': [construct_entry[0]],
+                      'well': [construct_entry[1]], 'upstream':
+                      [construct_entry[2]], 'downstream':
+                      [construct_entry[3]], 'plasmid': [
+                                      construct_entry[4]]}
+    return construct_dict
 
 
 def get_parts(path, constructs_list):
@@ -83,51 +85,6 @@ def get_parts(path, constructs_list):
         Uses constructs_list to record the number of times the part is used
         in the constructs and the roles it plays.
     '''
-    def process_part(part, constructs_list):
-        '''
-            Returns a part dictionary with detailed information.
-        '''
-        part_dict = {'name': [part[0]], 'well': [part[1]]}
-        occ, cons_in = count_part_occurences(constructs_list, part)
-        part_dict['occurences'] = occ
-
-        # part_dict['occurences'][2] = number of time part is actually plasmid
-        # plasmids cannot be inserted as parts, and vice versa
-        if part_dict['occurences'][2] > 0:
-            digests = 1
-            part_dict['roles'] = [['plasmid']]
-        elif part_dict['occurences'][0] > 0:
-            if part_dict['occurences'][1] > 0:
-                digests = 2
-                part_dict['roles'] = [['upstream', 'downstream']]
-            else:
-                digests = 1
-                part_dict['roles'] = [['upstream']]
-        elif part_dict['occurences'][1] > 0:
-            digests = 1
-            part_dict['roles'] = [['downstream']]
-        else:
-            digests = 0  # part/plasmid not in constructs
-            part_dict['roles'] = [[]]
-
-        if len(part) == 2:
-            concentration = DEFAULT_CONCENTRATION
-            part_vol = 1
-        else:
-            concentration = int(part[2])
-            part_vol = math.ceil(PART_AMOUNT/concentration)
-        part_dict['digests'] = [digests]
-        part_dict['concentration'] = [concentration]
-        part_dict['part_vol'] = [part_vol]
-        water_vol = FILL_VOL - part_vol - 2*ENZ_VOL - NEB_BUFFER_10X_VOL
-        part_dict['water_vol'] = [water_vol]
-        part_vol_tot = part_vol*digests
-        part_dict['part_vol_tot'] = [part_vol_tot]
-        water_vol_tot = water_vol*digests
-        part_dict['water_vol_tot'] = [water_vol_tot]
-        part_dict['occurences'] = [part_dict['occurences']]
-        part_dict['constructs_in'] = [cons_in]
-        return pd.DataFrame.from_dict(part_dict)
 
     parts_list = []
     with open(path, 'r') as csvfile:
@@ -140,10 +97,58 @@ def get_parts(path, constructs_list):
     return merged_parts_list
 
 
+def process_part(part, constructs_list):
+    '''
+        Returns a part dictionary with detailed information.
+    '''
+    part_dict = {'name': [part[0]], 'well': [part[1]]}
+    occ, cons_in = count_part_occurences(constructs_list, part)
+    part_dict['occurences'] = occ
+
+    # part_dict['occurences'][2] = number of time part is actually plasmid
+    # plasmids cannot be inserted as parts, and vice versa
+    if part_dict['occurences'][2] > 0:
+        digests = 1
+        part_dict['roles'] = [['plasmid']]
+    elif part_dict['occurences'][0] > 0:
+        if part_dict['occurences'][1] > 0:
+            digests = 2
+            part_dict['roles'] = [['upstream', 'downstream']]
+        else:
+            digests = 1
+            part_dict['roles'] = [['upstream']]
+    elif part_dict['occurences'][1] > 0:
+        digests = 1
+        part_dict['roles'] = [['downstream']]
+    else:
+        digests = 0  # part/plasmid not in constructs
+        part_dict['roles'] = [[]]
+
+    if len(part) == 2:
+        concentration = DEFAULT_CONCENTRATION
+        part_vol = 1
+    else:
+        concentration = int(part[2])
+        part_vol = math.ceil(PART_AMOUNT/concentration)
+    part_dict['digests'] = [digests]
+    part_dict['concentration'] = [concentration]
+    part_dict['part_vol'] = [part_vol]
+    water_vol = FILL_VOL - part_vol - 2*ENZ_VOL - NEB_BUFFER_10X_VOL
+    part_dict['water_vol'] = [water_vol]
+    part_vol_tot = part_vol*digests
+    part_dict['part_vol_tot'] = [part_vol_tot]
+    water_vol_tot = water_vol*digests
+    part_dict['water_vol_tot'] = [water_vol_tot]
+    part_dict['occurences'] = [part_dict['occurences']]
+    part_dict['constructs_in'] = [cons_in]
+    part_df = pd.DataFrame.from_dict(part_dict)
+    return part_df
+
+
 def get_reagents_wells(constructs_list, parts):
     '''
-        Returns dictionary with keys as reagent names and values as a list
-        of the reagent well and the volume of the reagent required.
+        Returns dataframe with rows as reagent names and cols
+        as the reagent well and the volume of the reagent required.
     '''
     reagents_well_list = []
     reagents = ['water', 'NEBBuffer10X', 'T4Ligase10X', 'T4Ligase',
@@ -178,7 +183,6 @@ def get_reagents_wells(constructs_list, parts):
         reagents_dict['well'] = [new_well]
         reagents_dict['total_vol'] = [total_volumes[i]]
         reagents_list.append(pd.DataFrame.from_dict(reagents_dict))
-
     return pd.concat(reagents_list, ignore_index=True), reagents_well_list
 
 
@@ -340,7 +344,6 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
                                     [T4_LIGASE_VOL_10X]*len(constructs)))]
     reagent_to_construct['A4'] = [*zip(construct_wells, tuple(
                                     [T4_LIGASE_VOL]*len(constructs)))]
-
     return source_to_digest, reagent_to_digest, digest_to_storage, \
         digest_to_construct, reagent_to_construct
 

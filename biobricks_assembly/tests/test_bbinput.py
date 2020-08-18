@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import numpy as np
 from pandas.util import testing as tm
-newpath = os.pardir
+newpath = os.path.join(os.pardir, 'biobricks10')
 sys.path.append(newpath)
 import bbinput
 

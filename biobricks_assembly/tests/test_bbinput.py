@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import numpy as np
 from pandas import testing as tm
-from .. import bbinput
+from ..biobricks10 import bbinput
 
 
 constructs_file = [

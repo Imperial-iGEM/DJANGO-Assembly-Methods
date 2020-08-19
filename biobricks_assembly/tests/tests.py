@@ -1,4 +1,4 @@
-from .. biobricks10 import bbinput
+import ../biobricks10/bbinput
 import pandas as pd
 import numpy as np
 import unittest

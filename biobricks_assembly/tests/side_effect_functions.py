@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from ..biobricks10 import bbinput
+from biobrick_assembly.biobricks10 import bbinput
 
 constructs_list = [['Construct', 'Well', 'upstream', 'downstream', 'plasmid'],
                    ['construct1', 'A1', 'BBa_B0034', 'BBa_C0040', 'BBa_pSB1AK3'

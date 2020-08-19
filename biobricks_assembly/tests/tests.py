@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 import csv
 from . import side_effect_functions
-from ..biobricks10 import bbinput
+from DJANGO-Assembly-Methods.biobricks_assembly.biobricks10 import bbinput
 
 class BioBricksInputTestCase(unittest.TestCase):
 

@@ -4,7 +4,7 @@ import numpy as np
 import unittest
 from unittest.mock import patch
 import csv
-import side_effect_functions
+from . import side_effect_functions
 
 
 class BioBricksInputTestCase(unittest.TestCase):

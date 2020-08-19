@@ -4,9 +4,9 @@ import unittest
 from unittest.mock import patch
 import csv
 import sys
-import os
-parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, '/biobricks10'))
-sys.path.append(parentdir)
+#import os
+#parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, '/biobricks10'))
+sys.path.append("/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/biobricks_assembly/biobricks10/")
 import bbinput
 
 class BioBricksInputTestCase(unittest.TestCase):

@@ -228,6 +228,7 @@ def get_digests(constructs_list, parts, reagents_wells_used, dest_wells_used,
 
 def next_well(wells_used):
     letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    well_avail = None
     for i in range(96):
         rowindex = i // 12
         row = letter[rowindex]
@@ -245,6 +246,7 @@ def next_well(wells_used):
 
 def next_well_reagent(wells_used):
     letter = ['A', 'B', 'C', 'D']
+    well_avail = None
     for i in range(24):
         rowindex = i // 6
         row = letter[rowindex]

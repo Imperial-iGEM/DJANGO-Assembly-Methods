@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from biobrick_assembly.biobricks10 import bbinput
+from .. import biobricks10
 
 constructs_list = [['Construct', 'Well', 'upstream', 'downstream', 'plasmid'],
                    ['construct1', 'A1', 'BBa_B0034', 'BBa_C0040', 'BBa_pSB1AK3'
@@ -69,7 +69,7 @@ def process_cons(construct):
             break
     if success_mock == 0:
         print('Unable to mock. Using actual function')
-        return bbinput.process_construct(construct)
+        return biobricks10.bbinput.process_construct(construct)
 
 
 def process_part(part, constructs_df):
@@ -81,6 +81,6 @@ def process_part(part, constructs_df):
             break
     if success_mock == 0:
         print('Unable to mock. Using actual function')
-        return bbinput.process_part(part, constructs_df)
+        return biobricks10.bbinput.process_part(part, constructs_df)
 
         

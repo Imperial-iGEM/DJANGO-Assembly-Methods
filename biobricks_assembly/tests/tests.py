@@ -1,11 +1,8 @@
-from .. import bbinput
+from ..biobricks10 import bbinput
 import pandas as pd
 import numpy as np
 import unittest
 from unittest.mock import patch
-#import sys
-#sys.path.append("C:/Users/gabri/Documents/Uni/iGEM/Biobricks")
-import bbinput
 import csv
 import side_effect_functions
 

@@ -8,6 +8,7 @@ import sys
 #parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, '/biobricks10'))
 sys.path.append("/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/biobricks_assembly/biobricks10/")
 import bbinput
+from . import side_effect_functions
 
 class BioBricksInputTestCase(unittest.TestCase):
 

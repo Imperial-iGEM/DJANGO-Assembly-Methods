@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
-import sys
-sys.path.append("C:/Users/gabri/Documents/Uni/iGEM/Biobricks")
-import bbinput
+from ..biobricks10 import bbinput
 
 constructs_list = [['Construct', 'Well', 'upstream', 'downstream', 'plasmid'],
                    ['construct1', 'A1', 'BBa_B0034', 'BBa_C0040', 'BBa_pSB1AK3'

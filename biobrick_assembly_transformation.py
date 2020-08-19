@@ -7,8 +7,12 @@
 #  as described in Method 3.1 "DNA Cloning and Assembly Methods" by
 #  Svein Valla, Rahmi Lale.]
 #  */
+import opentrons
 from opentrons import protocol_api, labware, instruments, modules, robot
 from typing import List
+
+
+print(opentrons.__version__)
 
 
 """ Location of reagents and volumes in slot SOURCE_PLATE_POSITION """

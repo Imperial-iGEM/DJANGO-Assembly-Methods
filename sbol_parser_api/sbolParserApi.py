@@ -157,6 +157,16 @@ class ParserSBOL:
         return listOfParts.sort(key=lambda x: x.displayId)
 
     def getDictOfComponents(self, listOfConstructs: list) -> dict:
+        """Get a dictionary of components (as component definitions)
+        from the list of constructs as
+        {construct.displayId: construct.components (as component definitions)}
+
+        Args:
+            listOfConstructs (list): List of constructs
+
+        Returns:
+            dict: Dictionary of components
+        """
         return {x.displayId: x.getPrimaryStructure() for x in listOfConstructs}
 
     def plateo_plates_from_constructs(
@@ -164,7 +174,18 @@ class ParserSBOL:
             allConstructs: list,
             numPlate: int = None,
             plate_class=None,
-            maxWellsFilled: int = None) -> list:
+            maxWellsFilled: int = None) -> dict:
+        """Generate a dictionary of plateo plate objects from list of constructs
+
+        Args:
+            allConstructs (list): List of constructs
+            numPlate (int): Number of plates to be generated (default = 1)
+            plate_class: Class of plateo plate (default = Plate96)
+            maxWellsFilled (int): Maximum number of filled wells on a plate
+
+        Returns:
+            dict: Dictionary of plates
+        """
         numPlate = 1 if numPlate is None else numPlate
         plate_class = (
             plateo.containers.Plate96 if plate_class is None else plate_class)

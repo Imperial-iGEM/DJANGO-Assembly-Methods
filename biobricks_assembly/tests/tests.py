@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 import csv
 from . import side_effect_functions
-from biobrick_assembly.biobricks10 import bbinput
+from .. import biobricks10
 
 class BioBricksInputTestCase(unittest.TestCase):
 
@@ -215,7 +215,7 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_process_construct(self):
         for i in range(len(self.constructs_list)-1):
             construct = self.constructs_list[i+1]
-            processed = bbinput.process_construct(construct)
+            processed = biobricks10.bbinput.process_construct(construct)
             self.assertDictEqual(processed, self.construct_dicts[i])
 
     @patch('bbinput.process_construct',
@@ -223,7 +223,7 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_get_constructs(self, mock_process_construct):
         with patch('csv.reader') as mocked_reader:
             mocked_reader.return_value = self.constructs_list
-            cons_df, dest_wells = bbinput.get_constructs(
+            cons_df, dest_wells = biobricks10.bbinput.get_constructs(
                                 'testfiles/constructs.csv')
             self.assertListEqual(dest_wells, self.construct_wells)
             for col in ['name', 'well', 'upstream', 'downstream', 'plasmid']:
@@ -233,16 +233,16 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_count_part_occurrences(self):
         for index, part in enumerate(self.parts_list):
             if index != 0:
-                self.assertListEqual(bbinput.count_part_occurences(
+                self.assertListEqual(biobricks10.bbinput.count_part_occurences(
                             self.constructs_df, part)[0], self.occ[index-1])
-                self.assertListEqual(bbinput.count_part_occurences(
+                self.assertListEqual(biobricks10.bbinput.count_part_occurences(
                             self.constructs_df, part)[1], self.cons_in[index-1]
                                      )
 
     def test_process_part(self):
         for index, part in enumerate(self.parts_list):
             if index != 0:
-                df = bbinput.process_part(part, self.constructs_df)
+                df = biobricks10.bbinput.process_part(part, self.constructs_df)
                 part_df = self.part_dfs[index - 1]
                 for col in df.columns:
                     self.assertListEqual(df[col].to_list(),
@@ -253,31 +253,31 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_get_parts(self, mock_process_part):
         with patch('csv.reader') as mocked_reader:
             mocked_reader.return_value = self.parts_list
-            df = bbinput.get_parts(
+            df = biobricks10.bbinput.get_parts(
                 'testfiles/parts.csv', self.constructs_df)
             for col in df.columns:
                 self.assertListEqual(df[col].to_list(),
                                      self.parts_df[col].to_list())
 
     def test_next_well(self):
-        self.assertEqual(bbinput.next_well([]), 'A1')
-        self.assertEqual(bbinput.next_well(['B2', 'A3']), 'A1')
-        self.assertEqual(bbinput.next_well(['A1', 'A2', 'A3', 'A4', 'A5',
+        self.assertEqual(biobricks10.bbinput.next_well([]), 'A1')
+        self.assertEqual(biobricks10.bbinput.next_well(['B2', 'A3']), 'A1')
+        self.assertEqual(biobricks10.bbinput.next_well(['A1', 'A2', 'A3', 'A4', 'A5',
                                             'A6', 'A7', 'A8', 'A9', 'A10',
                                             'A11', 'A12']), 'B1')
         with self.assertRaises(ValueError):
-            bbinput.next_well(self.all_wells)
+            biobricks10.bbinput.next_well(self.all_wells)
 
     def test_next_well_reagent(self):
-        self.assertEqual(bbinput.next_well_reagent([]), 'A1')
-        self.assertEqual(bbinput.next_well_reagent(['A2', 'A3']), 'A1')
-        self.assertEqual(bbinput.next_well_reagent(['A1', 'A2', 'A3', 'A4',
+        self.assertEqual(biobricks10.bbinput.next_well_reagent([]), 'A1')
+        self.assertEqual(biobricks10.bbinput.next_well_reagent(['A2', 'A3']), 'A1')
+        self.assertEqual(biobricks10.bbinput.next_well_reagent(['A1', 'A2', 'A3', 'A4',
                                                     'A5', 'A6']), 'B1')
         with self.assertRaises(ValueError):
-            bbinput.next_well_reagent(self.all_wells_reagent)
+            biobricks10.bbinput.next_well_reagent(self.all_wells_reagent)
 
     def test_get_digests(self):
-        digests, parts = bbinput.get_digests(self.constructs_df, self.parts_df,
+        digests, parts = biobricks10.bbinput.get_digests(self.constructs_df, self.parts_df,
                                              self.reagents_wells,
                                              self.constructs_wells,
                                              self.reagents_df)
@@ -289,7 +289,7 @@ class BioBricksInputTestCase(unittest.TestCase):
                                  self.parts_digest_wells)
 
     def test_create_assembly_dicts(self):
-        dict1, dict2, dict3, dict4, dict5 = bbinput.create_assembly_dicts(
+        dict1, dict2, dict3, dict4, dict5 = biobricks10.bbinput.create_assembly_dicts(
                     self.constructs_df, self.parts_df_full, self.digests_df,
                     self.reagents_df)
         self.assertDictEqual(dict1, self.source_to_digest)

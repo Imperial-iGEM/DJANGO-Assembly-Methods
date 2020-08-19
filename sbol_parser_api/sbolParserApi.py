@@ -1,4 +1,6 @@
 import sbol2
+import plateo
+import warnings
 import pandas
 
 
@@ -38,9 +40,7 @@ class ParserSBOL:
 
         # TODO: Insert up to 7 linkers - to handle on frontend?
 
-        # TODO: Create dictionary of wells
-
-        # TODO: Create plate from dictionary
+        # TODO: Create plate from all constructs
 
         # TODO: Write constructs csv from plate
 
@@ -145,8 +145,6 @@ class ParserSBOL:
         listOfParts = list(dict.fromkeys(listOfParts))
         return listOfParts
 
-    # TODO: Return list of component definitions instead of str
-    # TODO: Function to convert list of component definitions to str
     def getSortedListOfParts(self, listOfParts: list = []) -> list:
         """Get a sorted list of parts (str) from the list of parts.
 
@@ -156,8 +154,38 @@ class ParserSBOL:
         Returns:
             list: List of sorted parts (str)
         """
-        sortedListOfParts = []
-        for part in listOfParts:
-            sortedListOfParts.append(part.displayId)
-        sortedListOfParts = sorted(sortedListOfParts)
-        return sortedListOfParts
+        return listOfParts.sort(key=lambda x: x.displayId)
+
+    def getDictOfComponents(self, listOfConstructs: list) -> dict:
+        return {x.displayId: x.getPrimaryStructure() for x in listOfConstructs}
+
+    def plateo_plates_from_constructs(
+            self,
+            allConstructs: list,
+            numPlate: int = None,
+            plate_class=None,
+            maxWellsFilled: int = None) -> list:
+        numPlate = 1 if numPlate is None else numPlate
+        plate_class = (
+            plateo.containers.Plate96 if plate_class is None else plate_class)
+        maxWellsFilled = (
+            plate_class.num_wells if maxWellsFilled is None
+            else maxWellsFilled)
+        # Check if maxwells more than num_wells of plates
+        if maxWellsFilled > plate_class.num_wells:
+            raise ValueError(
+                "ValueError: maxWellsFilled must be less than"
+                " plate_class.num_wells")
+        # Check if numPlate*maxWellsFilled less than len(allconstructs)
+        if numPlate*maxWellsFilled < len(allConstructs):
+            raise ValueError(
+                "ValueError: Length of allConstructs must be"
+                " less than numPlate*maxWellsFilled")
+        # Check if there will be empty plates
+        if len(allConstructs)/maxWellsFilled < numPlate:
+            warnings.warn("Number of constructs cannot fill all plates.")
+        plates = {
+            index: plateo.containers.Plate96(name="Plate %d" % index)
+            for index in range(1, numPlate + 1)}
+        # TODO: Put wells into plates
+        return NotImplementedError("Not yet implemented")

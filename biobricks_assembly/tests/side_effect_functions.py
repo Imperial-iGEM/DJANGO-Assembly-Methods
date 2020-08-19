@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
-from .. import biobricks10
+import sys 
+parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, '/biobricks10'))
+sys.path.append(parentdir)
+import bbinput
 
 constructs_list = [['Construct', 'Well', 'upstream', 'downstream', 'plasmid'],
                    ['construct1', 'A1', 'BBa_B0034', 'BBa_C0040', 'BBa_pSB1AK3'

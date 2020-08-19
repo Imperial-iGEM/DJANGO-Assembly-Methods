@@ -7,11 +7,10 @@
 #  as described in Method 3.1 "DNA Cloning and Assembly Methods" by
 #  Svein Valla, Rahmi Lale.]
 #  */
-import opentrons
 from opentrons import protocol_api, labware, instruments, modules, robot
 from typing import List
 
-
+import opentrons
 print(opentrons.__version__)
 
 
@@ -38,6 +37,7 @@ TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
 ### Plate position constants
 CANDIDATE_TIPRACK_SLOT = '3'
 SOURCE_PLATE_POSITION = '2'
+DESTINATION_PLATE_POSITION = '5'
 TUBE_RACK_POSITION = '4'
 
 ### Reagent constants
@@ -62,7 +62,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # load labware
         source_plate = protocol.load_labware(SOURCE_PLATE_TYPE, SOURCE_PLATE_POSITION)
-        dest_plate = protocol.load_labware(DESTINATION_PLATE_TYPE)
+        dest_plate = protocol.load_labware(DESTINATION_PLATE_TYPE, DESTINATION_PLATE_POSITION)
         tube_rack = protocol.load_labware(TUBE_RACK_TYPE, TUBE_RACK_POSITION)
         tip_rack = protocol.load_labware(TIPRACK_TYPE, CANDIDATE_TIPRACK_SLOT)
         pipette = protocol.load_instrument(PIPETTE_TYPE, PIPETTE_MOUNT,
@@ -76,7 +76,7 @@ def run(protocol: protocol_api.ProtocolContext):
         The cells in the source will be treated as one well for pipetting and split volumes when
         one container would become empty. """
         ## Same for control cells
-        total_ctrl_volume = sum(source_wells['cells'][i][1] for i in range(len(source_wells['cells'])))
+        total_ctrl_volume = sum(source_wells['control_cells'][i][1] for i in range(len(source_wells['control_cells'])))
         target_ctrl_vol = total_ctrl_volume / len(target_wells['control_cells'])
 
         def transfer_cells(source_wells: List[List],
@@ -99,7 +99,8 @@ def run(protocol: protocol_api.ProtocolContext):
                 source_well = source_plate.wells_by_name()[source_wells[idx_current_cells][0]]
                 pipette.transfer(vol_remaining_cells,
                                  source_well,  # well name
-                                 target_well)
+                                 target_well,
+                                 new_tip='never')
                 cell_vol_transfered += vol_remaining_cells
 
                 idx_current_cells += 1
@@ -107,13 +108,15 @@ def run(protocol: protocol_api.ProtocolContext):
                 vol_to_transfer = target_cell_vol - vol_remaining_cells
                 pipette.transfer(vol_to_transfer,
                                  source_well,
-                                 target_well)
+                                 target_well, 
+                                 new_tip='never')
                 cell_vol_transfered += vol_to_transfer
             else:  # pipetting full volume from same cell
                 source_well = source_plate.wells_by_name()[source_wells[idx_current_cells][0]]
                 pipette.transfer(target_cell_vol,
                                  source_well,
-                                 target_well)
+                                 target_well,
+                                 new_tip='never')
                 cell_vol_transfered += target_cell_vol
 
             return cell_vol_transfered, idx_current_cells
@@ -160,4 +163,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # "main"
     run_robot_inits(protocol)
+    bb_transform(source_wells, target_wells)
 
+
+# Test
+# protocol = protocol_api.ProtocolContext()
+# run(protocol)

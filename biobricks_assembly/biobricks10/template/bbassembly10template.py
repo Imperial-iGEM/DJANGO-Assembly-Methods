@@ -100,7 +100,7 @@ def run(protocol: protocol_api.ProtocolContext):
             vol = val[0][1]
             pipette.transfer(vol, digest_plate_well, construct_wells,
                              blow_out=True)
-            
+
         for digest_well in digest_to_storage.keys():
             digest_plate_well = dest_plate.wells_by_name()[digest_well]
             val = digest_to_storage[digest_well]
@@ -112,7 +112,7 @@ def run(protocol: protocol_api.ProtocolContext):
             vol = val[0][1]
             pipette.transfer(vol, digest_plate_well, storage_wells,
                              blow_out=True)
-        
+
         for reagent_well in reagent_to_construct.keys():
             reagent_plate_well = tube_rack.wells_by_name()[reagent_well]
             val = reagent_to_construct[reagent_well]
@@ -123,7 +123,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 # vols.append(val[i][1])
             vol = val[0][1]
             pipette.transfer(vol, reagent_plate_well, construct_wells)
-        
+
         for construct_well in construct_wells:
             pipette.pick_up_tip()
             pipette.mix(5, 10, construct_well)

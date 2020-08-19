@@ -3,8 +3,10 @@ import numpy as np
 import unittest
 from unittest.mock import patch
 import csv
-from . import side_effect_functions
-from .. import biobricks10
+import sys 
+parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, '/biobricks10'))
+sys.path.append(parentdir)
+import bbinput
 
 class BioBricksInputTestCase(unittest.TestCase):
 

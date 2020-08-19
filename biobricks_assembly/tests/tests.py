@@ -4,8 +4,9 @@ import unittest
 from unittest.mock import patch
 import csv
 import sys
-#import os
+import os
 #parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, '/biobricks10'))
+TEST_DIR = "/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/biobricks_assembly/tests/"
 sys.path.append("/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/biobricks_assembly/biobricks10/")
 import bbinput
 from . import side_effect_functions
@@ -227,8 +228,8 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_get_constructs(self, mock_process_construct):
         with patch('csv.reader') as mocked_reader:
             mocked_reader.return_value = self.constructs_list
-            cons_df, dest_wells = bbinput.get_constructs(
-                                'testfiles/constructs.csv')
+            cons_df, dest_wells = bbinput.get_constructs(os.path.join(TEST_DIR,
+                              'testfiles/constructs.csv'))
             self.assertListEqual(dest_wells, self.construct_wells)
             for col in ['name', 'well', 'upstream', 'downstream', 'plasmid']:
                 self.assertListEqual(cons_df[col].to_list(),
@@ -257,8 +258,9 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_get_parts(self, mock_process_part):
         with patch('csv.reader') as mocked_reader:
             mocked_reader.return_value = self.parts_list
-            df = bbinput.get_parts(
-                'testfiles/parts.csv', self.constructs_df)
+            df = bbinput.get_parts((os.path.join(TEST_DIR,
+                                                 'testfiles/constructs.csv')),
+                                   self.constructs_df)
             for col in df.columns:
                 self.assertListEqual(df[col].to_list(),
                                      self.parts_df[col].to_list())

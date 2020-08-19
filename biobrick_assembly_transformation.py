@@ -7,7 +7,7 @@
 #  as described in Method 3.1 "DNA Cloning and Assembly Methods" by
 #  Svein Valla, Rahmi Lale.]
 #  */
-from opentrons import protocol_api
+from opentrons import protocol_api, labware, instruments, modules, robot
 from typing import List
 
 
@@ -57,59 +57,75 @@ def run(protocol: protocol_api.ProtocolContext):
     def bb_transform(source, target):
 
         # load labware
-        source_plate = protocol.load_labware(SOURCE_PLATE_TYPE,
-                                             SOURCE_PLATE_POSITION)
+        source_plate = protocol.load_labware(SOURCE_PLATE_TYPE, SOURCE_PLATE_POSITION)
+        dest_plate = protocol.load_labware(DESTINATION_PLATE_TYPE)
         tube_rack = protocol.load_labware(TUBE_RACK_TYPE, TUBE_RACK_POSITION)
         tip_rack = protocol.load_labware(TIPRACK_TYPE, CANDIDATE_TIPRACK_SLOT)
         pipette = protocol.load_instrument(PIPETTE_TYPE, PIPETTE_MOUNT,
                                            tip_racks=[tip_rack])
 
         # Calculate vols
+        num_dna_parts = len(target_wells['cells'])
         total_cell_volume = sum(source_wells['cells'][i][1] for i in range(len(source_wells['cells'])))
         target_cell_vol = total_cell_volume / num_dna_parts
         """ Volume of target wells that the source competent cells will be transfered into.
         The cells in the source will be treated as one well for pipetting and split volumes when
         one container would become empty. """
+        ## Same for control cells
+        total_ctrl_volume = sum(source_wells['cells'][i][1] for i in range(len(source_wells['cells'])))
+        target_ctrl_vol = total_ctrl_volume / len(target_wells['control_cells'])
 
         def transfer_cells(source_wells: List[List],
                            target_wells: List,
+                           target_vol: int,
                            cell_vol_transfered: int,
                            idx_current_cells: int,
-                           index_target_wells: int) -> (int, int):
+                           idx_target_wells: int) -> (int, int):
             """ Helper function to transfer 'cells' from 1 source well to
-            target wells """
+            target wells 
+            Args:
+                idx_target_wells: index to target_wells """
+
             would_empty_cells = ((cell_vol_transfered+target_cell_vol) >= source_wells[idx_current_cells][1])
             vol_remaining_cells = source_wells[idx_current_cells][1] - cell_vol_transfered+target_cell_vol
-            
+
             # Distribute source cells into wells
+            target_well = dest_plate.wells_by_name()[target_wells[idx_target_wells]] #
             if (vol_remaining_cells < target_cell_vol) or would_empty_cells:  # full volume across cells
+                source_well = source_plate.wells_by_name()[source_wells[idx_current_cells][0]]
                 pipette.transfer(vol_remaining_cells,
-                                 source_wells[idx_current_cells][0],  # well name
-                                 target_wells[index_target_wells])
+                                 source_well,  # well name
+                                 target_well)
                 cell_vol_transfered += vol_remaining_cells
 
                 idx_current_cells += 1
+                source_well = source_plate.wells_by_name()[source_wells[idx_current_cells][0]]
                 vol_to_transfer = target_cell_vol - vol_remaining_cells
                 pipette.transfer(vol_to_transfer,
-                                 source_wells[idx_current_cells][0],
-                                 target_wells[index_target_wells])
+                                 source_well,
+                                 target_well)
                 cell_vol_transfered += vol_to_transfer
             else:  # pipetting full volume from same cell
+                source_well = source_plate.wells_by_name()[source_wells[idx_current_cells][0]]
                 pipette.transfer(target_cell_vol,
-                                 source_wells[idx_current_cells][0],
-                                 target_wells[index_target_wells])
+                                 source_well,
+                                 target_well)
                 cell_vol_transfered += target_cell_vol
 
             return cell_vol_transfered, idx_current_cells
 
-        # Transfer DNA to competent cells
+        '''
+            Transfer DNA to competent cells
+        '''
         cell_vol_transfered = 0
         idx_current_cells = 0  # index for the wells of the current cells
         for i_cell, _ in enumerate(target_wells['cells']):
 
             # Distribute source cells into wells
+            pipette.pick_up_tip()
             cell_vol_transfered, idx_current_cells = transfer_cells(source_wells['cells'],
                                                                     target_wells['cells'],
+                                                                    target_cell_vol,
                                                                     cell_vol_transfered,
                                                                     idx_current_cells,
                                                                     i_cell)
@@ -122,18 +138,22 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.drop_tip()
                              
 
-        # Controls: Transfer dH2O to control competent cells
+        '''
+            Transfer dH2O to control competent cells
+        '''
         ctrl_vol_transfered = 0
         idx_current_ctrl = 0
         for i_ctrl, _ in enumerate(target_wells['control_cells']):
             # Distribute source cells into wells
             ctrl_vol_transfered, idx_current_ctrl = transfer_cells(source_wells['cells'],
                                                                    target_wells['control_cells'],
+                                                                   target_ctrl_vol,
                                                                    ctrl_vol_transfered,
                                                                    idx_current_ctrl,
                                                                    i_ctrl)
 
+        print(protocol.deck)
 
     # "main"
-    run_robot_inits(protocol)                                       
+    run_robot_inits(protocol)
 

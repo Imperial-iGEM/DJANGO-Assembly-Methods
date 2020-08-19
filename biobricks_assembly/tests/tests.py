@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 import csv
 from . import side_effect_functions
-from biobrick_assembly.biobricks10 import bbinput.py
+from biobrick_assembly.biobricks10 import bbinput
 
 class BioBricksInputTestCase(unittest.TestCase):
 

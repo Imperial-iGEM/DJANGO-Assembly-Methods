@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-import sys 
+import sys
+import os
 parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, '/biobricks10'))
 sys.path.append(parentdir)
 import bbinput

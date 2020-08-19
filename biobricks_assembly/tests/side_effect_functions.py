@@ -72,7 +72,7 @@ def process_cons(construct):
             break
     if success_mock == 0:
         print('Unable to mock. Using actual function')
-        return biobricks10.bbinput.process_construct(construct)
+        return bbinput.process_construct(construct)
 
 
 def process_part(part, constructs_df):
@@ -84,6 +84,6 @@ def process_part(part, constructs_df):
             break
     if success_mock == 0:
         print('Unable to mock. Using actual function')
-        return biobricks10.bbinput.process_part(part, constructs_df)
+        return bbinput.process_part(part, constructs_df)
 
         

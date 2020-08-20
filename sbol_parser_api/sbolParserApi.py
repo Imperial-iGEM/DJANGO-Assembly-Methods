@@ -2,19 +2,20 @@ import sbol2
 import plateo
 import warnings
 import pandas
+from typing import List, Dict
 
 from typing import List
 
 
 class ParserSBOL:
 
-    def __init__(self, sbolDocument: sbol2.Document()):
+    def __init__(self, sbolDocument: sbol2.document.Document):
         self.doc = sbolDocument
 
     def generateCsv_for_DNABot(
             self,
-            listOfNonCombUris: list,
-            listOfCombUris: list):
+            listOfNonCombUris: List[str],
+            listOfCombUris: List[str]):
         """Create construct and parts/linkers CSVs for DNABot input
 
         Args:
@@ -42,7 +43,12 @@ class ParserSBOL:
 
         # TODO: Insert up to 7 linkers - to handle on frontend?
 
-        # TODO: Create plate from all constructs
+        # Create plateo construct plates
+        constructPlates = self.getPlateoConstructPlates(
+            allConstructs,
+            1,
+            plateo.plate.Plate96,
+            88)
 
         # TODO: Write constructs csv from plate
 
@@ -62,7 +68,8 @@ class ParserSBOL:
     def generateCsv_for_MoClo(self):
         raise NotImplementedError("Not yet implemented")
 
-    def getRootComponenentDefinitions(self) -> list:
+    def getRootComponenentDefinitions(
+            self) -> List[sbol2.componentdefinition.ComponentDefinition]:
         """Get the root component definitions of an SBOL document.
 
         Returns:
@@ -87,8 +94,8 @@ class ParserSBOL:
 
     def getListOfConstructs(
             self,
-            listOfNonCombUris: list = [],
-            listOfCombUris: list = []) -> list:
+            listOfNonCombUris: List[str] = [],
+            listOfCombUris: List[str] = []) -> List[sbol2.componentdefinition.ComponentDefinition]:
         """Get the list of constructs (component definitions) specified by
         the list of non-combinatorial URIs and combinatorial derivation URIs.
 
@@ -126,7 +133,7 @@ class ParserSBOL:
 
     def getListOfParts(
             self,
-            allConstructs: List[sbol2.ComponentDefinition] = []) -> list:
+            allConstructs: List[sbol2.componentdefinition.ComponentDefinition] = []) -> List[sbol2.componentdefinition.ComponentDefinition]:
         """Get list of parts (component defintions) from the list of
         all constructs.
 
@@ -147,7 +154,9 @@ class ParserSBOL:
         listOfParts = list(dict.fromkeys(listOfParts))
         return listOfParts
 
-    def getSortedListOfParts(self, listOfParts: list = []) -> list:
+    def getSortedListOfParts(
+            self,
+            listOfParts: List[sbol2.componentdefinition.ComponentDefinition] = []) -> List[sbol2.componentdefinition.ComponentDefinition]:
         """Get a sorted list of parts (str) from the list of parts.
         Sort by sbol2 displayId
 
@@ -161,23 +170,50 @@ class ParserSBOL:
         listOfParts.sort(key=lambda x: x.displayId)
         return listOfParts
 
-    def getDictOfComponents(self, listOfConstructs: list) -> dict:
+    def getDictOfComponents(
+            self,
+            listOfConstructs: List[sbol2.componentdefinition.ComponentDefinition]) -> Dict[str, sbol2.componentdefinition.ComponentDefinition]:
+        """Get a dictionary of components (as component definitions)
+        from the list of constructs as
+        {construct.displayId: construct.components (as component definitions)}
+
+        Args:
+            listOfConstructs (list): List of constructs
+
+        Returns:
+            dict: Dictionary of components
+        """
         return {x.displayId: x.getPrimaryStructure() for x in listOfConstructs}
 
-    def plateo_plates_from_constructs(
+    def getPlateoConstructPlates(
             self,
-            allConstructs: list,
+            allConstructs: List[sbol2.componentdefinition.ComponentDefinition],
             numPlate: int = None,
-            plate_class=None,
-            maxWellsFilled: int = None) -> list:
+            plate_class: plateo.Plate = None,
+            maxWellsFilled: int = None) -> List[plateo.Plate]:
+        """Generate a dictionary of plateo plate objects from list of constructs
+
+        Args:
+            allConstructs (list): List of constructs
+            numPlate (int): Number of plates to be generated (default = 1)
+            plate_class (plateo.Plate):
+                Class of plateo plate (default = Plate96)
+            maxWellsFilled (int): Maximum number of filled wells on a plate
+
+        Returns:
+            list: Dictionary of plates
+        """
+        # TODO: Infer numPlate or plate_class?
+        copyAllConstructs = allConstructs.copy()
         numPlate = 1 if numPlate is None else numPlate
         plate_class = (
             plateo.containers.Plate96 if plate_class is None else plate_class)
+        num_wells = plate_class.num_rows*plate_class.num_columns
         maxWellsFilled = (
-            plate_class.num_wells if maxWellsFilled is None
+            num_wells if maxWellsFilled is None
             else maxWellsFilled)
         # Check if maxwells more than num_wells of plates
-        if maxWellsFilled > plate_class.num_wells:
+        if maxWellsFilled > num_wells:
             raise ValueError(
                 "ValueError: maxWellsFilled must be less than"
                 " plate_class.num_wells")
@@ -187,10 +223,18 @@ class ParserSBOL:
                 "ValueError: Length of allConstructs must be"
                 " less than numPlate*maxWellsFilled")
         # Check if there will be empty plates
-        if len(allConstructs)/maxWellsFilled < numPlate:
+        if len(allConstructs) < (numPlate-1)*maxWellsFilled:
             warnings.warn("Number of constructs cannot fill all plates.")
-        plates = {
-            index: plateo.containers.Plate96(name="Plate %d" % index)
-            for index in range(1, numPlate + 1)}
-        # TODO: Put wells into plates
-        return NotImplementedError("Not yet implemented")
+        plates = [
+            plate_class(name="Plate %d" % index)
+            for index in range(1, numPlate + 1)]
+        for plate in plates:
+            for i in range(1, maxWellsFilled+1):
+                while copyAllConstructs:
+                    well = plate.wells[
+                        plateo.tools.index_to_wellname(i, plate.num_wells)]
+                    well.data = {"Construct": copyAllConstructs.pop(0)}
+        return plates
+
+    def getConstructCsvFromPlateoPlates():
+        raise NotImplementedError("Not yet implemented")

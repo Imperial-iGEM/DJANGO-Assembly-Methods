@@ -16,13 +16,18 @@ T4_LIGASE_VOL = 1
 T4_LIGASE_VOL_10X = 2
 WATER_VOL_LIG = 11
 DIGEST_TO_CONS_VOL = 2
+DNA_TRANS_VOL = 1
+CELL_TRANS_VOL = 50
+COMPETENT_WELL_MAX_VOL = 200
 
 
 def main():
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
-    template_path = os.path.join(template_dir_path,
-                                 'bbassembly10template.py')
+    assembly_template_path = os.path.join(template_dir_path,
+                                          'bbassembly10template.py')
+    transformation_template_path = os.path.join(template_dir_path,
+                                                'bbtransformationtemplate.py')
     output_path = os.path.join(generator_dir, OUTPUT_DIR_NAME)
     constructs, dest_well_list = get_constructs(
         os.path.join(generator_dir, 'examples/constructs.csv'))
@@ -40,9 +45,21 @@ def main():
     source_to_digest, reagent_to_digest, digest_to_storage, \
         digest_to_construct, reagent_to_construct = create_assembly_dicts(
                                     constructs, parts, digest_loc, reagents)
-    create_protocol(template_path, output_path, source_to_digest,
-                    reagent_to_digest, digest_to_storage, digest_to_construct,
-                    reagent_to_construct)
+    create_assembly_protocol(assembly_template_path, output_path,
+                             source_to_digest, reagent_to_digest,
+                             digest_to_storage, digest_to_construct,
+                             reagent_to_construct)
+
+    competent_source_to_dest, control_source_to_dest, \
+        assembly_source_to_dest, water_source_to_dest \
+        = create_tranformation_dicts(constructs, water_well='A1',
+                                     controls_per_cons=False)
+
+    create_transformation_protocol(transformation_template_path, output_path,
+                                   competent_source_to_dest,
+                                   control_source_to_dest,
+                                   assembly_source_to_dest,
+                                   water_source_to_dest)
 
 
 def get_constructs(path):
@@ -350,9 +367,73 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
         digest_to_construct, reagent_to_construct
 
 
-def create_protocol(template_path, output_path, source_to_digest,
-                    reagent_to_digest, digest_to_storage, digest_to_construct,
-                    reagent_to_construct):
+def create_tranformation_dicts(constructs, water_well='A1',
+                               controls_per_cons=False):
+    competent_source_to_dest = {}
+    control_source_to_dest = {}
+    assembly_source_to_dest = {}
+    water_source_to_dest = {}
+    construct_wells = [construct['well'] for index, construct in
+                       constructs.iterrows()]
+    full_source_wells = construct_wells
+    full_dest_wells = []
+    competent_source_wells = []
+    competent_source_wells.append(next_well(full_source_wells))
+    last_competent = competent_source_wells[0]
+    competent_source_to_dest[last_competent] = []
+    full_source_wells.append(last_competent)
+
+    for index, row in constructs.iterrows():
+        construct_well = row['well']
+        assembly_source_to_dest[construct_well] = []
+        for i in range(4):
+            dest_well = next_well(full_dest_wells)
+            full_dest_wells.append(dest_well)
+            assembly_source_to_dest[construct_well].append((dest_well,
+                                                            DNA_TRANS_VOL))
+
+            # max volume of source well = 200 uL, use 150 uL for safety
+            # -> only 3 transfers of 50 uL, then get new source well
+            if len(competent_source_to_dest[last_competent]) > 2:
+                last_competent = next_well(full_source_wells)
+                competent_source_wells.append(last_competent)
+                full_source_wells.append(last_competent)
+                competent_source_to_dest[last_competent] = []
+            competent_source_to_dest[last_competent].append((dest_well,
+                                                             CELL_TRANS_VOL))
+
+    control_source_wells = []
+    control_source_wells.append(next_well(full_source_wells))
+    last_control = control_source_wells[0]
+    full_source_wells.append(last_control)
+    control_source_to_dest[last_control] = []
+
+    if controls_per_cons:
+        no_constructs = len(constructs['well'].to_list())
+        no_controls = no_constructs*3
+    else:
+        no_controls = 3
+
+    water_source_to_dest[water_well] = []
+    for i in range(no_controls):
+        dest_well = next_well(full_dest_wells)
+        full_dest_wells.append(dest_well)
+        water_source_to_dest[water_well].append((dest_well, DNA_TRANS_VOL))
+        if len(control_source_to_dest[last_control]) > 2:
+            last_control = next_well(full_source_wells)
+            control_source_wells.append(last_control)
+            full_source_wells.append(last_control)
+            control_source_to_dest[last_control] = []
+        control_source_to_dest[last_control].append((dest_well,
+                                                     CELL_TRANS_VOL))
+
+    return competent_source_to_dest, control_source_to_dest, \
+        assembly_source_to_dest, water_source_to_dest
+
+
+def create_assembly_protocol(template_path, output_path, source_to_digest,
+                             reagent_to_digest, digest_to_storage,
+                             digest_to_construct, reagent_to_construct):
     with open(template_path) as template_file:
         template_string = template_file.read()
     with open(os.path.join(output_path, 'bb_assembly_protocol.py'),
@@ -368,6 +449,30 @@ def create_protocol(template_path, output_path, source_to_digest,
                             + json.dumps(digest_to_construct) + '\n\n')
         protocol_file.write('reagent_to_construct = '
                             + json.dumps(reagent_to_construct) + '\n\n')
+
+        # Paste the rest of the protocol.
+        protocol_file.write(template_string)
+
+
+def create_transformation_protocol(template_path, output_path,
+                                   competent_source_to_dest,
+                                   control_source_to_dest,
+                                   assembly_source_to_dest,
+                                   water_source_to_dest):
+
+    with open(template_path) as template_file:
+        template_string = template_file.read()
+    with open(os.path.join(output_path, 'bb_transformation_protocol.py'),
+              "w+") as protocol_file:
+        # Paste in plate maps at top of file.
+        protocol_file.write('competent_source_to_dest = ' +
+                            json.dumps(competent_source_to_dest) + '\n\n')
+        protocol_file.write('control_source_to_dest = '
+                            + json.dumps(control_source_to_dest) + '\n\n')
+        protocol_file.write('assembly_source_to_dest = '
+                            + json.dumps(assembly_source_to_dest) + '\n\n')
+        protocol_file.write('water_to_dest = '
+                            + json.dumps(water_source_to_dest) + '\n\n')
 
         # Paste the rest of the protocol.
         protocol_file.write(template_string)

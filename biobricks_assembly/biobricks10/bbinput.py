@@ -16,13 +16,18 @@ T4_LIGASE_VOL = 1
 T4_LIGASE_VOL_10X = 2
 WATER_VOL_LIG = 11
 DIGEST_TO_CONS_VOL = 2
+DNA_TRANS_VOL = 1
+CELL_TRANS_VOL = 50
+COMPETENT_WELL_MAX_VOL = 200
 
 
 def main():
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
-    template_path = os.path.join(template_dir_path,
-                                 'bbassembly10template.py')
+    assembly_template_path = os.path.join(template_dir_path,
+                                          'bbassembly10template.py')
+    transformation_template_path = os.path.join(template_dir_path,
+                                                'bbtransformationtemplate.py')
     output_path = os.path.join(generator_dir, OUTPUT_DIR_NAME)
     constructs, dest_well_list = get_constructs(
         os.path.join(generator_dir, 'examples/constructs.csv'))
@@ -40,25 +45,27 @@ def main():
     source_to_digest, reagent_to_digest, digest_to_storage, \
         digest_to_construct, reagent_to_construct = create_assembly_dicts(
                                     constructs, parts, digest_loc, reagents)
-    create_protocol(template_path, output_path, source_to_digest,
-                    reagent_to_digest, digest_to_storage, digest_to_construct,
-                    reagent_to_construct)
+    create_assembly_protocol(assembly_template_path, output_path,
+                             source_to_digest, reagent_to_digest,
+                             digest_to_storage, digest_to_construct,
+                             reagent_to_construct)
+
+    competent_source_to_dest, control_source_to_dest, \
+        assembly_source_to_dest, water_source_to_dest \
+        = create_tranformation_dicts(constructs, water_well='A1',
+                                     controls_per_cons=False)
+
+    create_transformation_protocol(transformation_template_path, output_path,
+                                   competent_source_to_dest,
+                                   control_source_to_dest,
+                                   assembly_source_to_dest,
+                                   water_source_to_dest)
 
 
 def get_constructs(path):
     '''
         Returns list of construct dictionaries from csv file
     '''
-    def process_construct(construct_entry):
-        '''
-            Returns construct dictionary from row in csv file
-        '''
-        construct_dict = {'name': [construct_entry[0]],
-                          'well': [construct_entry[1]], 'upstream':
-                          [construct_entry[2]], 'downstream':
-                          [construct_entry[3]], 'plasmid': [
-                                          construct_entry[4]]}
-        return construct_dict
     constructs_list = []
     dest_well_list = []
     with open(path, 'r') as csvfile:
@@ -72,9 +79,21 @@ def get_constructs(path):
                     construct_dict = process_construct(construct)
                     construct_df = pd.DataFrame.from_dict(construct_dict)
                     constructs_list.append(construct_df)
-                    dest_well_list.append(construct_dict['well'])
+                    dest_well_list.append(construct_dict['well'][0])
     merged_constructs_list = pd.concat(constructs_list, ignore_index=True)
     return merged_constructs_list, dest_well_list
+
+
+def process_construct(construct_entry):
+    '''
+        Returns construct dictionary from row in csv file
+    '''
+    construct_dict = {'name': [construct_entry[0]],
+                      'well': [construct_entry[1]], 'upstream':
+                      [construct_entry[2]], 'downstream':
+                      [construct_entry[3]], 'plasmid': [
+                                      construct_entry[4]]}
+    return construct_dict
 
 
 def get_parts(path, constructs_list):
@@ -83,51 +102,6 @@ def get_parts(path, constructs_list):
         Uses constructs_list to record the number of times the part is used
         in the constructs and the roles it plays.
     '''
-    def process_part(part, constructs_list):
-        '''
-            Returns a part dictionary with detailed information.
-        '''
-        part_dict = {'name': [part[0]], 'well': [part[1]]}
-        occ, cons_in = count_part_occurences(constructs_list, part)
-        part_dict['occurences'] = occ
-
-        # part_dict['occurences'][2] = number of time part is actually plasmid
-        # plasmids cannot be inserted as parts, and vice versa
-        if part_dict['occurences'][2] > 0:
-            digests = 1
-            part_dict['roles'] = [['plasmid']]
-        elif part_dict['occurences'][0] > 0:
-            if part_dict['occurences'][1] > 0:
-                digests = 2
-                part_dict['roles'] = [['upstream', 'downstream']]
-            else:
-                digests = 1
-                part_dict['roles'] = [['upstream']]
-        elif part_dict['occurences'][1] > 0:
-            digests = 1
-            part_dict['roles'] = [['downstream']]
-        else:
-            digests = 0  # part/plasmid not in constructs
-            part_dict['roles'] = [[]]
-
-        if len(part) == 2:
-            concentration = DEFAULT_CONCENTRATION
-            part_vol = 1
-        else:
-            concentration = int(part[2])
-            part_vol = math.ceil(PART_AMOUNT/concentration)
-        part_dict['digests'] = [digests]
-        part_dict['concentration'] = [concentration]
-        part_dict['part_vol'] = [part_vol]
-        water_vol = FILL_VOL - part_vol - 2*ENZ_VOL - NEB_BUFFER_10X_VOL
-        part_dict['water_vol'] = [water_vol]
-        part_vol_tot = part_vol*digests
-        part_dict['part_vol_tot'] = [part_vol_tot]
-        water_vol_tot = water_vol*digests
-        part_dict['water_vol_tot'] = [water_vol_tot]
-        part_dict['occurences'] = [part_dict['occurences']]
-        part_dict['constructs_in'] = [cons_in]
-        return pd.DataFrame.from_dict(part_dict)
 
     parts_list = []
     with open(path, 'r') as csvfile:
@@ -140,10 +114,58 @@ def get_parts(path, constructs_list):
     return merged_parts_list
 
 
+def process_part(part, constructs_list):
+    '''
+        Returns a part dictionary with detailed information.
+    '''
+    part_dict = {'name': [part[0]], 'well': [part[1]]}
+    occ, cons_in = count_part_occurences(constructs_list, part)
+    part_dict['occurences'] = occ
+
+    # part_dict['occurences'][2] = number of time part is actually plasmid
+    # plasmids cannot be inserted as parts, and vice versa
+    if part_dict['occurences'][2] > 0:
+        digests = 1
+        part_dict['roles'] = [['plasmid']]
+    elif part_dict['occurences'][0] > 0:
+        if part_dict['occurences'][1] > 0:
+            digests = 2
+            part_dict['roles'] = [['upstream', 'downstream']]
+        else:
+            digests = 1
+            part_dict['roles'] = [['upstream']]
+    elif part_dict['occurences'][1] > 0:
+        digests = 1
+        part_dict['roles'] = [['downstream']]
+    else:
+        digests = 0  # part/plasmid not in constructs
+        part_dict['roles'] = [[]]
+
+    if len(part) == 2:
+        concentration = DEFAULT_CONCENTRATION
+        part_vol = 1
+    else:
+        concentration = int(part[2])
+        part_vol = math.ceil(PART_AMOUNT/concentration)
+    part_dict['digests'] = [digests]
+    part_dict['concentration'] = [concentration]
+    part_dict['part_vol'] = [part_vol]
+    water_vol = FILL_VOL - part_vol - 2*ENZ_VOL - NEB_BUFFER_10X_VOL
+    part_dict['water_vol'] = [water_vol]
+    part_vol_tot = part_vol*digests
+    part_dict['part_vol_tot'] = [part_vol_tot]
+    water_vol_tot = water_vol*digests
+    part_dict['water_vol_tot'] = [water_vol_tot]
+    part_dict['occurences'] = [part_dict['occurences']]
+    part_dict['constructs_in'] = [cons_in]
+    part_df = pd.DataFrame.from_dict(part_dict)
+    return part_df
+
+
 def get_reagents_wells(constructs_list, parts):
     '''
-        Returns dictionary with keys as reagent names and values as a list
-        of the reagent well and the volume of the reagent required.
+        Returns dataframe with rows as reagent names and cols
+        as the reagent well and the volume of the reagent required.
     '''
     reagents_well_list = []
     reagents = ['water', 'NEBBuffer10X', 'T4Ligase10X', 'T4Ligase',
@@ -178,7 +200,6 @@ def get_reagents_wells(constructs_list, parts):
         reagents_dict['well'] = [new_well]
         reagents_dict['total_vol'] = [total_volumes[i]]
         reagents_list.append(pd.DataFrame.from_dict(reagents_dict))
-
     return pd.concat(reagents_list, ignore_index=True), reagents_well_list
 
 
@@ -224,6 +245,7 @@ def get_digests(constructs_list, parts, reagents_wells_used, dest_wells_used,
 
 def next_well(wells_used):
     letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    well_avail = None
     for i in range(96):
         rowindex = i // 12
         row = letter[rowindex]
@@ -241,6 +263,7 @@ def next_well(wells_used):
 
 def next_well_reagent(wells_used):
     letter = ['A', 'B', 'C', 'D']
+    well_avail = None
     for i in range(24):
         rowindex = i // 6
         row = letter[rowindex]
@@ -340,14 +363,77 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
                                     [T4_LIGASE_VOL_10X]*len(constructs)))]
     reagent_to_construct['A4'] = [*zip(construct_wells, tuple(
                                     [T4_LIGASE_VOL]*len(constructs)))]
-
     return source_to_digest, reagent_to_digest, digest_to_storage, \
         digest_to_construct, reagent_to_construct
 
 
-def create_protocol(template_path, output_path, source_to_digest,
-                    reagent_to_digest, digest_to_storage, digest_to_construct,
-                    reagent_to_construct):
+def create_tranformation_dicts(constructs, water_well='A1',
+                               controls_per_cons=False):
+    competent_source_to_dest = {}
+    control_source_to_dest = {}
+    assembly_source_to_dest = {}
+    water_source_to_dest = {}
+    construct_wells = [construct['well'] for index, construct in
+                       constructs.iterrows()]
+    full_source_wells = construct_wells
+    full_dest_wells = []
+    competent_source_wells = []
+    competent_source_wells.append(next_well(full_source_wells))
+    last_competent = competent_source_wells[0]
+    competent_source_to_dest[last_competent] = []
+    full_source_wells.append(last_competent)
+
+    for index, row in constructs.iterrows():
+        construct_well = row['well']
+        assembly_source_to_dest[construct_well] = []
+        for i in range(4):
+            dest_well = next_well(full_dest_wells)
+            full_dest_wells.append(dest_well)
+            assembly_source_to_dest[construct_well].append((dest_well,
+                                                            DNA_TRANS_VOL))
+
+            # max volume of source well = 200 uL, use 150 uL for safety
+            # -> only 3 transfers of 50 uL, then get new source well
+            if len(competent_source_to_dest[last_competent]) > 2:
+                last_competent = next_well(full_source_wells)
+                competent_source_wells.append(last_competent)
+                full_source_wells.append(last_competent)
+                competent_source_to_dest[last_competent] = []
+            competent_source_to_dest[last_competent].append((dest_well,
+                                                             CELL_TRANS_VOL))
+
+    control_source_wells = []
+    control_source_wells.append(next_well(full_source_wells))
+    last_control = control_source_wells[0]
+    full_source_wells.append(last_control)
+    control_source_to_dest[last_control] = []
+
+    if controls_per_cons:
+        no_constructs = len(constructs['well'].to_list())
+        no_controls = no_constructs*3
+    else:
+        no_controls = 3
+
+    water_source_to_dest[water_well] = []
+    for i in range(no_controls):
+        dest_well = next_well(full_dest_wells)
+        full_dest_wells.append(dest_well)
+        water_source_to_dest[water_well].append((dest_well, DNA_TRANS_VOL))
+        if len(control_source_to_dest[last_control]) > 2:
+            last_control = next_well(full_source_wells)
+            control_source_wells.append(last_control)
+            full_source_wells.append(last_control)
+            control_source_to_dest[last_control] = []
+        control_source_to_dest[last_control].append((dest_well,
+                                                     CELL_TRANS_VOL))
+
+    return competent_source_to_dest, control_source_to_dest, \
+        assembly_source_to_dest, water_source_to_dest
+
+
+def create_assembly_protocol(template_path, output_path, source_to_digest,
+                             reagent_to_digest, digest_to_storage,
+                             digest_to_construct, reagent_to_construct):
     with open(template_path) as template_file:
         template_string = template_file.read()
     with open(os.path.join(output_path, 'bb_assembly_protocol.py'),
@@ -363,6 +449,30 @@ def create_protocol(template_path, output_path, source_to_digest,
                             + json.dumps(digest_to_construct) + '\n\n')
         protocol_file.write('reagent_to_construct = '
                             + json.dumps(reagent_to_construct) + '\n\n')
+
+        # Paste the rest of the protocol.
+        protocol_file.write(template_string)
+
+
+def create_transformation_protocol(template_path, output_path,
+                                   competent_source_to_dest,
+                                   control_source_to_dest,
+                                   assembly_source_to_dest,
+                                   water_source_to_dest):
+
+    with open(template_path) as template_file:
+        template_string = template_file.read()
+    with open(os.path.join(output_path, 'bb_transformation_protocol.py'),
+              "w+") as protocol_file:
+        # Paste in plate maps at top of file.
+        protocol_file.write('competent_source_to_dest = ' +
+                            json.dumps(competent_source_to_dest) + '\n\n')
+        protocol_file.write('control_source_to_dest = '
+                            + json.dumps(control_source_to_dest) + '\n\n')
+        protocol_file.write('assembly_source_to_dest = '
+                            + json.dumps(assembly_source_to_dest) + '\n\n')
+        protocol_file.write('water_to_dest = '
+                            + json.dumps(water_source_to_dest) + '\n\n')
 
         # Paste the rest of the protocol.
         protocol_file.write(template_string)

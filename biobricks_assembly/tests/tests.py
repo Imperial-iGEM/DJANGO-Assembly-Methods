@@ -213,6 +213,27 @@ class BioBricksInputTestCase(unittest.TestCase):
                                             ('A3', 11)],
                                      'A3': [('A1', 2), ('A2', 2), ('A3', 2)],
                                      'A4': [('A1', 1), ('A2', 1), ('A3', 1)]}
+        
+        self.competent_source_to_dest = {"A4": [("A1", 50), ("A2", 50),
+                                                ("A3", 50)],
+                                         "A5": [("A4", 50), ("A5", 50),
+                                                ("A6", 50)],
+                                         "A6": [("A7", 50), ("A8", 50),
+                                                ("A9", 50)],
+                                         "A7": [("A10", 50), ("A11", 50),
+                                                ("A12", 50)]}
+
+        self.control_source_to_dest = {"A8": [("B1", 50), ("B2", 50),
+                                              ("B3", 50)]}
+
+        self.assembly_source_to_dest = {"A1": [("A1", 1), ("A2", 1), ("A3", 1),
+                                               ("A4", 1)],
+                                        "A2": [("A5", 1), ("A6", 1), ("A7", 1),
+                                               ("A8", 1)],
+                                        "A3": [("A9", 1), ("A10", 1),
+                                               ("A11", 1), ("A12", 1)]}
+
+        self.water_to_dest = {"A1": [("B1", 1), ("B2", 1), ("B3", 1)]}
 
     def tearDown(self):
         pass
@@ -303,6 +324,14 @@ class BioBricksInputTestCase(unittest.TestCase):
         self.assertDictEqual(dict3, self.digest_to_storage)
         self.assertDictEqual(dict4, self.digest_to_construct)
         self.assertDictEqual(dict5, self.reagent_to_construct)
+       
+    def test_create_tranformation_dicts(self):
+        dict1, dict2, dict3, dict4 = bbinput.create_tranformation_dicts(
+            self.constructs_df)
+        self.assertDictEqual(dict1, self.competent_source_to_dest)
+        self.assertDictEqual(dict2, self.control_source_to_dest)
+        self.assertDictEqual(dict3, self.assembly_source_to_dest)
+        self.assertDictEqual(dict4, self.water_to_dest)
 
 
 if __name__ == "__main__":

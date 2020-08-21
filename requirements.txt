@@ -32,7 +32,7 @@ primers==0.2.6
 pyflakes==2.2.0
 pylint==2.5.3
 pyrsistent==0.15.4
-pySBOL==2.3.3.post8
+pySBOL >= 2.3.2
 pyserial==3.4
 python-dateutil==2.8.0
 pytz==2019.3

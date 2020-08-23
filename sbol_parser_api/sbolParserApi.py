@@ -1,7 +1,10 @@
 import sbol2
 import plateo
+import plateo.containers
+import plateo.tools
 import warnings
-import pandas
+import pandas as pd
+import uuid
 from typing import List, Dict
 
 
@@ -13,7 +16,8 @@ class ParserSBOL:
     def generateCsv_for_DNABot(
             self,
             listOfNonCombUris: List[str],
-            listOfCombUris: List[str]):
+            listOfCombUris: List[str]
+    ):
         """Create construct and parts/linkers CSVs for DNABot input
 
         Args:
@@ -45,10 +49,14 @@ class ParserSBOL:
         constructPlates = self.getPlateoConstructPlates(
             allConstructs,
             1,
-            plateo.plate.Plate96,
-            88)
+            plateo.containers.Plate96,
+            88
+        )
 
-        # TODO: Write constructs csv from plate
+        # Create construct CSVs from plateo plates
+        for plate in constructPlates:
+            uniqueId = uuid.uuid4().hex
+            self.getConstructCsvFromPlateoPlate(plate, uniqueId)
 
         # Obtain parts and linkers
         listOfParts = self.getListOfParts(allConstructs)
@@ -93,7 +101,8 @@ class ParserSBOL:
     def getListOfConstructs(
             self,
             listOfNonCombUris: List[str] = [],
-            listOfCombUris: List[str] = []) -> List[sbol2.componentdefinition.ComponentDefinition]:
+            listOfCombUris: List[str] = []
+    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
         """Get the list of constructs (component definitions) specified by
         the list of non-combinatorial URIs and combinatorial derivation URIs.
 
@@ -126,7 +135,7 @@ class ParserSBOL:
         raise NotImplementedError("Not yet implemented")
 
     # TODO: Implement a Filter class?
-    def filter(self):
+    def filterConstructs(self):
         raise NotImplementedError("Not yet implemented")
 
     def getListOfParts(
@@ -154,7 +163,8 @@ class ParserSBOL:
 
     def getSortedListOfParts(
             self,
-            listOfParts: List[sbol2.componentdefinition.ComponentDefinition] = []) -> List[sbol2.componentdefinition.ComponentDefinition]:
+            listOfParts: List[sbol2.componentdefinition.ComponentDefinition] = []
+    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
         """Get a sorted list of parts (str) from the list of parts.
 
         Args:
@@ -185,8 +195,9 @@ class ParserSBOL:
             allConstructs: List[sbol2.componentdefinition.ComponentDefinition],
             numPlate: int = None,
             plate_class: plateo.Plate = None,
-            maxWellsFilled: int = None) -> List[plateo.Plate]:
-        """Generate a dictionary of plateo plate objects from list of constructs
+            maxWellsFilled: int = None
+    ) -> List[plateo.Plate]:
+        """Generate a list of plateo plate objects from list of constructs
 
         Args:
             allConstructs (list): List of constructs
@@ -196,7 +207,7 @@ class ParserSBOL:
             maxWellsFilled (int): Maximum number of filled wells on a plate
 
         Returns:
-            list: Dictionary of plates
+            list: List of plates
         """
         # TODO: Infer numPlate or plate_class?
         copyAllConstructs = allConstructs.copy()
@@ -231,5 +242,140 @@ class ParserSBOL:
                     well.data = {"Construct": copyAllConstructs.pop(0)}
         return plates
 
-    def getConstructCsvFromPlateoPlates():
-        raise NotImplementedError("Not yet implemented")
+    def getAllConstructsFromPlateoPlate(
+        self,
+        constructPlate: plateo.Plate
+    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        '''Get a list of all constructs (as component definitions) from a
+        Plateo plate.
+
+        Args:
+            constructPlate (plateo.Plate): Plateo plate containing constructs
+
+        Returns:
+            list: List of all constructs (as component definitions)
+        '''
+        allConstructs = []
+        for well in constructPlate.iter_wells():
+            for key, value in well.data.items():
+                allConstructs.append(value)
+        return allConstructs
+
+    def getMinNumberOfBasicParts(
+        self,
+        allConstructs: List[sbol2.componentdefinition.ComponentDefinition]
+    ) -> int:
+        '''Get the minimum number of Part/Linker pairs required to perform
+        BASIC assembly for all constructs.
+
+        Args:
+            allConstructs (list): List of all constructs as component
+                definitions
+
+        Returns:
+            int: Number of Part/Linker paris for BASIC assembly
+        '''
+        minValue = 0
+        numParts = 0
+        for cd in allConstructs:
+            components = cd.components
+            numParts = len(components) // 2
+            if minValue < numParts:
+                minValue = numParts
+        return minValue
+
+    def getConstructCsvHeader(
+        self,
+        minNumberOfBasicParts: int
+    ) -> List[str]:
+        '''Create header for Construct CSV for DNABot
+
+        Args:
+            minNumberOfBasicParts (int): Minimum number of of Part/Linker
+                pairs required to perform BASIC assembly for all constructs
+
+        Returns:
+            List[str]: List of strings describing header for Construct CSV
+        '''
+        header = ["Well"]
+        for i in range(1, minNumberOfBasicParts + 1):
+            header.extend(["Linker %d" % i, "Part %d" % i])
+        return header
+
+    def getWellComponentDictFromPlateoPlate(
+        self,
+        constructPlate: plateo.Plate
+    ) -> Dict[str, List[sbol2.componentdefinition.ComponentDefinition]]:
+        '''Get a dictionary of wells containing constructs (as
+        component definitions) in the form {Wellname:Construct}
+
+        Args:
+            constructPlate (plateo.Plate): Plateo plate containing constructs
+
+        Returns:
+            dict: Dictionary of wells containing constructs
+        '''
+        dictWellComponent = {}
+        for wellname, well in constructPlate.wells.items():
+            for key, value in well.data.items():
+                dictWellComponent[wellname] = value.getPrimaryStructure()
+        return dictWellComponent
+
+    def getListFromWellComponentDict(
+        self,
+        dictWellComponent: Dict[str, sbol2.componentdefinition.ComponentDefinition]
+    ) -> List[str]:
+        '''Get a concatenated list of wellname and components (as display ID)
+        comprising the construct from the dictionary of wells containing
+        constructs.
+
+        Args:
+            dictWellComponent: Dictionary of wells containing constructs
+
+        Returns:
+            List[str]: List of wellnames and components (as display ID)
+        '''
+        listWellComponent = []
+        for k, v in dictWellComponent.items():
+            listWellComponent.append([k, *(x.displayId for x in v)])
+        return listWellComponent
+
+    def getConstructDfFromPlateoPlate(
+        self,
+        constructPlate: plateo.Plate
+    ) -> pd.DataFrame:
+        '''Get dataframe of constructs from Plateo plate containing constructs
+
+        Args:
+            constructPlate (plateo.Plate): Plateo plate containing constructs
+
+        Returns:
+            pd.DataFrame: Dataframe of constructs
+        '''
+        allComponents = self.getAllConstructsFromPlateoPlate(constructPlate)
+        minNumberOfBasicParts = self.getMinNumberOfBasicParts(allComponents)
+        header = self.getConstructCsvHeader(minNumberOfBasicParts)
+        dictWellComponent = self.getWellComponentDictFromPlateoPlate(constructPlate)
+        listWellComponent = self.getListFromWellComponentDict(dictWellComponent)
+        # Create sparse array from list
+        sparr = pd.arrays.SparseArray(listWellComponent)
+        # Create df from sparr
+        df = pd.DataFrame(data=sparr, columns=header)
+        return df
+
+    def getConstructCsvFromPlateoPlate(
+        self,
+        constructPlate: List[plateo.Plate],
+        uniqueId: str = None
+    ):
+        '''Convert construct dataframe into CSV and creates CSV file in the same
+        directory.
+
+        Args:
+            constructPlate (plateo.Plate): Plateo plate containing constructs
+            uniqueId (str): Unique ID appended to filename
+        '''
+        constructDf = self.getConstructDfFromPlateoPlate(constructPlate)
+        constructDf.to_csv(
+            "construct_"+uniqueId+".csv",
+            index=False)

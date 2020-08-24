@@ -235,6 +235,81 @@ class BioBricksInputTestCase(unittest.TestCase):
 
         self.water_to_dest = {"A1": [("B1", 1), ("B2", 1), ("B3", 1)]}
 
+        self.entry_dfs = [
+            pd.DataFrame(data={'name': ['construct1-0'],
+                               'number': [0], 'cell_type': ['competent'],
+                               'construct': 'construct1', 'construct_well':
+                               ['A1'], 'cell_well': ['A4'], 'dest_well':
+                               ['A1'], 'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct1-1'], 'number': [1],
+                               'cell_type': ['competent'], 'construct':
+                               'construct1', 'construct_well': ['A1'],
+                               'cell_well': ['A4'], 'dest_well': ['A2'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct1-2'], 'number': [2],
+                               'cell_type': ['competent'], 'construct':
+                               'construct1', 'construct_well': ['A1'],
+                               'cell_well': ['A4'], 'dest_well': ['A3'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct1-3'], 'number': [3],
+                               'cell_type': ['competent'], 'construct':
+                               'construct1', 'construct_well': ['A1'],
+                               'cell_well': ['A5'], 'dest_well': ['A4'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct2-0'], 'number': [0],
+                               'cell_type': ['competent'], 'construct':
+                               'construct2', 'construct_well': ['A2'],
+                               'cell_well': ['A5'], 'dest_well': ['A5'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct2-1'], 'number': [1],
+                               'cell_type': ['competent'], 'construct':
+                               'construct2', 'construct_well': ['A2'],
+                               'cell_well': ['A5'], 'dest_well': ['A6'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct2-2'], 'number': [2],
+                               'cell_type': ['competent'], 'construct':
+                               'construct2', 'construct_well': ['A2'],
+                               'cell_well': ['A6'], 'dest_well': ['A7'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct2-3'], 'number': [3],
+                               'cell_type': ['competent'], 'construct':
+                               'construct2', 'construct_well': ['A2'],
+                               'cell_well': ['A6'], 'dest_well': ['A8'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct3-0'], 'number': [0],
+                               'cell_type': ['competent'], 'construct':
+                               'construct3', 'construct_well': ['A3'],
+                               'cell_well': ['A6'], 'dest_well': ['A9'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct3-1'], 'number': [1],
+                               'cell_type': ['competent'], 'construct':
+                               'construct3', 'construct_well': ['A3'],
+                               'cell_well': ['A7'], 'dest_well': ['A10'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct3-2'], 'number': [2],
+                               'cell_type': ['competent'], 'construct':
+                               'construct3', 'construct_well': ['A3'],
+                               'cell_well': ['A7'], 'dest_well': ['A11'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['construct3-3'], 'number': [3],
+                               'cell_type': ['competent'], 'construct':
+                               'construct3', 'construct_well': ['A3'],
+                               'cell_well': ['A7'], 'dest_well': ['A12'],
+                               'reagent_well': [None]}),
+            pd.DataFrame(data={'name': ['control-0'], 'number': [0],
+                               'cell_type': ['control'], 'construct': [None],
+                               'construct_well': [None], 'cell_well': ['A8'],
+                               'dest_well': ['B1'], 'reagent_well': ['A1']}),
+            pd.DataFrame(data={'name': ['control-1'], 'number': [1],
+                               'cell_type': ['control'], 'construct': [None],
+                               'construct_well': [None], 'cell_well': ['A8'],
+                               'dest_well': ['B2'], 'reagent_well': ['A1']}),
+            pd.DataFrame(data={'name': ['control-2'], 'number': [2],
+                               'cell_type': ['control'], 'construct': [None],
+                               'construct_well': [None], 'cell_well': ['A8'],
+                               'dest_well': ['B3'], 'reagent_well': ['A1']})]
+        self.transform_df = pd.concat(self.entry_dfs, ignore_index=True)
+
     def tearDown(self):
         pass
 
@@ -326,12 +401,15 @@ class BioBricksInputTestCase(unittest.TestCase):
         self.assertDictEqual(dict5, self.reagent_to_construct)
        
     def test_create_tranformation_dicts(self):
-        dict1, dict2, dict3, dict4 = bbinput.create_tranformation_dicts(
+        dict1, dict2, dict3, dict4, df = bbinput.create_tranformation_dicts(
             self.constructs_df)
         self.assertDictEqual(dict1, self.competent_source_to_dest)
         self.assertDictEqual(dict2, self.control_source_to_dest)
         self.assertDictEqual(dict3, self.assembly_source_to_dest)
         self.assertDictEqual(dict4, self.water_to_dest)
+        for col in df.columns:
+            self.assertListEqual(df[col].to_list(),
+                                 self.transform_df[col].to_list())
 
 
 if __name__ == "__main__":

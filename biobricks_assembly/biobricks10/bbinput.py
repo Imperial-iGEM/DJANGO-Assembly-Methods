@@ -36,12 +36,13 @@ def main():
     reagents, reagents_well_list = get_reagents_wells(constructs, parts)
     digest_loc, parts_df = get_digests(constructs, parts, reagents_well_list,
                                        dest_well_list, reagents)
-    parts_df.to_csv(path_or_buf=os.path.join(generator_dir,
+    parts_df.to_csv(path_or_buf=os.path.join(output_path,
                                              'parts_df.csv'), index=False)
-    reagents.to_csv(path_or_buf=os.path.join(generator_dir,
+    reagents.to_csv(path_or_buf=os.path.join(output_path,
                                              'reagents_df.csv'), index=False)
-    digest_loc.to_csv(path_or_buf=os.path.join(generator_dir,
+    digest_loc.to_csv(path_or_buf=os.path.join(output_path,
                                                'digests_df.csv'), index=False)
+
     source_to_digest, reagent_to_digest, digest_to_storage, \
         digest_to_construct, reagent_to_construct = create_assembly_dicts(
                                     constructs, parts, digest_loc, reagents)
@@ -51,9 +52,13 @@ def main():
                              reagent_to_construct)
 
     competent_source_to_dest, control_source_to_dest, \
-        assembly_source_to_dest, water_source_to_dest \
+        assembly_source_to_dest, water_source_to_dest, transform_df \
         = create_tranformation_dicts(constructs, water_well='A1',
                                      controls_per_cons=False)
+
+    transform_df.to_csv(path_or_buf=os.path.join(output_path,
+                                                 'transform_df.csv'),
+                        index=False)
 
     create_transformation_protocol(transformation_template_path, output_path,
                                    competent_source_to_dest,
@@ -382,11 +387,18 @@ def create_tranformation_dicts(constructs, water_well='A1',
     last_competent = competent_source_wells[0]
     competent_source_to_dest[last_competent] = []
     full_source_wells.append(last_competent)
+    entry_dicts = []
 
     for index, row in constructs.iterrows():
         construct_well = row['well']
         assembly_source_to_dest[construct_well] = []
         for i in range(4):
+            entry_dict = {}
+            entry_dict['name'] = [row['name'] + '-' + str(i)]
+            entry_dict['number'] = [i]
+            entry_dict['cell_type'] = ['competent']
+            entry_dict['construct'] = row['name']
+            entry_dict['construct_well'] = [row['well']]
             dest_well = next_well(full_dest_wells)
             full_dest_wells.append(dest_well)
             assembly_source_to_dest[construct_well].append((dest_well,
@@ -401,6 +413,10 @@ def create_tranformation_dicts(constructs, water_well='A1',
                 competent_source_to_dest[last_competent] = []
             competent_source_to_dest[last_competent].append((dest_well,
                                                              CELL_TRANS_VOL))
+            entry_dict['cell_well'] = [last_competent]
+            entry_dict['dest_well'] = [dest_well]
+            entry_dict['reagent_well'] = [None]
+            entry_dicts.append(pd.DataFrame.from_dict(entry_dict))
 
     control_source_wells = []
     control_source_wells.append(next_well(full_source_wells))
@@ -416,6 +432,11 @@ def create_tranformation_dicts(constructs, water_well='A1',
 
     water_source_to_dest[water_well] = []
     for i in range(no_controls):
+        entry_dict['name'] = ['control' + '-' + str(i)]
+        entry_dict['number'] = [i]
+        entry_dict['cell_type'] = ['control']
+        entry_dict['construct'] = [None]
+        entry_dict['construct_well'] = [None]
         dest_well = next_well(full_dest_wells)
         full_dest_wells.append(dest_well)
         water_source_to_dest[water_well].append((dest_well, DNA_TRANS_VOL))
@@ -426,9 +447,15 @@ def create_tranformation_dicts(constructs, water_well='A1',
             control_source_to_dest[last_control] = []
         control_source_to_dest[last_control].append((dest_well,
                                                      CELL_TRANS_VOL))
+        entry_dict['cell_well'] = [last_control]
+        entry_dict['dest_well'] = [dest_well]
+        entry_dict['reagent_well'] = [water_well]
+        entry_dicts.append(pd.DataFrame.from_dict(entry_dict))
+
+    transform_df = pd.concat(entry_dicts, ignore_index=True)
 
     return competent_source_to_dest, control_source_to_dest, \
-        assembly_source_to_dest, water_source_to_dest
+        assembly_source_to_dest, water_source_to_dest, transform_df
 
 
 def create_assembly_protocol(template_path, output_path, source_to_digest,

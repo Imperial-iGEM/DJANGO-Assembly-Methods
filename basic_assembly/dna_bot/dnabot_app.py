@@ -11,6 +11,8 @@ import numpy as np
 import json
 import sys
 from .mplates import final_well
+import random
+import string
 
 # now this in a python function
 # we need to consider having this as a command line tool
@@ -164,11 +166,14 @@ def dnabot(ethanol_well_for_stage_2,
 
     # Write non-OT2 scripts
     os.chdir(generator_dir)
+
     if 'metainformation' in os.listdir():
         pass
     else:
-        os.makedirs('metainformation')
-    os.chdir('metainformation')
+        random = get_random_string(20)
+        my_meta_dir = os.path.join('basic_files/output',random,'metainformation')
+        os.makedirs(my_meta_dir)
+    os.chdir(my_meta_dir)
     master_mix_df = generate_master_mix_df(clips_df['number'].sum())
     sources_paths_df = generate_sources_paths_df(
         output_sources_paths, SOURCE_DECK_POS)
@@ -459,8 +464,22 @@ def generate_ot2_script(ot2_script_path, template_path, **kwargs):
 
     """
     print("output location of ot2_script_path:{}".format(ot2_script_path))
-    print(os.path.realpath(ot2_script_path))
-    this_object_output_path = os.path.realpath(ot2_script_path)
+    random = get_random_string(20)
+    print('random: {}'.format(random))
+    output_str = os.path.join('basic_files/output',random)
+
+    working_directory = os.getcwd()
+    
+    os.makedirs(output_str)
+    os.chdir(output_str)
+
+    full_file_path = os.path.join(output_str,ot2_script_path)
+
+
+
+    #print('output string: {}'.format(output_str))
+    #print(os.path.realpath(output_str))
+    this_object_output_path = os.path.realpath(full_file_path)
 
     #current_path = os.getcwd()
     #remove_example = os.path.split("my_examples")
@@ -489,6 +508,8 @@ def generate_ot2_script(ot2_script_path, template_path, **kwargs):
             for index, line in enumerate(rf):
                 if index >= function_start - 1:
                     wf.write(line)
+
+    os.chdir(working_directory)
     return this_object_output_path
 
 
@@ -562,6 +583,12 @@ def handle_2_columns(datalist):
         mylist[0] = datalist
         return mylist
     return datalist
+
+def get_random_string(length):
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    #print("Random string of length", length, "is:", result_str)
+    return result_str
 
 #if __name__ == '__main__':
 #    main()

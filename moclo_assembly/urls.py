@@ -3,7 +3,7 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register('Basic', views.BasicView, 'Basic')
+router.register('Moclo', views.MocloView)
 
 urlpatterns = [
     path('', include(router.urls))

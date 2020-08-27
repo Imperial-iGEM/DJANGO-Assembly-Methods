@@ -1,0 +1,4 @@
+When running opentrons_simulate to test the transformation protocol, enter:
+opentrons_simulate -L your/labware/path transform_moclo_protocol.py
+This is so that the custom labware works.
+The labware can currently be found in this folder. 

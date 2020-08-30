@@ -8,8 +8,6 @@ import uuid
 import numpy as np
 from typing import List, Dict
 
-from typing import List
-
 
 class ParserSBOL:
 

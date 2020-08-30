@@ -1,0 +1,1403 @@
+<?xml version='1.0' ?>
+<rdf:RDF xmlns:pr="http://www.dummy.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sbol="http://sbols.org/v2#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:prov="http://www.w3.org/ns/prov#">
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3_Prefix"/>
+    <sbol:displayId>L1RBS3_Prefix</sbol:displayId>
+    <dcterms:title>L1RBS3_Prefix</dcterms:title>
+    <dcterms:description>RBS Linkers Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS3_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L3_Suffix"/>
+    <sbol:displayId>L3_Suffix</sbol:displayId>
+    <dcterms:title>L3_Suffix</dcterms:title>
+    <dcterms:description>Neutral Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L3_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L4">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L4"/>
+    <sbol:displayId>L4</sbol:displayId>
+    <dcterms:title>L4</dcterms:title>
+    <dcterms:description>Neutral Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L4/L4_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L4/L4_S"/>
+        <sbol:displayId>L4_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L4_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L4/L4_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L4/L4_P"/>
+        <sbol:displayId>L4_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L4_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L4/L4_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L4/L4_sc"/>
+        <sbol:displayId>L4_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L4/L4_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L4/L4_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L4"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2_Prefix"/>
+    <sbol:displayId>L2_Prefix</sbol:displayId>
+    <dcterms:title>L2_Prefix</dcterms:title>
+    <dcterms:description>Neutral Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS4">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS4"/>
+    <sbol:displayId>L2RBS4</sbol:displayId>
+    <dcterms:title>L2RBS4</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2RBS4/L2RBS4_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS4/L2RBS4_S"/>
+        <sbol:displayId>L2RBS4_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2RBS4_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2RBS4/L2RBS4_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS4/L2RBS4_P"/>
+        <sbol:displayId>L2RBS4_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2RBS4_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L2RBS4/L2RBS4_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS4/L2RBS4_sc"/>
+        <sbol:displayId>L2RBS4_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L2RBS4/L2RBS4_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L2RBS4/L2RBS4_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS4"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS2">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS2"/>
+    <sbol:displayId>L2RBS2</sbol:displayId>
+    <dcterms:title>L2RBS2</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2RBS2/L2RBS2_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS2/L2RBS2_S"/>
+        <sbol:displayId>L2RBS2_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2RBS2_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2RBS2/L2RBS2_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS2/L2RBS2_P"/>
+        <sbol:displayId>L2RBS2_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2RBS2_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L2RBS2/L2RBS2_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS2/L2RBS2_sc"/>
+        <sbol:displayId>L2RBS2_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L2RBS2/L2RBS2_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L2RBS2/L2RBS2_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS2"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LF1_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF1_Prefix"/>
+    <sbol:displayId>LF1_Prefix</sbol:displayId>
+    <dcterms:title>LF1_Prefix</dcterms:title>
+    <dcterms:description>Fusion Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LF1_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LF3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF3_Suffix"/>
+    <sbol:displayId>LF3_Suffix</sbol:displayId>
+    <dcterms:title>LF3_Suffix</dcterms:title>
+    <dcterms:description>Fusion Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LF3_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMP_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP_Prefix"/>
+    <sbol:displayId>LMP_Prefix</sbol:displayId>
+    <dcterms:title>LMP_Prefix</dcterms:title>
+    <dcterms:description>Methylated Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMP_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS4_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS4_Prefix"/>
+    <sbol:displayId>L2RBS4_Prefix</sbol:displayId>
+    <dcterms:title>L2RBS4_Prefix</dcterms:title>
+    <dcterms:description>RBS Linkers Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS4_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L7_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L7_Prefix"/>
+    <sbol:displayId>L7_Prefix</sbol:displayId>
+    <dcterms:title>L7_Prefix</dcterms:title>
+    <dcterms:description>Neutral Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L7_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS4_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS4_Suffix"/>
+    <sbol:displayId>L1RBS4_Suffix</sbol:displayId>
+    <dcterms:title>L1RBS4_Suffix</dcterms:title>
+    <dcterms:description>RBS Linkers Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS4_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L4_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L4_Suffix"/>
+    <sbol:displayId>L4_Suffix</sbol:displayId>
+    <dcterms:title>L4_Suffix</dcterms:title>
+    <dcterms:description>Neutral Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L4_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1_Prefix"/>
+    <sbol:displayId>L1_Prefix</sbol:displayId>
+    <dcterms:title>L1_Prefix</dcterms:title>
+    <dcterms:description>Neutral Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMS">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS"/>
+    <sbol:displayId>LMS</sbol:displayId>
+    <dcterms:title>LMS</dcterms:title>
+    <dcterms:description>Methylated Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LMS/LMS_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS/LMS_P"/>
+        <sbol:displayId>LMS_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMS_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LMS/LMS_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS/LMS_S"/>
+        <sbol:displayId>LMS_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMS_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/LMS/LMS_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS/LMS_sc"/>
+        <sbol:displayId>LMS_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/LMS/LMS_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/LMS/LMS_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMS"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L7">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L7"/>
+    <sbol:displayId>L7</sbol:displayId>
+    <dcterms:title>L7</dcterms:title>
+    <dcterms:description>Neutral Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L7/L7_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L7/L7_S"/>
+        <sbol:displayId>L7_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L7_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L7/L7_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L7/L7_P"/>
+        <sbol:displayId>L7_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L7_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L7/L7_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L7/L7_sc"/>
+        <sbol:displayId>L7_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L7/L7_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L7/L7_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L7"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMP">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP"/>
+    <sbol:displayId>LMP</sbol:displayId>
+    <dcterms:title>LMP</dcterms:title>
+    <dcterms:description>Methylated Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LMP/LMP_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP/LMP_P"/>
+        <sbol:displayId>LMP_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMP_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LMP/LMP_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP/LMP_S"/>
+        <sbol:displayId>LMP_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMP_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/LMP/LMP_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP/LMP_sc"/>
+        <sbol:displayId>LMP_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/LMP/LMP_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/LMP/LMP_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMP"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMS_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS_Suffix"/>
+    <sbol:displayId>LMS_Suffix</sbol:displayId>
+    <dcterms:title>LMS_Suffix</dcterms:title>
+    <dcterms:description>Methylated Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMS_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3_Suffix"/>
+    <sbol:displayId>L1RBS3_Suffix</sbol:displayId>
+    <dcterms:title>L1RBS3_Suffix</dcterms:title>
+    <dcterms:description>RBS Linkers Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS3_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS4_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS4_Prefix"/>
+    <sbol:displayId>L1RBS4_Prefix</sbol:displayId>
+    <dcterms:title>L1RBS4_Prefix</dcterms:title>
+    <dcterms:description>RBS Linkers Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS4_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LF3">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF3"/>
+    <sbol:displayId>LF3</sbol:displayId>
+    <dcterms:title>LF3</dcterms:title>
+    <dcterms:description>Fusion Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LF3/LF3_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF3/LF3_P"/>
+        <sbol:displayId>LF3_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LF3_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LF3/LF3_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF3/LF3_S"/>
+        <sbol:displayId>LF3_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LF3_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/LF3/LF3_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF3/LF3_sc"/>
+        <sbol:displayId>LF3_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/LF3/LF3_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/LF3/LF3_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LF3"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L5_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L5_Suffix"/>
+    <sbol:displayId>L5_Suffix</sbol:displayId>
+    <dcterms:title>L5_Suffix</dcterms:title>
+    <dcterms:description>Neutral Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L5_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LF2_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF2_Suffix"/>
+    <sbol:displayId>LF2_Suffix</sbol:displayId>
+    <dcterms:title>LF2_Suffix</dcterms:title>
+    <dcterms:description>Fusion Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LF2_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L6_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L6_Prefix"/>
+    <sbol:displayId>L6_Prefix</sbol:displayId>
+    <dcterms:title>L6_Prefix</dcterms:title>
+    <dcterms:description>Neutral Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L6_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LF2">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF2"/>
+    <sbol:displayId>LF2</sbol:displayId>
+    <dcterms:title>LF2</dcterms:title>
+    <dcterms:description>Fusion Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LF2/LF2_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF2/LF2_P"/>
+        <sbol:displayId>LF2_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LF2_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LF2/LF2_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF2/LF2_S"/>
+        <sbol:displayId>LF2_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LF2_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/LF2/LF2_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF2/LF2_sc"/>
+        <sbol:displayId>LF2_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/LF2/LF2_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/LF2/LF2_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LF2"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS4_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS4_Suffix"/>
+    <sbol:displayId>L2RBS4_Suffix</sbol:displayId>
+    <dcterms:title>L2RBS4_Suffix</dcterms:title>
+    <dcterms:description>RBS Linkers Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS4_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LF1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF1"/>
+    <sbol:displayId>LF1</sbol:displayId>
+    <dcterms:title>LF1</dcterms:title>
+    <dcterms:description>Fusion Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LF1/LF1_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF1/LF1_S"/>
+        <sbol:displayId>LF1_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LF1_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LF1/LF1_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF1/LF1_P"/>
+        <sbol:displayId>LF1_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LF1_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/LF1/LF1_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF1/LF1_sc"/>
+        <sbol:displayId>LF1_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/LF1/LF1_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/LF1/LF1_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LF1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1"/>
+    <sbol:displayId>L1</sbol:displayId>
+    <dcterms:title>L1</dcterms:title>
+    <dcterms:description>Neutral Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1/L1_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1/L1_S"/>
+        <sbol:displayId>L1_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1/L1_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1/L1_P"/>
+        <sbol:displayId>L1_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L1/L1_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1/L1_sc"/>
+        <sbol:displayId>L1_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L1/L1_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L1/L1_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS2_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS2_Prefix"/>
+    <sbol:displayId>L2RBS2_Prefix</sbol:displayId>
+    <dcterms:title>L2RBS2_Prefix</dcterms:title>
+    <dcterms:description>RBS Linkers Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS2_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS1"/>
+    <sbol:displayId>L2RBS1</sbol:displayId>
+    <dcterms:title>L2RBS1</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2RBS1/L2RBS1_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS1/L2RBS1_S"/>
+        <sbol:displayId>L2RBS1_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2RBS1_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2RBS1/L2RBS1_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS1/L2RBS1_P"/>
+        <sbol:displayId>L2RBS1_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2RBS1_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L2RBS1/L2RBS1_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS1/L2RBS1_sc"/>
+        <sbol:displayId>L2RBS1_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L2RBS1/L2RBS1_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L2RBS1/L2RBS1_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L4_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L4_Prefix"/>
+    <sbol:displayId>L4_Prefix</sbol:displayId>
+    <dcterms:title>L4_Prefix</dcterms:title>
+    <dcterms:description>Neutral Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L4_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2"/>
+    <sbol:displayId>L2</sbol:displayId>
+    <dcterms:title>L2</dcterms:title>
+    <dcterms:description>Neutral Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2/L2_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2/L2_S"/>
+        <sbol:displayId>L2_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2/L2_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2/L2_P"/>
+        <sbol:displayId>L2_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L2/L2_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2/L2_sc"/>
+        <sbol:displayId>L2_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L2/L2_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L2/L2_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS2_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS2_Suffix"/>
+    <sbol:displayId>L1RBS2_Suffix</sbol:displayId>
+    <dcterms:title>L1RBS2_Suffix</dcterms:title>
+    <dcterms:description>RBS Linkers Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS2_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1_Suffix"/>
+    <sbol:displayId>L1_Suffix</sbol:displayId>
+    <dcterms:title>L1_Suffix</dcterms:title>
+    <dcterms:description>Neutral Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS1_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS1_Prefix"/>
+    <sbol:displayId>L1RBS1_Prefix</sbol:displayId>
+    <dcterms:title>L1RBS1_Prefix</dcterms:title>
+    <dcterms:description>RBS Linkers Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS1_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMP_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP_Suffix"/>
+    <sbol:displayId>LMP_Suffix</sbol:displayId>
+    <dcterms:title>LMP_Suffix</dcterms:title>
+    <dcterms:description>Methylated Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMP_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS1"/>
+    <sbol:displayId>L1RBS1</sbol:displayId>
+    <dcterms:title>L1RBS1</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS1/L1RBS1_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS1/L1RBS1_S"/>
+        <sbol:displayId>L1RBS1_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS1_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS1/L1RBS1_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS1/L1RBS1_P"/>
+        <sbol:displayId>L1RBS1_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS1_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L1RBS1/L1RBS1_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS1/L1RBS1_sc"/>
+        <sbol:displayId>L1RBS1_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L1RBS1/L1RBS1_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L1RBS1/L1RBS1_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMS_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS_Prefix"/>
+    <sbol:displayId>LMS_Prefix</sbol:displayId>
+    <dcterms:title>LMS_Prefix</dcterms:title>
+    <dcterms:description>Methylated Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMS_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS3_Suffix"/>
+    <sbol:displayId>L2RBS3_Suffix</sbol:displayId>
+    <dcterms:title>L2RBS3_Suffix</dcterms:title>
+    <dcterms:description>RBS Linkers Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS3_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LF3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF3_Prefix"/>
+    <sbol:displayId>LF3_Prefix</sbol:displayId>
+    <dcterms:title>LF3_Prefix</dcterms:title>
+    <dcterms:description>Fusion Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LF3_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS4">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS4"/>
+    <sbol:displayId>L1RBS4</sbol:displayId>
+    <dcterms:title>L1RBS4</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS4/L1RBS4_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS4/L1RBS4_S"/>
+        <sbol:displayId>L1RBS4_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS4_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS4/L1RBS4_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS4/L1RBS4_P"/>
+        <sbol:displayId>L1RBS4_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS4_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L1RBS4/L1RBS4_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS4/L1RBS4_sc"/>
+        <sbol:displayId>L1RBS4_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L1RBS4/L1RBS4_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L1RBS4/L1RBS4_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS4"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L6_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L6_Suffix"/>
+    <sbol:displayId>L6_Suffix</sbol:displayId>
+    <dcterms:title>L6_Suffix</dcterms:title>
+    <dcterms:description>Neutral Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L6_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L5_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L5_Prefix"/>
+    <sbol:displayId>L5_Prefix</sbol:displayId>
+    <dcterms:title>L5_Prefix</dcterms:title>
+    <dcterms:description>Neutral Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L5_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2_Suffix"/>
+    <sbol:displayId>L2_Suffix</sbol:displayId>
+    <dcterms:title>L2_Suffix</dcterms:title>
+    <dcterms:description>Neutral Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS3">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3"/>
+    <sbol:displayId>L1RBS3</sbol:displayId>
+    <dcterms:title>L1RBS3</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS3/L1RBS3_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_P"/>
+        <sbol:displayId>L1RBS3_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS3_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS3/L1RBS3_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_S"/>
+        <sbol:displayId>L1RBS3_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS3_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L1RBS3/L1RBS3_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_sc"/>
+        <sbol:displayId>L1RBS3_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS3"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS1_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS1_Suffix"/>
+    <sbol:displayId>L2RBS1_Suffix</sbol:displayId>
+    <dcterms:title>L2RBS1_Suffix</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS1_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS1_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS1_Suffix"/>
+    <sbol:displayId>L1RBS1_Suffix</sbol:displayId>
+    <dcterms:title>L1RBS1_Suffix</dcterms:title>
+    <dcterms:description>RBS Linkers Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS1_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS1_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS1_Prefix"/>
+    <sbol:displayId>L2RBS1_Prefix</sbol:displayId>
+    <dcterms:title>L2RBS1_Prefix</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS1_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L7_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L7_Suffix"/>
+    <sbol:displayId>L7_Suffix</sbol:displayId>
+    <dcterms:title>L7_Suffix</dcterms:title>
+    <dcterms:description>Neutral Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L7_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L3_Prefix"/>
+    <sbol:displayId>L3_Prefix</sbol:displayId>
+    <dcterms:title>L3_Prefix</dcterms:title>
+    <dcterms:description>Neutral Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L3_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS3">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS3"/>
+    <sbol:displayId>L2RBS3</sbol:displayId>
+    <dcterms:title>L2RBS3</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2RBS3/L2RBS3_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS3/L2RBS3_P"/>
+        <sbol:displayId>L2RBS3_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2RBS3_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L2RBS3/L2RBS3_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS3/L2RBS3_S"/>
+        <sbol:displayId>L2RBS3_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L2RBS3_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L2RBS3/L2RBS3_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS3/L2RBS3_sc"/>
+        <sbol:displayId>L2RBS3_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L2RBS3/L2RBS3_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L2RBS3/L2RBS3_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS3"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L3">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L3"/>
+    <sbol:displayId>L3</sbol:displayId>
+    <dcterms:title>L3</dcterms:title>
+    <dcterms:description>Neutral Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L3/L3_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L3/L3_S"/>
+        <sbol:displayId>L3_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L3_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L3/L3_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L3/L3_P"/>
+        <sbol:displayId>L3_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L3_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L3/L3_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L3/L3_sc"/>
+        <sbol:displayId>L3_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L3/L3_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L3/L3_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L3"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LF2_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF2_Prefix"/>
+    <sbol:displayId>LF2_Prefix</sbol:displayId>
+    <dcterms:title>LF2_Prefix</dcterms:title>
+    <dcterms:description>Fusion Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LF2_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS3_Prefix"/>
+    <sbol:displayId>L2RBS3_Prefix</sbol:displayId>
+    <dcterms:title>L2RBS3_Prefix</dcterms:title>
+    <dcterms:description>RBS Linkers Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS3_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS2_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS2_Prefix"/>
+    <sbol:displayId>L1RBS2_Prefix</sbol:displayId>
+    <dcterms:title>L1RBS2_Prefix</dcterms:title>
+    <dcterms:description>RBS Linkers Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS2_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LF1_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LF1_Suffix"/>
+    <sbol:displayId>LF1_Suffix</sbol:displayId>
+    <dcterms:title>LF1_Suffix</dcterms:title>
+    <dcterms:description>Fusion Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LF1_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS2">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS2"/>
+    <sbol:displayId>L1RBS2</sbol:displayId>
+    <dcterms:title>L1RBS2</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS2/L1RBS2_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS2/L1RBS2_P"/>
+        <sbol:displayId>L1RBS2_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS2_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS2/L1RBS2_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS2/L1RBS2_S"/>
+        <sbol:displayId>L1RBS2_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS2_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L1RBS2/L1RBS2_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS2/L1RBS2_sc"/>
+        <sbol:displayId>L1RBS2_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L1RBS2/L1RBS2_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L1RBS2/L1RBS2_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS2"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L5">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L5"/>
+    <sbol:displayId>L5</sbol:displayId>
+    <dcterms:title>L5</dcterms:title>
+    <dcterms:description>Neutral Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L5/L5_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L5/L5_S"/>
+        <sbol:displayId>L5_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L5_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L5/L5_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L5/L5_P"/>
+        <sbol:displayId>L5_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L5_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L5/L5_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L5/L5_sc"/>
+        <sbol:displayId>L5_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L5/L5_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L5/L5_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L5"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L6">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L6"/>
+    <sbol:displayId>L6</sbol:displayId>
+    <dcterms:title>L6</dcterms:title>
+    <dcterms:description>Neutral Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L6/L6_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L6/L6_P"/>
+        <sbol:displayId>L6_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L6_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L6/L6_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L6/L6_S"/>
+        <sbol:displayId>L6_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L6_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L6/L6_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L6/L6_sc"/>
+        <sbol:displayId>L6_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L6/L6_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L6/L6_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L6"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L2RBS2_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L2RBS2_Suffix"/>
+    <sbol:displayId>L2RBS2_Suffix</sbol:displayId>
+    <dcterms:title>L2RBS2_Suffix</dcterms:title>
+    <dcterms:description>RBS Linkers Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L2RBS2_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMS">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMS"/>
+    <sbol:displayId>LMS</sbol:displayId>
+    <sbol:elements>GGCTCGGGAGACCTATCGGTAATAACAGTCCAATCTGGTGTAACTTCGGAATCGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMP">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMP"/>
+    <sbol:displayId>LMP</sbol:displayId>
+    <sbol:elements>GGCTCGGGTAAGAACTCGCACTTCGTGGAAACACTATTATCTGGTGGGTCTCTGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LF2_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LF2_Prefix"/>
+    <sbol:displayId>LF2_Prefix</sbol:displayId>
+    <sbol:elements>GGACCCGGAGCCCGATCCTGAACCTGAACCAGATCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS4_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS4_Suffix"/>
+    <sbol:displayId>L1RBS4_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGTTGAACACCGTCTCAGGTAAGTATCAGTTGTAA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L7">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L7"/>
+    <sbol:displayId>L7</sbol:displayId>
+    <sbol:elements>GGCTCGAACTTTTACGGGTGCCGACTCACTATTACAGACTTACTACAATCTGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L5_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L5_Prefix"/>
+    <sbol:displayId>L5_Prefix</sbol:displayId>
+    <sbol:elements>GGACaggataaatcaactcgtaagcaatactgtctgt</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS4">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS4"/>
+    <sbol:displayId>L2RBS4</sbol:displayId>
+    <sbol:elements>GGCTCGTGTTACTATTGGCTGAGATAAGGGTAGCAGAAAATCACAAGGAGGTAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS4">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS4"/>
+    <sbol:displayId>L1RBS4</sbol:displayId>
+    <sbol:elements>GGCTCGTTGAACACCGTCTCAGGTAAGTATCAGTTGTAAATCACAAGGAGGTAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L6_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L6_Suffix"/>
+    <sbol:displayId>L6_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGgtattgtaaagcacgaaacctacgataagagtg</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LF2">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LF2"/>
+    <sbol:displayId>LF2</sbol:displayId>
+    <sbol:elements>GGCTCGGGCTCGGGCTCCGGATCTGGTTCAGGTTCAGGATCGGGCTCCGGGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L4">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L4"/>
+    <sbol:displayId>L4</sbol:displayId>
+    <sbol:elements>GGCTCGACCCACGACTATTGACTGCTCTGAGAAAGTTGATTGTTACGATTAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LF2_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LF2_Suffix"/>
+    <sbol:displayId>LF2_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGGGCTCGGGCTCCGGATCTGGTTCAGGTTCAGG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L5">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L5"/>
+    <sbol:displayId>L5</sbol:displayId>
+    <sbol:elements>GGCTCGAGAAGTAGTGCCACAGACAGTATTGCTTACGAGTTGATTTATCCTGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS2_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS2_Prefix"/>
+    <sbol:displayId>L1RBS2_Prefix</sbol:displayId>
+    <sbol:elements>GGACTATTTCCCCTCTTTTTACAACTGATACTTACCTGA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS1_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS1_Suffix"/>
+    <sbol:displayId>L2RBS1_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGTGTTACTATTGGCTGAGATAAGGGTAGCAGAAA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS2">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS2"/>
+    <sbol:displayId>L1RBS2</sbol:displayId>
+    <sbol:elements>GGCTCGTTGAACACCGTCTCAGGTAAGTATCAGTTGTAAAAAGAGGGGAAATAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS2_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS2_Suffix"/>
+    <sbol:displayId>L2RBS2_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGTGTTACTATTGGCTGAGATAAGGGTAGCAGAAA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2_Prefix"/>
+    <sbol:displayId>L2_Prefix</sbol:displayId>
+    <sbol:elements>GGACaggtaataagaactacacgactggatactgact</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L3_Suffix"/>
+    <sbol:displayId>L3_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGatcacggcactacactcgttgctttatcggtat</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L4_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L4_Suffix"/>
+    <sbol:displayId>L4_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGacccacgactattgactgctctgagaaagttga</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS3_Suffix"/>
+    <sbol:displayId>L2RBS3_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGTGTTACTATTGGCTGAGATAAGGGTAGCAGAAA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1"/>
+    <sbol:displayId>L1</sbol:displayId>
+    <sbol:elements>GGCTCGTTACTTACGACACTCCGAGACAGTCAGAGGGTATTTATTGAACTAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS4_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS4_Suffix"/>
+    <sbol:displayId>L2RBS4_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGTGTTACTATTGGCTGAGATAAGGGTAGCAGAAA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1_Suffix"/>
+    <sbol:displayId>L1_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGttacttacgacactccgagacagtcagagggta</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2"/>
+    <sbol:displayId>L2</sbol:displayId>
+    <sbol:elements>GGCTCGATCGGTGTGAAAAGTCAGTATCCAGTCGTGTAGTTCTTATTACCTGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS2_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS2_Prefix"/>
+    <sbol:displayId>L2RBS2_Prefix</sbol:displayId>
+    <sbol:elements>GGACTATTTCCCCTCTTTTTTCTGCTACCCTTATCTCAG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS3_Prefix"/>
+    <sbol:displayId>L1RBS3_Prefix</sbol:displayId>
+    <sbol:elements>GGACTATTTCTCCTCTTTTTACAACTGATACTTACCTGA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS3">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS3"/>
+    <sbol:displayId>L2RBS3</sbol:displayId>
+    <sbol:elements>GGCTCGTGTTACTATTGGCTGAGATAAGGGTAGCAGAAAAAAGAGGAGAAATAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMP_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMP_Prefix"/>
+    <sbol:displayId>LMP_Prefix</sbol:displayId>
+    <sbol:elements>GGACAGAGACCCACCAGATAATAGTGTTTCCACGAAGTG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS4_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS4_Prefix"/>
+    <sbol:displayId>L1RBS4_Prefix</sbol:displayId>
+    <sbol:elements>GGACTACCTCCTTGTGATTTACAACTGATACTTACCTGA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L3_Prefix"/>
+    <sbol:displayId>L3_Prefix</sbol:displayId>
+    <sbol:elements>GGACtctgtaataacaataccgataaagcaacgagtg</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS3_Prefix"/>
+    <sbol:displayId>L2RBS3_Prefix</sbol:displayId>
+    <sbol:elements>GGACTATTTCTCCTCTTTTTTCTGCTACCCTTATCTCAG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LF3">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LF3"/>
+    <sbol:displayId>LF3</sbol:displayId>
+    <sbol:elements>GGCTCGCTGCTTGAGAGCCCTAAAGCATTAGAAGAAGCACCTTGGCCTCCACCAGAAGGGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS2">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS2"/>
+    <sbol:displayId>L2RBS2</sbol:displayId>
+    <sbol:elements>GGCTCGTGTTACTATTGGCTGAGATAAGGGTAGCAGAAAAAAGAGGGGAAATAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L7_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L7_Suffix"/>
+    <sbol:displayId>L7_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGaacttttacgggtgccgactcactattacagac</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L6_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L6_Prefix"/>
+    <sbol:displayId>L6_Prefix</sbol:displayId>
+    <sbol:elements>GGACaaggagaactgacactcttatcgtaggtttcgt</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LF3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LF3_Suffix"/>
+    <sbol:displayId>LF3_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGCTGCTTGAGAGCCCTAAAGCATTAGAAGAAGCACCTTGGCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS1_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS1_Prefix"/>
+    <sbol:displayId>L2RBS1_Prefix</sbol:displayId>
+    <sbol:elements>GGACTAGTCCTGTGTGATTTTCTGCTACCCTTATCTCAG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2_Suffix"/>
+    <sbol:displayId>L2_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGatcggtgtgaaaagtcagtatccagtcgtgtag</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LF1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LF1"/>
+    <sbol:displayId>LF1</sbol:displayId>
+    <sbol:elements>GGCTCGGCCGAAGCGGCTGCTAAAGAAGCAGCTGCTAAAGAGGCGGCCGCCAAGGCAGGGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS4_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS4_Prefix"/>
+    <sbol:displayId>L2RBS4_Prefix</sbol:displayId>
+    <sbol:elements>GGACTACCTCCTTGTGATTTTCTGCTACCCTTATCTCAG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS3_Suffix"/>
+    <sbol:displayId>L1RBS3_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGTTGAACACCGTCTCAGGTAAGTATCAGTTGTAA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS1"/>
+    <sbol:displayId>L1RBS1</sbol:displayId>
+    <sbol:elements>GGCTCGTTGAACACCGTCTCAGGTAAGTATCAGTTGTAAATCACACAGGACTAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMS_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMS_Prefix"/>
+    <sbol:displayId>LMS_Prefix</sbol:displayId>
+    <sbol:elements>GGACGATTCCGAAGTTACACCAGATTGGACTGTTATTAC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS1_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS1_Prefix"/>
+    <sbol:displayId>L1RBS1_Prefix</sbol:displayId>
+    <sbol:elements>GGACTAGTCCTGTGTGATTTACAACTGATACTTACCTGA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1_Prefix"/>
+    <sbol:displayId>L1_Prefix</sbol:displayId>
+    <sbol:elements>GGACtagttcaataaataccctctgactgtctcggag</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L7_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L7_Prefix"/>
+    <sbol:displayId>L7_Prefix</sbol:displayId>
+    <sbol:elements>GGACagattgtagtaagtctgtaatagtgagtcggca</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L2RBS1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L2RBS1"/>
+    <sbol:displayId>L2RBS1</sbol:displayId>
+    <sbol:elements>GGCTCGTGTTACTATTGGCTGAGATAAGGGTAGCAGAAAATCACACAGGACTAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMS_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMS_Suffix"/>
+    <sbol:displayId>LMS_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGGGAGACCTATCGGTAATAACAGTCCAATCTGGTGT</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LF1_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LF1_Prefix"/>
+    <sbol:displayId>LF1_Prefix</sbol:displayId>
+    <sbol:elements>GGACCCTGCCTTGGCGGCCGCCTCTTTAGCAGCTGCTTCTTTAGC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LF1_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LF1_Suffix"/>
+    <sbol:displayId>LF1_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGGCCGAAGCGGCTGCTAAAGAAGCAGCTGCTAAAGAGGCGGC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L5_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L5_Suffix"/>
+    <sbol:displayId>L5_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGagaagtagtgccacagacagtattgcttacgag</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L4_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L4_Prefix"/>
+    <sbol:displayId>L4_Prefix</sbol:displayId>
+    <sbol:elements>GGACtaatcgtaacaatcaactttctcagagcagtca</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS2_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS2_Suffix"/>
+    <sbol:displayId>L1RBS2_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGTTGAACACCGTCTCAGGTAAGTATCAGTTGTAA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS1_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS1_Suffix"/>
+    <sbol:displayId>L1RBS1_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGTTGAACACCGTCTCAGGTAAGTATCAGTTGTAA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMP_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMP_Suffix"/>
+    <sbol:displayId>LMP_Suffix</sbol:displayId>
+    <sbol:elements>GGCTCGGGTAAGAACTCGCACTTCGTGGAAACACTATTA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L6">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L6"/>
+    <sbol:displayId>L6</sbol:displayId>
+    <sbol:elements>GGCTCGGTATTGTAAAGCACGAAACCTACGATAAGAGTGTCAGTTCTCCTTGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS3">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS3"/>
+    <sbol:displayId>L1RBS3</sbol:displayId>
+    <sbol:elements>GGCTCGTTGAACACCGTCTCAGGTAAGTATCAGTTGTAAAAAGAGGAGAAATAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L3">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L3"/>
+    <sbol:displayId>L3</sbol:displayId>
+    <sbol:elements>GGCTCGATCACGGCACTACACTCGTTGCTTTATCGGTATTGTTATTACAGAGTCC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LF3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LF3_Prefix"/>
+    <sbol:displayId>LF3_Prefix</sbol:displayId>
+    <sbol:elements>GGACCCTTCTGGTGGAGGCCAAGGTGCTTCTTCTAATGCTTTAGG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+</rdf:RDF>

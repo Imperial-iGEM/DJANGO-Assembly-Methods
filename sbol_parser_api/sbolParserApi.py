@@ -5,6 +5,7 @@ import plateo.tools
 import warnings
 import pandas as pd
 import uuid
+import numpy as np
 from typing import List, Dict
 
 
@@ -16,7 +17,8 @@ class ParserSBOL:
     def generateCsv_for_DNABot(
             self,
             listOfNonCombUris: List[str],
-            listOfCombUris: List[str]
+            listOfCombUris: List[str],
+            linkerFile: sbol2.document.Document
     ):
         """Create construct and parts/linkers CSVs for DNABot input
 
@@ -41,62 +43,58 @@ class ParserSBOL:
         numberOfDesigns = len(allConstructs)
         print(numberOfDesigns, "construct(s) will be assembled.")
 
-        # TODO: Check/Insert backbone - to handle on frontend?
-
-        # TODO: Insert up to 7 linkers - to handle on frontend?
-
         # Create plateo construct plates
-        constructPlates = self.getPlateoConstructPlates(
+        constructPlates = self.fillPlateoPlates(
             allConstructs,
+            "Construct",
             1,
             plateo.containers.Plate96,
             88
         )
 
-        # Create construct CSVs from plateo plates
+        # Create construct and parts/linkers CSVs from plateo plates
         for plate in constructPlates:
+            # Create UUID
             uniqueId = uuid.uuid4().hex
+            # Create construct CSV
             self.getConstructCsvFromPlateoPlate(plate, uniqueId)
-
-        # Obtain parts and linkers
-        listOfParts = self.getListOfParts(allConstructs)
-
-        # TODO: Convert list of parts from component definition to str
-
-        # TODO: If part is a linker, include prefix/suffix entries
-        # Obtain linkers from frontend?
-
-        # Sort parts/linkers alphabetically
-        sortedListOfParts = self.getSortedListOfParts(listOfParts)
-
-        # TODO: Write parts/linkers csv
+            # Write parts/linkers csv
+            self.getPartLinkerCsvFromPlateoPlate(plate, linkerFile, uniqueId)
 
     def generateCsv_for_MoClo(self):
         raise NotImplementedError("Not yet implemented")
 
     def getRootComponenentDefinitions(
-            self) -> List[sbol2.componentdefinition.ComponentDefinition]:
+            self,
+            sbolDocument: sbol2.document.Document = None
+    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
         """Get the root component definitions of an SBOL document.
+
+        Args:
+            sbolDocument (sbol2.document.Document): SBOL document from
+                which to get root component definitions (default: self.doc)
 
         Returns:
             list: List of root component definitions.
         """
-        componentDefs = self.doc.componentDefinitions
+        document = self.doc if sbolDocument is None else sbolDocument
+        componentDefs = list(document.componentDefinitions)
         # Remove child components of component definitions
-        for obj in self.doc.componentDefinitions:
+        for obj in document.componentDefinitions:
             for component in obj.components:
-                childDefinition = component.definition
+                childDefinition = document.getComponentDefinition(component.definition)
                 if(childDefinition is not None
                         and childDefinition in componentDefs):
                     componentDefs.remove(childDefinition)
         # Remove child components of combinatorial derivations
-        for obj in self.doc.combinatorialderivations:
+        for obj in document.combinatorialderivations:
             for variableComponent in obj.variableComponents:
+                # TODO: Verify that variants are component definitions
                 for childDefinition in variableComponent.variants:
                     if(childDefinition is not None
                             and childDefinition in componentDefs):
                         componentDefs.remove(childDefinition)
-        return componentDefs
+        return list(componentDefs)
 
     def getListOfConstructs(
             self,
@@ -163,7 +161,7 @@ class ParserSBOL:
 
     def getSortedListOfParts(
             self,
-            listOfParts: List[sbol2.componentdefinition.ComponentDefinition] = []
+            listOfParts: List[sbol2.componentdefinition.ComponentDefinition]
     ) -> List[sbol2.componentdefinition.ComponentDefinition]:
         """Get a sorted list of parts (str) from the list of parts.
 
@@ -190,9 +188,10 @@ class ParserSBOL:
         """
         return {x.displayId: x.getPrimaryStructure() for x in listOfConstructs}
 
-    def getPlateoConstructPlates(
+    def fillPlateoPlates(
             self,
-            allConstructs: List[sbol2.componentdefinition.ComponentDefinition],
+            allContent: List[sbol2.componentdefinition.ComponentDefinition],
+            contentName: str,
             numPlate: int = None,
             plate_class: plateo.Plate = None,
             maxWellsFilled: int = None
@@ -200,7 +199,8 @@ class ParserSBOL:
         """Generate a list of plateo plate objects from list of constructs
 
         Args:
-            allConstructs (list): List of constructs
+            allContent (list): List of constructs
+            contentName (str): Name of content (Construct or Part)
             numPlate (int): Number of plates to be generated (default = 1)
             plate_class (plateo.Plate):
                 Class of plateo plate (default = Plate96)
@@ -210,7 +210,8 @@ class ParserSBOL:
             list: List of plates
         """
         # TODO: Infer numPlate or plate_class?
-        copyAllConstructs = allConstructs.copy()
+        # TODO: Input well content vol and qty
+        copyAllContent = allContent.copy()
         numPlate = 1 if numPlate is None else numPlate
         plate_class = (
             plateo.containers.Plate96 if plate_class is None else plate_class)
@@ -223,43 +224,43 @@ class ParserSBOL:
             raise ValueError(
                 "ValueError: maxWellsFilled must be less than"
                 " plate_class.num_wells")
-        # Check if numPlate*maxWellsFilled less than len(allconstructs)
-        if numPlate*maxWellsFilled < len(allConstructs):
+        # Check if numPlate*maxWellsFilled less than len(allContent)
+        if numPlate*maxWellsFilled < len(allContent):
             raise ValueError(
-                "ValueError: Length of allConstructs must be"
+                "ValueError: Length of allContent must be"
                 " less than numPlate*maxWellsFilled")
         # Check if there will be empty plates
-        if len(allConstructs) < (numPlate-1)*maxWellsFilled:
-            warnings.warn("Number of constructs cannot fill all plates.")
+        if len(allContent) < (numPlate-1)*maxWellsFilled:
+            warnings.warn("Number of "+contentName+"s cannot fill all plates.")
         plates = [
             plate_class(name="Plate %d" % index)
             for index in range(1, numPlate + 1)]
         for plate in plates:
             for i in range(1, maxWellsFilled+1):
-                while copyAllConstructs:
+                if copyAllContent:
                     well = plate.wells[
                         plateo.tools.index_to_wellname(i, plate.num_wells)]
-                    well.data = {"Construct": copyAllConstructs.pop(0)}
+                    well.data = {contentName: copyAllContent.pop(0)}
         return plates
 
-    def getAllConstructsFromPlateoPlate(
+    def getAllContentFromPlateoPlate(
         self,
-        constructPlate: plateo.Plate
+        contentPlate: plateo.Plate
     ) -> List[sbol2.componentdefinition.ComponentDefinition]:
-        '''Get a list of all constructs (as component definitions) from a
+        '''Get a list of all content (as component definitions) from a
         Plateo plate.
 
         Args:
-            constructPlate (plateo.Plate): Plateo plate containing constructs
+            contentPlate (plateo.Plate): Plateo plate containing content
 
         Returns:
-            list: List of all constructs (as component definitions)
+            list: List of all content (as component definitions)
         '''
-        allConstructs = []
-        for well in constructPlate.iter_wells():
+        allContent = []
+        for well in contentPlate.iter_wells():
             for key, value in well.data.items():
-                allConstructs.append(value)
-        return allConstructs
+                allContent.append(value)
+        return allContent
 
     def getMinNumberOfBasicParts(
         self,
@@ -306,8 +307,9 @@ class ParserSBOL:
         self,
         constructPlate: plateo.Plate
     ) -> Dict[str, List[sbol2.componentdefinition.ComponentDefinition]]:
-        '''Get a dictionary of wells containing constructs (as
-        component definitions) in the form {Wellname:Construct}
+        '''Get a dictionary of wells containing components comprising
+        constructs (as component definitions) in the form
+        {Wellname:[Components]}
 
         Args:
             constructPlate (plateo.Plate): Plateo plate containing constructs
@@ -318,6 +320,7 @@ class ParserSBOL:
         dictWellComponent = {}
         for wellname, well in constructPlate.wells.items():
             for key, value in well.data.items():
+                # TODO: Move linker at last position to front of the list
                 dictWellComponent[wellname] = value.getPrimaryStructure()
         return dictWellComponent
 
@@ -352,7 +355,7 @@ class ParserSBOL:
         Returns:
             pd.DataFrame: Dataframe of constructs
         '''
-        allComponents = self.getAllConstructsFromPlateoPlate(constructPlate)
+        allComponents = self.getAllContentFromPlateoPlate(constructPlate)
         minNumberOfBasicParts = self.getMinNumberOfBasicParts(allComponents)
         header = self.getConstructCsvHeader(minNumberOfBasicParts)
         dictWellComponent = self.getWellComponentDictFromPlateoPlate(constructPlate)
@@ -365,7 +368,7 @@ class ParserSBOL:
 
     def getConstructCsvFromPlateoPlate(
         self,
-        constructPlate: List[plateo.Plate],
+        constructPlate: plateo.Plate,
         uniqueId: str = None
     ):
         '''Convert construct dataframe into CSV and creates CSV file in the same
@@ -379,3 +382,103 @@ class ParserSBOL:
         constructDf.to_csv(
             "construct_"+uniqueId+".csv",
             index=False)
+
+    def isLinker(
+        self,
+        part: sbol2.componentdefinition.ComponentDefinition,
+        linkerFile: sbol2.document.Document
+    ) -> bool:
+        linkers = self.getRootComponenentDefinitions(linkerFile)
+        if part.identity in [linker.identity for linker in linkers]:
+            return True
+        else:
+            return False
+
+    def getLinkerSP(
+        self,
+        linker: sbol2.componentdefinition.ComponentDefinition,
+    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        linkersp = []
+        for component in linker.components:
+            linkersp.append(
+                self.doc.getComponentDefinition(component.definition))
+        return linkersp
+
+    def convertLinkerToSuffixPrefix(
+        self,
+        listOfParts: List[sbol2.componentdefinition.ComponentDefinition],
+        linkerFile: sbol2.document.Document
+    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        newListOfParts = []
+        for part in listOfParts:
+            if self.isLinker(part, linkerFile):
+                newListOfParts.extend(self.getLinkerSP(part))
+            else:
+                newListOfParts.append(part)
+        return newListOfParts
+
+    def getWellContentDictFromPlateoPlate(
+        self,
+        plateoPlate: plateo.Plate,
+        contentName: str
+    ) -> Dict[str, List[sbol2.componentdefinition.ComponentDefinition]]:
+        # TODO: Add option to include content vol/qty?
+        # FIXME: Function works, but only outside of module?
+        dictWellContent = {}
+        for wellname, well in plateoPlate.wells.items():
+            if contentName in well.data.keys():
+                dictWellContent[wellname] = well.data[contentName]
+        return dictWellContent
+
+    def getListFromWellPartDict(
+        self,
+        dictWellPart: Dict[str, List[sbol2.componentdefinition.ComponentDefinition]]
+    ) -> List[str]:
+        listWellPart = []
+        for k, v in dictWellPart.items():
+            listWellPart.append([v.displayId, k, np.nan])
+        return listWellPart
+
+    def getPartLinkerDfFromPlateoPlate(
+        self,
+        partPlate: plateo.Plate
+    ) -> pd.DataFrame:
+        header = ["Part/linker", "Well", "Part concentration (ng/uL)"]
+        dictWellPart = self.getWellContentDictFromPlateoPlate(partPlate, "Part")
+        listWellPart = self.getListFromWellPartDict(dictWellPart)
+        sparr = pd.arrays.SparseArray(listWellPart)
+        df = pd.DataFrame(data=sparr, columns=header)
+        return df
+
+    def getPartLinkerCsvFromPlateoPlate(
+        self,
+        constructPlate: plateo.Plate,
+        linkerFile: sbol2.document.Document,
+        uniqueId: str = None
+    ):
+        # Obtain all constructs from plate
+        allConstructs = self.getAllContentFromPlateoPlate(constructPlate)
+        # Obtain parts and linkers from all constructs
+        listOfParts = self.getListOfParts(allConstructs)
+        # Change linker to linker-s and linker-p
+        listOfParts = self.convertLinkerToSuffixPrefix(listOfParts, linkerFile)
+        # Sort list of parts and linkers
+        self.getSortedListOfParts(listOfParts)
+        # Add parts and linkers to plate
+        # TODO: Calculate part/linker concentration
+        # TODO: Add part/linker concentration to plate
+        partPlates = self.fillPlateoPlates(
+            listOfParts,
+            "Part",
+            1,
+            plateo.containers.Plate96,
+            96
+        )
+        for plate in partPlates:
+            # Create df
+            partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
+            # TODO: Create csv
+            partLinkerDf.to_csv(
+                "part_linker_"+str(partPlates.index(plate)+1)+uniqueId,
+                index=False
+            )

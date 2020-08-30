@@ -8,6 +8,8 @@ import uuid
 import numpy as np
 from typing import List, Dict
 
+from typing import List
+
 
 class ParserSBOL:
 
@@ -164,14 +166,17 @@ class ParserSBOL:
             listOfParts: List[sbol2.componentdefinition.ComponentDefinition]
     ) -> List[sbol2.componentdefinition.ComponentDefinition]:
         """Get a sorted list of parts (str) from the list of parts.
+        Sort by sbol2 displayId
 
         Args:
-            listOfParts (list): List of parts to be sorted.
+            listOfParts (list): List of parts to be sorted. (generated
+            by getListOfConstructs)
 
         Returns:
             list: List of sorted parts (str)
         """
-        return listOfParts.sort(key=lambda x: x.displayId)
+        listOfParts.sort(key=lambda x: x.displayId)
+        return listOfParts
 
     def getDictOfComponents(
             self,

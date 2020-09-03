@@ -1,4 +1,4 @@
-# Modified version 9/4/2019
+# Modified version 27/07/20
 
 import os
 import tkinter
@@ -33,12 +33,22 @@ def moclo_function(output_folder, single_or_triplicate, dna_plate_map, combinati
     # ^ returns config just a read of setting.yaml hopefull try to set to
     # string and still work
     config = {'output_folder_path': output_folder,
-              'protocol_template_path':
-              'moclo_assembly/moclo_transformation/data/moclo_transform_template.py'}
+              'assembly_template_path':
+              'moclo_assembly/moclo_transformation/data/moclo_assembly_template.py',
+              'transform_template_path':
+              'moclo_assembly/moclo_transformation/data/transform_moclo_template.py'}
 
     # combinations_limit = ask_single_or_triplicate()
     # ^ return the string either 'single' or triplet
     combinations_limit = single_or_triplicate
+    
+    # whether user wants to use p300 multi or single channel
+    # multi = get_multi() in offline vers
+    multi = False
+    
+    # whether user wants to use thermocycler module
+    # thermocycle = get_thermocycle() in offline vers
+    thermocycle = True
 
     # dna_plate_map_filename = ask_dna_plate_map_filename()
     # ^ return string of full disk file path of dna plate map
@@ -54,14 +64,16 @@ def moclo_function(output_folder, single_or_triplicate, dna_plate_map, combinati
     check_number_of_combinations(combinations_limit, combinations_to_make)
 
     # Generate and save output plate maps.
-    generate_and_save_output_plate_maps(combinations_to_make,
-                                        combinations_limit,
-                                        config['output_folder_path'])
+    triplicate = generate_and_save_output_plate_maps(combinations_to_make,
+                                                     combinations_limit,
+                                                     config['output_folder_path'])
 
     # Create a protocol file and hard code the plate maps into it.
     create_protocol(dna_plate_map_dict, combinations_to_make,
-                    config['protocol_template_path'],
-                    config['output_folder_path'])
+                    config['assembly_template_path'],
+                    config['transform_template_path'],
+                    config['output_folder_path'], thermocycle,
+                    triplicate, multi)
 
 ###############################################################################
 # Functions for getting user input
@@ -209,9 +221,12 @@ def generate_and_save_output_plate_maps(combinations_to_make,
                 output_plate_map[j].append(element)
 
     print("output_plate_map", output_plate_map)
+    
+    triplicate = False # false unless otherwise
 
     # creating an output plate three copies of each column
     if combinations_limit == 'triplicate':
+        triplicate = True
         combinedRow = []
         splitRows = []
 
@@ -239,25 +254,41 @@ def generate_and_save_output_plate_maps(combinations_to_make,
         writer = csv.writer(f)
         for row in output_plate_map:
             writer.writerow(row)
+    return triplicate
 
 
 def create_protocol(dna_plate_map_dict, combinations_to_make,
-                    protocol_template_path, output_folder_path):
+                    assembly_template_path, transform_template_path,
+                    output_folder_path, thermocycle, triplicate, multi):
 
     # Get the contents of colony_pick_template.py, which contains the body of
     # the protocol.
-    with open(protocol_template_path) as template_file:
-        template_string = template_file.read()
-    with open(output_folder_path + '/' + 'moclo_transform_protocol.py',
-              "w+") as protocol_file:
+    with open(assembly_template_path) as assembly_template_file:
+        assembly_template_string = assembly_template_file.read()
+    with open(output_folder_path + '/' + 'moclo_assembly_protocol.py',
+              "w+") as assembly_file:
         # Paste in plate maps at top of file.
-        protocol_file.write('dna_plate_map_dict = ' +
+        assembly_file.write('dna_plate_map_dict = ' +
                             json.dumps(dna_plate_map_dict) + '\n\n')
-        protocol_file.write('combinations_to_make = '
+        assembly_file.write('combinations_to_make = '
                             + json.dumps(combinations_to_make) + '\n\n')
+        assembly_file.write('thermocycle = ' + str(thermocycle) + '\n\n')
 
         # Paste the rest of the protocol.
-        protocol_file.write(template_string)
+        assembly_file.write(assembly_template_string)
+
+    with open(transform_template_path) as transform_template_file:
+        transform_template_string = transform_template_file.read()
+    with open(output_folder_path + '/' + 'transform_moclo_protocol.py',
+              "w+") as transform_file:
+        # Paste in plate maps at top of file.
+        transform_file.write('combinations_to_make = '
+                             + json.dumps(combinations_to_make) + '\n\n')
+        transform_file.write('multi = ' + str(multi) + '\n\n')
+        transform_file.write('triplicate = ' + str(triplicate) + '\n\n')
+
+        # Paste the rest of the protocol.
+        transform_file.write(transform_template_string)
 
 ###############################################################################
 # Call main function

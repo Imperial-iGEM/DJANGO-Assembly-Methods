@@ -148,7 +148,8 @@ def run(protocol: protocol_api.ProtocolContext):
                  protocol.load_labware('opentrons_96_tiprack_10ul', '6')]
 
         # Load in pipettes
-        p10_single = protocol.load_instrument('p10_single', mount='right',
+        p10_single = protocol.load_instrument('p10_single',
+                                              mount=pipetteMount10,
                                               tip_racks=tr_10)
 
         ''' Need to provide the instructions for loading reagent'''

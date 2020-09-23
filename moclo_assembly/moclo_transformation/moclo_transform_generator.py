@@ -1,4 +1,4 @@
-# Modified version 27/07/20
+# Modified version 09/23/20
 
 import os
 import tkinter
@@ -11,18 +11,11 @@ import yaml
 # Constants
 ###############################################################################
 
-# CONFIG_PATH = "data/settings.yaml"
+CONFIG_PATH = "data/settings.yaml"
 
 ###############################################################################
 # Main function of script
 ###############################################################################
-
-# all variables for the function
-# config = {'output_folder_path': 'output'}
-# combinations_limit = 'single'
-# dna_plate_map_filename = '/Users/Benedict/Documents/MoClo/OT2-MoClo-Transformation-Ecoli/examples/input_DNA_plate_csv/input-dna-map.csv'
-# combinations_filename = '/Users/Benedict/Documents/MoClo/OT2-MoClo-Transformation-Ecoli/examples/combination_to_make_csv/combination-to-make-72.csv'
-# moclo_function('output','single','/Users/Benedict/Documents/MoClo/OT2-MoClo-Transformation-Ecoli/examples/input_DNA_plate_csv/input-dna-map.csv','/Users/Benedict/Documents/MoClo/OT2-MoClo-Transformation-Ecoli/examples/combination_to_make_csv/combination-to-make-72.csv')
 
 
 def moclo_function(output_folder, single_or_triplicate, dna_plate_map, combinations_file):
@@ -41,14 +34,22 @@ def moclo_function(output_folder, single_or_triplicate, dna_plate_map, combinati
     # combinations_limit = ask_single_or_triplicate()
     # ^ return the string either 'single' or triplet
     combinations_limit = single_or_triplicate
-    
+
     # whether user wants to use p300 multi or single channel
     # multi = get_multi() in offline vers
     multi = False
-    
+
     # whether user wants to use thermocycler module
     # thermocycle = get_thermocycle() in offline vers
     thermocycle = True
+
+    # whether to use left or right mount for p10 pipette
+    # p10Mount = get_pipette_mount('p10') in offline vers
+    p10Mount = 'left'
+
+    # whether to use left or right mount for p300 pipette
+    # p300Mount = get_pipette_mount('p300') in offline vers
+    p300Mount = 'right'
 
     # dna_plate_map_filename = ask_dna_plate_map_filename()
     # ^ return string of full disk file path of dna plate map
@@ -73,7 +74,7 @@ def moclo_function(output_folder, single_or_triplicate, dna_plate_map, combinati
                     config['assembly_template_path'],
                     config['transform_template_path'],
                     config['output_folder_path'], thermocycle,
-                    triplicate, multi)
+                    triplicate, multi, p10Mount, p300Mount)
 
 ###############################################################################
 # Functions for getting user input
@@ -104,16 +105,58 @@ def get_config(config_path):
 
     return config
 
-
 # Ask user in command line whether they want single combinations or triplicates
 # Max number of combinations if single is 88 (11 unique columns), and if
 # triplicate is 24 (3 unique columns, each repeated 3 times)
 
 
 def ask_single_or_triplicate():
-    return str(input("Enter 'single' if you want to run at most 88 single"
-                     "combinations or 'triplicate' if you want to run at most"
+    return str(input("Enter 'single' if you want to run at most 88 single "
+                     "combinations or 'triplicate' if you want to run at most "
                      "24 triplicate combinations: "))
+
+
+def ask_multi():
+    return str(input("Enter 'yes' if you want to use a p300 multi-channel "
+                     "pipette in transformation, and 'no' if you want to use "
+                     "a p300 single channel pipette: "))
+
+
+def get_multi():
+    multi_res = ask_multi()
+    if 'yes' in multi_res.lower():
+        multi = True
+    else:
+        multi = False
+    return multi
+
+
+def ask_thermocycle():
+    return str(input("Enter 'yes' if you want to use the Opentrons  "
+                     "thermocycler module, and 'no' if you want to use "
+                     "a benchtop thermocycler: "))
+
+
+def get_thermocycle():
+    thermocycle_res = ask_thermocycle()
+    if 'yes' in thermocycle_res.lower():
+        thermocycle = True
+    else:
+        thermocycle = False
+    return thermocycle
+
+
+def ask_pipette_mount(pipetteType):
+    return str(input("Enter 'left' or 'right' to select the mount of the "
+                     + pipetteType + " pipette: "))
+
+
+def get_pipette_mount(pipetteType):
+    pipetteMount = ask_pipette_mount(pipetteType)
+    if 'l' in pipetteMount.lower():
+        return 'left'
+    else:
+        return 'right'
 
 
 def ask_dna_plate_map_filename():
@@ -178,12 +221,12 @@ def check_number_of_combinations(combinations_limit, combinations_to_make):
     if combinations_limit == 'single':
         if number_of_combinations > 88:
             raise ValueError('Too many combinations ({0}) requested.'
-                             'Max for single combinations is'
-                             '88.'.format(number_of_combinations))
+                             'Max for single combinations is '
+                             ' 88.'.format(number_of_combinations))
     elif combinations_limit == 'triplicate':
         if number_of_combinations > 24:
             raise ValueError('Too many combinations ({0}) requested.'
-                             'Max for triplicate combinations is'
+                             'Max for triplicate combinations is '
                              '24.'.format(number_of_combinations))
 
 ###############################################################################
@@ -221,14 +264,13 @@ def generate_and_save_output_plate_maps(combinations_to_make,
                 output_plate_map[j].append(element)
 
     print("output_plate_map", output_plate_map)
-    
-    triplicate = False # false unless otherwise
 
+    triplicate = False
     # creating an output plate three copies of each column
     if combinations_limit == 'triplicate':
-        triplicate = True
         combinedRow = []
         splitRows = []
+        triplicate = True
 
         for j in range(0, len(output_plate_map)):  # 8
             # Tripling each item in the plate
@@ -259,7 +301,8 @@ def generate_and_save_output_plate_maps(combinations_to_make,
 
 def create_protocol(dna_plate_map_dict, combinations_to_make,
                     assembly_template_path, transform_template_path,
-                    output_folder_path, thermocycle, triplicate, multi):
+                    output_folder_path, thermocycle, triplicate, multi,
+                    p10Mount, p300Mount):
 
     # Get the contents of colony_pick_template.py, which contains the body of
     # the protocol.
@@ -273,6 +316,7 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
         assembly_file.write('combinations_to_make = '
                             + json.dumps(combinations_to_make) + '\n\n')
         assembly_file.write('thermocycle = ' + str(thermocycle) + '\n\n')
+        assembly_file.write('pipetteMount10 = "' + p10Mount + '"\n\n')
 
         # Paste the rest of the protocol.
         assembly_file.write(assembly_template_string)
@@ -286,14 +330,17 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
                              + json.dumps(combinations_to_make) + '\n\n')
         transform_file.write('multi = ' + str(multi) + '\n\n')
         transform_file.write('triplicate = ' + str(triplicate) + '\n\n')
+        transform_file.write('pipetteMount10 = "' + p10Mount + '"\n\n')
+        transform_file.write('pipetteMount300 = "' + p300Mount + '"\n\n')
 
         # Paste the rest of the protocol.
         transform_file.write(transform_template_string)
+
 
 ###############################################################################
 # Call main function
 ###############################################################################
 
 
-# if __name__ == '__main__':
-#    main()
+if __name__ == '__main__':
+    main()

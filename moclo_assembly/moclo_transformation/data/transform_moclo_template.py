@@ -62,9 +62,9 @@ def run(protocol: protocol_api.ProtocolContext):
         num_cols = len(reaction_plate.columns())
         if multi:
             dest_wells = [reaction_plate.columns()[i][0]
-                            for i in range(num_cols)]
+                          for i in range(num_cols)]
             agar_wells = [agar_plate.columns()[i][0]
-                            for i in range(num_cols)]
+                          for i in range(num_cols)]
         else:
             dest_wells = reaction_plate.wells()
             agar_wells = agar_plate.wells()
@@ -128,15 +128,9 @@ def run(protocol: protocol_api.ProtocolContext):
         #   tr_300.append(labware.load('tipone_96_tiprack_200ul', '9'))
 
         # Load in pipettes
-        p10_single = protocol.load_instrument('p10_single', mount='right',
+        p10_single = protocol.load_instrument('p10_single',
+                                              mount=pipetteMount10,
                                               tip_racks=tr_10)
-
-        if multi:
-            p300_multi = protocol.load_instrument('p300_multi', mount='left',
-                                                  tip_racks=tr_300)
-        else:
-            p300_single = protocol.load_instrument('p300_single', mount='left',
-                                                   tip_racks=tr_300)
         
         # reaction plate from assembly
         post_moclo_reaction_plate = protocol.load_labware(
@@ -147,7 +141,7 @@ def run(protocol: protocol_api.ProtocolContext):
         trough = protocol.load_labware('usascientific_12_reservoir_22ml', '5',
                                        'Reagents trough')
 
-        water = trough.wells()[0]  # Well 1
+        # water = trough.wells()[0]  # Well 1
         wash_0 = trough.wells()[1]  # Well 2
         wash_1 = trough.wells()[2]  # Well 3
         soc = trough.wells()[3]  # Well 4
@@ -187,6 +181,24 @@ def run(protocol: protocol_api.ProtocolContext):
         temp_deck.set_temperature(4)
         protocol.delay(minutes=5)
 
+        if pipetteMount10 == pipetteMount300:
+            protocol.pause()
+            protocol.comment(
+                "Replace the p10 pipette with the p300 pipette, mounting in the same position.")
+            rep = True  # tell opentrons that the p10 pipette is being replaced
+        else:
+            rep = False  # p10 pipette is not being replaced
+
+        if multi:
+            p300_multi = protocol.load_instrument('p300_multi',
+                                                  mount=pipetteMount300,
+                                                  tip_racks=tr_300,
+                                                  replace=rep)
+        else:
+            p300_single = protocol.load_instrument('p300_single',
+                                                   mount=pipetteMount300,
+                                                   tip_racks=tr_300,
+                                                   replace=rep)
         # add soc
         if multi:
             pipette300 = p300_multi

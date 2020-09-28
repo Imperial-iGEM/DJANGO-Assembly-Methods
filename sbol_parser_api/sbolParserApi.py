@@ -31,6 +31,7 @@ class ParserSBOL:
         allConstructs = []
 
         # Get list of constructs
+        # TODO: Get all constructs based on root designs
         allConstructs = self.getListOfConstructs(
             listOfNonCombUris,
             listOfCombUris)
@@ -96,6 +97,8 @@ class ParserSBOL:
                         componentDefs.remove(childDefinition)
         return list(componentDefs)
 
+    # TODO: Get root combinatorial derivations
+
     def getListOfConstructs(
             self,
             listOfNonCombUris: List[str] = [],
@@ -129,8 +132,11 @@ class ParserSBOL:
         return listOfConstructs
 
     # TODO: Implement an Enumerator class?
-    def enumerator(self) -> list:
-        raise NotImplementedError("Not yet implemented")
+    def enumerator(
+        self,
+        derivation: sbol2.combinatorialderivation.CombinatorialDerivation
+    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        return
 
     # TODO: Implement a Filter class?
     def filterConstructs(self):
@@ -482,6 +488,6 @@ class ParserSBOL:
             partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
             # TODO: Create csv
             partLinkerDf.to_csv(
-                "part_linker_"+str(partPlates.index(plate)+1)+uniqueId,
+                "part_linker_"+str(partPlates.index(plate)+1)+"_"+uniqueId,
                 index=False
             )

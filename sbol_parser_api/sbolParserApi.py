@@ -7,6 +7,8 @@ import pandas as pd
 import uuid
 import numpy as np
 from typing import List, Dict
+from rdflib import URIRef
+from sbol2.constants import *
 
 
 class ParserSBOL:
@@ -131,12 +133,286 @@ class ParserSBOL:
                 self.doc.combinatorialderivations.get(uri)))
         return listOfConstructs
 
-    # TODO: Implement an Enumerator class?
     def enumerator(
         self,
         derivation: sbol2.combinatorialderivation.CombinatorialDerivation
     ) -> List[sbol2.componentdefinition.ComponentDefinition]:
-        return
+        parents = []
+        template = self.doc.getComponentDefinition(derivation.masterTemplate)
+        templateCopy = self.createTemplateCopy(template, template.displayId + "_Var", "1")
+        parents.append(templateCopy)
+        for vc in derivation.variableComponents:
+            newParents = []
+            for parent in parents:
+                for children in self.group(self.collectVariants(vc), "http://sbols.org/v2#one"):
+                    varDisplayId = self.concatenateChildrenDisplayId(children)
+                    if parent.persistentIdentity + "_" + varDisplayId + "/1" not in [cd.identity for cd in self.doc.componentDefinitions]:
+                        # Create parent copy
+                        uniqueId = self.getUniqueDisplayId(None, None, parent.displayId + "_" + varDisplayId, parent.version, "CD", self.doc)
+                        newParent = self.createTemplateCopy(parent, uniqueId, "1")
+                        self.doc.add(newParent)
+                    else:
+                        # Set newParent to existing CD
+                        newParent = self.doc.getComponentDefinition(parent.persistentIdentity + "_" + varDisplayId + "/1")
+                    # Add children
+                    self.addChildren(template, template.components[vc.variable], newParent, children)
+                    # Add to newParents
+                    newParents.append(newParent)
+            parents = newParents
+        return parents
+
+    def addChildren(
+        self,
+        originalTemplate: sbol2.componentdefinition.ComponentDefinition,
+        originalComponent: sbol2.component.Component,
+        newParent: sbol2.componentdefinition.ComponentDefinition,
+        children: List[sbol2.componentdefinition.ComponentDefinition]
+    ):
+        newComponent = newParent.components[originalComponent.displayId]
+        newComponent.wasDerivedFrom = originalComponent.identity
+        if children is None:
+            self.removeConstraintReferences(newParent, newComponent)
+            for sa in newParent.sequenceAnnotations:
+                if sa.component is not None and sa.component == newComponent.identity:
+                    newParent.sequenceAnnotations.remove(sa.identity)
+            newParent.components.remove(newComponent.identity)
+            return
+        first = True
+        for child in children:
+            if first:
+                # Take over definition of newParent's version of original component
+                newComponent.definition = child.identity
+                first = False
+            else:
+                # Create new component
+                uniqueId = self.getUniqueDisplayId(newParent, None, child.displayId + "_Component", "1", "Component", None)
+                link = newParent.components.create(uniqueId)
+                link.definition = child.persistentIdentity
+                link.access = SBOL_ACCESS_PUBLIC
+                link.version = child.version
+                link.wasDerivedFrom = originalComponent.identity
+                # Create a new 'prev precedes link' constraint
+                if originalTemplate.hasUpstreamComponent(originalComponent):
+                    oldPrev = originalTemplate.getUpstreamComponent(originalComponent)
+                    if oldPrev.identity in newParent.components:
+                        newPrev = newParent.components[oldPrev.identity]
+                        uniqueId = self.getUniqueDisplayId(newParent, None, newParent.displayId + "_SequenceConstraint", None, "SequenceConstraint", None)
+                        newSequenceConstraint = newParent.sequenceConstraints.create(uniqueId)
+                        newSequenceConstraint.subject = newPrev.identity
+                        newSequenceConstraint.object = link.identity
+                        newSequenceConstraint.restriction = SBOL_RESTRICTION_PRECEDES
+                # Create new 'link precedes next' constraint
+                if originalTemplate.hasDownstreamComponent(originalComponent):
+                    oldNext = originalTemplate.getDownstreamComponent(originalComponent)
+                    if oldNext.identity in newParent.components:
+                        newNext = newParent.components[oldNext.identity]
+                        uniqueId = self.getUniqueDisplayId(newParent, None, newParent.displayId + "_SeqeunceConstraint", None, "SequenceConstraint", None)
+                        newSequenceConstraint = newParent.sequenceConstraints.create(uniqueId)
+                        newSequenceConstraint.subject = link.identity
+                        newSequenceConstraint.object = newNext.identity
+                        newSequenceConstraint.restriction = SBOL_RESTRICTION_PRECEDES
+
+    def removeConstraintReferences(
+        self,
+        newParent: sbol2.componentdefinition.ComponentDefinition,
+        newComponent: sbol2.component.Component
+    ):
+        subj = None
+        obj = None
+        for sc in newParent.sequenceConstraints:
+            if sc.subject == newComponent.identity:
+                obj = newParent.components[sc.object]
+                if subj is not None:
+                    sc.subject = subj
+                    obj = None
+                    subj = None
+                else:
+                    newParent.sequenceConstraints.remove(sc.identity)
+            if sc.object == newComponent.identity:
+                subj = newParent.components[sc.subject]
+                if obj is not None:
+                    sc.object = obj
+                    obj = None
+                    subj = None
+                else:
+                    newParent.sequenceConstraints.remove(sc.identity)
+
+    def createTemplateCopy(
+        self,
+        template: sbol2.componentdefinition.ComponentDefinition,
+        displayId: str,
+        version: str
+    ) -> sbol2.componentdefinition.ComponentDefinition:
+        newDisplayId = URIRef(displayId)
+        templateCopy = sbol2.componentdefinition.ComponentDefinition(newDisplayId, template.types, version)
+        templateCopy.roles = template.roles
+        primaryStructure = template.getPrimaryStructureComponents()
+        curr = None
+        prev = None
+        for c in primaryStructure:
+            curr = templateCopy.components.create(c.displayId)
+            curr.access = c.access
+            curr.definition = c.definition
+            if prev is not None:
+                uniqueId = self.getUniqueDisplayId(
+                    templateCopy,
+                    None,
+                    templateCopy.displayId + "_SequenceConstraint",
+                    None,
+                    "SequenceConstraint",
+                    None)
+                sc = templateCopy.sequenceConstraints.create(uniqueId)
+                sc.subject = prev.identity
+                sc.object = curr.identity
+                sc.restriction = SBOL_RESTRICTION_PRECEDES
+            prev = curr
+        templateCopy.wasDerivedFrom = [template.identity]
+        for c in templateCopy.components:
+            component = template.components[c.displayId]
+            c.wasDerivedFrom = component.identity
+        return templateCopy
+
+    def getUniqueDisplayId(
+        self,
+        comp: sbol2.componentdefinition.ComponentDefinition = None,
+        derivation: sbol2.combinatorialderivation.CombinatorialDerivation = None,
+        displayId: str = None,
+        version: str = None,
+        dataType: str = None,
+        doc: sbol2.document.Document = None
+    ) -> str:
+        i = 1
+        if dataType == "CD":
+            uniqueUri = sbol2.getHomespace() + displayId + "/" + version
+            # while doc.find(uniqueUri):
+            while uniqueUri in [cd.displayId for cd in doc.componentDefinitions]:
+                i += 1
+                uniqueUri = sbol2.getHomespace() + "%s_%d/%s" % (displayId, i, version)
+            if i == 1:
+                return displayId
+            else:
+                return displayId + "_" + str(i)
+        elif dataType == "SequenceAnnotation":
+            while displayId in [sa.displayId for sa in comp.sequenceAnnotations]:
+                i += 1
+                displayId = displayId + str(i)
+            if i == 1:
+                return displayId
+            else:
+                return displayId
+        elif dataType == "SequenceConstraint":
+            while displayId in [sc.displayId for sc in comp.sequenceConstraints]:
+                i += 1
+                displayId = displayId + str(i)
+            if i == 1:
+                return displayId
+            else:
+                return displayId
+        elif dataType == "Component":
+            while displayId in [c.displayId for c in comp.components]:
+                i += 1
+                displayId = displayId + str(i)
+            if i == 1:
+                return displayId
+            else:
+                return displayId
+        elif dataType == "Sequence":
+            uniqueUri = sbol2.getHomespace() + displayId + "/" + version
+            while doc.find(uniqueUri):
+                i += 1
+                uniqueUri = sbol2.getHomespace() + "%s_%d/%s" % (displayId, i, version)
+            if i == 1:
+                return displayId
+            else:
+                return displayId + str(i)
+        # TODO: Range
+        elif dataType == "CombinatorialDerivation":
+            uniqueUri = sbol2.getHomespace() + displayId + "/" + version
+            while doc.find(uniqueUri):
+                i += 1
+                uniqueUri = sbol2.getHomespace() + "%s_%d/%s" % (displayId, i, version)
+            if i == 1:
+                return displayId
+            else:
+                return displayId + str(i)
+        elif dataType == "VariableComponent":
+            while displayId + str(i) in [vc.displayId for vc in derivation.variableComponents]:
+                i += 1
+                displayId = displayId + str(i)
+            if i == 1:
+                return displayId
+            else:
+                return displayId
+        else:
+            raise ValueError("")
+
+    def concatenateChildrenDisplayId(
+        self,
+        children: List[sbol2.componentdefinition.ComponentDefinition]
+    ) -> str:
+        concDisplayId = ""
+        for child in children:
+            concDisplayId = concDisplayId + child.displayId
+        return concDisplayId
+
+    def collectVariants(
+        self,
+        vc: sbol2.combinatorialderivation.VariableComponent
+    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        variants = []
+        # Add all variants
+        for v in vc.variants:
+            variant = self.doc.componentDefinitions.get(v)
+            variants.append(variant)
+        # Add all variants from Variant Collections
+        for c in vc.variantCollections:
+            for m in c.members:
+                tl = self.doc.get(m)
+                if type(tl) == sbol2.componentdefinition.ComponentDefinition:
+                    variants.add(tl)
+        for derivation in vc.variantDerivations:
+            variants.extend(self.enumerator(self.doc.get(derivation)))
+        return variants
+
+    def group(
+        self,
+        variants: List[sbol2.componentdefinition.ComponentDefinition],
+        repeat: str
+    ) -> List[List[sbol2.componentdefinition.ComponentDefinition]]:
+        groups = []
+        for cd in variants:
+            group = []
+            group.append(cd)
+            groups.append(group)
+        if repeat == "http://sbols.org/v2#one":
+            return groups
+        if repeat == "http://sbols.org/v2#zeroOrOne":
+            groups.append([])
+            return groups
+        groups.clear()
+        self.generateCombinations(groups, variants, 0, [])
+        if repeat == "http://sbols.org/v2#oneOrMore":
+            return groups
+        if repeat == "http://sbols.org/v2#zeroOrMore":
+            groups.append([])
+            return groups
+
+    def generateCombinations(
+        self,
+        groups: List[List[sbol2.componentdefinition.ComponentDefinition]],
+        variants: List[sbol2.componentdefinition.ComponentDefinition],
+        i: int,
+        sets: List[sbol2.componentdefinition.ComponentDefinition]
+    ):
+        if i == len(variants):
+            if not sets:
+                groups.add(sets)
+            return
+        no = sets.copy()
+        self.generateCombinations(groups, variants, i+1, no)
+        yes = sets.copy()
+        yes.add(variants[i])
+        self.generateCombinations(groups, variants, i+1, yes)
 
     # TODO: Implement a Filter class?
     def filterConstructs(self):

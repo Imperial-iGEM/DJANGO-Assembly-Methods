@@ -6,6 +6,7 @@ import warnings
 import pandas as pd
 import uuid
 import numpy as np
+import os
 from typing import List, Dict
 from rdflib import URIRef
 from sbol2.constants import *
@@ -18,8 +19,6 @@ class ParserSBOL:
 
     def generateCsv_for_DNABot(
             self,
-            listOfNonCombUris: List[str],
-            listOfCombUris: List[str],
             linkerFile: sbol2.document.Document
     ):
         """Create construct and parts/linkers CSVs for DNABot input
@@ -33,10 +32,7 @@ class ParserSBOL:
         allConstructs = []
 
         # Get list of constructs
-        # TODO: Get all constructs based on root designs
-        allConstructs = self.getListOfConstructs(
-            listOfNonCombUris,
-            listOfCombUris)
+        allConstructs = self.getListOfConstructs()
 
         # TODO: Filter constructs - to improve
 
@@ -48,7 +44,7 @@ class ParserSBOL:
 
         # Create plateo construct plates
         constructPlates = self.fillPlateoPlates(
-            allConstructs,
+            allConstructs[0:87],
             "Construct",
             1,
             plateo.containers.Plate96,
@@ -59,6 +55,10 @@ class ParserSBOL:
         for plate in constructPlates:
             # Create UUID
             uniqueId = uuid.uuid4().hex
+            # Create new directory
+            outdir = "./" + uniqueId
+            if not os.path.exists(outdir):
+                os.mkdir(outdir)
             # Create construct CSV
             self.getConstructCsvFromPlateoPlate(plate, uniqueId)
             # Write parts/linkers csv
@@ -92,14 +92,34 @@ class ParserSBOL:
         # Remove child components of combinatorial derivations
         for obj in document.combinatorialderivations:
             for variableComponent in obj.variableComponents:
-                # TODO: Verify that variants are component definitions
-                for childDefinition in variableComponent.variants:
+                for variant in variableComponent.variants:
+                    childDefinition = document.getComponentDefinition(variant)
                     if(childDefinition is not None
                             and childDefinition in componentDefs):
                         componentDefs.remove(childDefinition)
+        # Remove Templates
+        for obj in document.combinatorialderivations:
+            template = document.getComponentDefinition(obj.masterTemplate)
+            if (template is not None
+                    and template in componentDefs):
+                    componentDefs.remove(template)
         return list(componentDefs)
 
-    # TODO: Get root combinatorial derivations
+    def getRootCombinatorialDerivations(
+        self,
+        sbolDocument: sbol2.document.Document = None
+    ) -> List[sbol2.combinatorialderivation.CombinatorialDerivation]:
+        document = self.doc if sbolDocument is None else sbolDocument
+        combDerivs = list(document.combinatorialderivations)
+        for obj in document.combinatorialderivations:
+            for vc in obj.variableComponents:
+                if vc.variantDerivations is not None:
+                    for vd in vc.variantDerivations:
+                        childDeriv = document.combinatorialderivations.get(vd)
+                        if (childDeriv is not None
+                                and childDeriv in combDerivs):
+                            combDerivs.remove(childDeriv)
+        return combDerivs
 
     def getListOfConstructs(
             self,
@@ -123,14 +143,24 @@ class ParserSBOL:
         """
         listOfConstructs = []
         # Add non-combinatorial constructs to list
-        for uri in listOfNonCombUris:
-            listOfConstructs.append(self.doc.getComponentDefinition(uri))
+        if listOfNonCombUris == []:
+            # Get all root component definitions and append to list
+            listOfConstructs.extend(self.getRootComponenentDefinitions())
+        else:
+            for uri in listOfNonCombUris:
+                listOfConstructs.append(self.doc.getComponentDefinition(uri))
         # Add combinatorial constructs to list
-        for uri in listOfCombUris:
-            # Enumerate Combinatorial Derivations and add to allConstructs
-            # sbol2 doesnt have getCombinatorialDerivation() function
-            listOfConstructs.extend(self.enumerator(
-                self.doc.combinatorialderivations.get(uri)))
+        if listOfCombUris == []:
+            # Get all root combinatorial derivations
+            combDerivs = self.getRootCombinatorialDerivations()
+            # Enumerate all root combinatorial derivations and append to list
+            for combDeriv in combDerivs:
+                listOfConstructs.extend(self.enumerator(combDeriv))
+        else:
+            for uri in listOfCombUris:
+                # Enumerate Combinatorial Derivations and add to allConstructs
+                listOfConstructs.extend(self.enumerator(
+                    self.doc.combinatorialderivations.get(uri)))
         return listOfConstructs
 
     def enumerator(
@@ -665,7 +695,7 @@ class ParserSBOL:
         '''
         constructDf = self.getConstructDfFromPlateoPlate(constructPlate)
         constructDf.to_csv(
-            "construct_"+uniqueId+".csv",
+            "./" + uniqueId + "/construct.csv",
             index=False)
 
     def isLinker(
@@ -750,7 +780,7 @@ class ParserSBOL:
         # Sort list of parts and linkers
         self.getSortedListOfParts(listOfParts)
         # Add parts and linkers to plate
-        # TODO: Calculate part/linker concentration
+        # TODO: Determine number of plates from number of parts
         # TODO: Add part/linker concentration to plate
         partPlates = self.fillPlateoPlates(
             listOfParts,
@@ -762,8 +792,7 @@ class ParserSBOL:
         for plate in partPlates:
             # Create df
             partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
-            # TODO: Create csv
             partLinkerDf.to_csv(
-                "part_linker_"+str(partPlates.index(plate)+1)+"_"+uniqueId,
+                "./" + uniqueId + "/part_linker_" + str(partPlates.index(plate)+1) + ".csv",
                 index=False
             )

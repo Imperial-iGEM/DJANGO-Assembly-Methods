@@ -10,6 +10,7 @@ import csv
 import numpy as np
 import json
 import sys
+# from .mplates import final_well
 from .mplates import final_well
 import random
 import string
@@ -29,15 +30,18 @@ import string
 #output_sources_paths = ('..../DNA-BOT/my_examples/BIOLEGIO_BASIC_STD_SET.csv', '/Users/Benedict/Documents/iGEM/DNA-BOT-EDITING/DNA-BOT/my_examples/part_plate_2_230419.csv')
     
 # Constant str
-TEMPLATE_DIR_NAME = 'basic_assembly/dna_bot/template_ot2_scripts'
+# TEMPLATE_DIR_NAME = 'basic_assembly/dna_bot/template_ot2_scripts'
+TEMPLATE_DIR_NAME = 'template_ot2_scripts'
 CLIP_TEMP_FNAME = 'clip_template.py'
 MAGBEAD_TEMP_FNAME = 'purification_template.py'
 F_ASSEMBLY_TEMP_FNAME = 'assembly_template.py'
 TRANS_SPOT_TEMP_FNAME = 'transformation_template.py'
+THERMOCYCLE_TEMP_NAME = 'thermocycle_template.py'
 CLIP_FNAME = '1_clip.ot2.py'
 MAGBEAD_FNAME = '2_purification.ot2.py'
 F_ASSEMBLY_FNAME = '3_assembly.ot2.py'
 TRANS_SPOT_FNAME = '4_transformation.ot2.py'
+THERMOCYCLE_FNAME = '1_5_thermocycle.ot2.py'
 CLIPS_INFO_FNAME = 'clip_run_info.csv'
 FINAL_ASSEMBLIES_INFO_FNAME = 'final_assembly_run_info.csv'
 WELL_OUTPUT_FNAME = 'wells.txt'
@@ -57,6 +61,7 @@ FINAL_ASSEMBLIES_PER_CLIP = 15
 DEFAULT_PART_VOL = 1
 MAX_SOURCE_PLATES = 6
 MAX_FINAL_ASSEMBLY_TIPRACKS = 7
+PART_DEAD_VOL = 15
 
 # Constant dicts
 SPOTTING_VOLS_DICT = {2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5}
@@ -64,11 +69,30 @@ SPOTTING_VOLS_DICT = {2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5}
 # Constant lists
 SOURCE_DECK_POS = ['2', '5', '8', '7', '10', '11']
 
+labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
+                'well_plate': 'biorad_96_wellplate_200ul_pcr',
+                'reagent_plate': 'usascientific_12_reservoir_22ml',
+                'mag_plate': 'biorad_96_wellplate_200ul_pcr',
+                'tube_rack': 'opentrons_24_tuberack_nest_1.5ml_snapcap',
+                'aluminum_block':
+                'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+                'bead_container': 'usascientific_96_wellplate_2.4ml_deep',
+                'soc_plate': 'usascientific_96_wellplate_2.4ml_deep',
+                'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
-def dnabot(ethanol_well_for_stage_2,
-            deep_well_plate_stage_4,
-            input_construct_path,
-            output_sources_paths):
+
+def dnabot(ethanol_well_for_stage_2, deep_well_plate_stage_4,
+           input_construct_path, output_sources_paths,
+           p10_mount='right', p300_mount='left',
+           well_plate='biorad_96_wellplate_200ul_pcr',
+           reagent_plate='usascientific_12_reservoir_22ml',
+           mag_plate='biorad_96_wellplate_200ul_pcr',
+           tube_rack='opentrons_24_tuberack_nest_1.5ml_snapcap',
+           aluminum_block='opentrons_96_aluminumblock_biorad_wellplate_200ul',
+           bead_container='usascientific_96_wellplate_2.4ml_deep',
+           soc_plate='usascientific_96_wellplate_2.4ml_deep',
+           agar_plate='thermofisher_96_wellplate_180ul'):
+
     # Parent directories
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
@@ -95,7 +119,7 @@ def dnabot(ethanol_well_for_stage_2,
     #        'Number of source plates exceeds deck positions.')
 
 
-    # HERE YOU CAN SPECIFY THE PATH NAME AND IT WORKS 
+    # HERE YOU CAN SPECIFY THE PATH NAME AND IT WORKS
     #construct_path.output = input_construct_path
     #sources_paths.output = output_sources_paths
 
@@ -121,14 +145,16 @@ def dnabot(ethanol_well_for_stage_2,
     constructs_list = generate_constructs_list(input_construct_path)
     clips_df = generate_clips_df(constructs_list)
     print(output_sources_paths)
-    sources_dict = generate_sources_dict(output_sources_paths)
+    sources_dict, parts_df = generate_sources_dict(output_sources_paths)
+    parts_df_temp = fill_parts_df(clips_df, parts_df)
+    parts_df = parts_df_temp.copy()
 
     # calculate OT2 script variables
     print('Calculating OT-2 variables...')
-    clips_dict = generate_clips_dict(clips_df, sources_dict)
+    clips_dict = generate_clips_dict(clips_df, sources_dict, parts_df)
     magbead_sample_number = clips_df['number'].sum()
-    final_assembly_dict = generate_final_assembly_dict(constructs_list,
-                                                       clips_df)
+    final_assembly_dict, clips_df, parts_df = generate_final_assembly_dict(
+        constructs_list, clips_df, parts_df)
     final_assembly_tipracks = calculate_final_assembly_tipracks(
         final_assembly_dict)
     spotting_tuples = generate_spotting_tuples(constructs_list,
@@ -138,9 +164,13 @@ def dnabot(ethanol_well_for_stage_2,
 
     # Write OT2 scripts
     out_full_path_1 = generate_ot2_script(CLIP_FNAME, os.path.join(
-        template_dir_path, CLIP_TEMP_FNAME), clips_dict=clips_dict)
+        template_dir_path, CLIP_TEMP_FNAME), clips_dict=clips_dict,
+        p10_mount=p10_mount, well_plate_type=well_plate,
+        tube_rack_type=tube_rack)
     out_full_path_2 = generate_ot2_script(MAGBEAD_FNAME, os.path.join(
-        template_dir_path, MAGBEAD_TEMP_FNAME),
+        template_dir_path, MAGBEAD_TEMP_FNAME), p300_mount=p300_mount,
+        well_plate_type=well_plate, reagent_plate_type=reagent_plate,
+        bead_container_type=bead_container,
         sample_number=magbead_sample_number,
         # THIS IS FOR THE ETHANOL TROUGH WELL IN STEP 2
         #ethanol_well=dnabotinst.etoh_well)
@@ -149,20 +179,30 @@ def dnabot(ethanol_well_for_stage_2,
     out_full_path_3 = generate_ot2_script(F_ASSEMBLY_FNAME, os.path.join(
         template_dir_path, F_ASSEMBLY_TEMP_FNAME),
         final_assembly_dict=final_assembly_dict,
-        tiprack_num=final_assembly_tipracks)
+        tiprack_num=final_assembly_tipracks,
+        p10_mount=p10_mount, mag_plate_type=mag_plate,
+        tube_rack_type=tube_rack, aluminum_block_type=aluminum_block)
     out_full_path_4 = generate_ot2_script(TRANS_SPOT_FNAME, os.path.join(
         template_dir_path, TRANS_SPOT_TEMP_FNAME),
         spotting_tuples=spotting_tuples,
         #Deep well plate for Soc media during
         #soc_well="A{}".format(dnabotinst.soc_column))
-        #previously the information about the location of the 
-        soc_well="A1")
+        #previously the information about the location of the
+        soc_well="A1", p10_mount=p10_mount,
+        p300_mount=p300_mount, well_plate_type=well_plate,
+        tube_rack_type=tube_rack, soc_plate_type=soc_plate,
+        agar_plate_type=agar_plate)
+
+    out_full_path_5 = generate_ot2_script(THERMOCYCLE_FNAME, os.path.join(
+        template_dir_path, THERMOCYCLE_TEMP_NAME),
+        well_plate_type=well_plate)
 
     all_my_output_paths = []
     all_my_output_paths.append(out_full_path_1)
     all_my_output_paths.append(out_full_path_2)
     all_my_output_paths.append(out_full_path_3)
     all_my_output_paths.append(out_full_path_4)
+    all_my_output_paths.append(out_full_path_5)
 
     # Write non-OT2 scripts
     os.chdir(generator_dir)
@@ -171,15 +211,19 @@ def dnabot(ethanol_well_for_stage_2,
         pass
     else:
         random = get_random_string(20)
-        my_meta_dir = os.path.join('basic_files/output',random,'metainformation')
+        my_meta_dir = os.path.join('basic_files/output', random,
+                                   'metainformation')
         os.makedirs(my_meta_dir)
     os.chdir(my_meta_dir)
     master_mix_df = generate_master_mix_df(clips_df['number'].sum())
     sources_paths_df = generate_sources_paths_df(
         output_sources_paths, SOURCE_DECK_POS)
+    labwareDf = pd.DataFrame(
+        data={'name': list(labware_dict.keys()),
+              'definition': list(labware_dict.values())})
     dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
                MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
-               CLIP_REACTIONS=clips_df)
+               CLIP_REACTIONS=clips_df, PART_INFO=parts_df, LABWARE=labwareDf)
     with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
               'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
@@ -280,20 +324,29 @@ def generate_clips_df(constructs_list):
     clips_df['number'] = [int(i) for i in clip_count.tolist()]
 
     # Associate well/s for each CLIP reaction
+    clips_df['clip_well'] = pd.Series(['0'] * len(clips_df.index),
+                                      index=clips_df.index)
     clips_df['mag_well'] = pd.Series(['0'] * len(clips_df.index),
                                      index=clips_df.index)
+
     for index, number in clips_df['number'].iteritems():
         if index == 0:
+            clip_wells = []
             mag_wells = []
             for x in range(number):
+                clip_wells.append(final_well(x + 1))
                 mag_wells.append(final_well(x + 1 + 48))
+            clips_df.at[index, 'clip_well'] = tuple(clip_wells)
             clips_df.at[index, 'mag_well'] = tuple(mag_wells)
         else:
+            clip_wells = []
             mag_wells = []
             for x in range(number):
                 well_count = clips_df.loc[
                     :index - 1, 'number'].sum() + x + 1 + 48
+                clip_wells.append(final_well(well_count - 48))
                 mag_wells.append(final_well(well_count))
+            clips_df.at[index, 'clip_well'] = tuple(clip_wells)
             clips_df.at[index, 'mag_well'] = tuple(mag_wells)
     return clips_df
 
@@ -309,6 +362,8 @@ def generate_sources_dict(paths):
 
     """
     sources_dict = {}
+    part_dict = {}
+    part_dict_list = []
     print('my paths: {}'.format(paths))
     for deck_index, path in enumerate(paths):
         print('my path: {}'.format(path[1:]))
@@ -319,11 +374,103 @@ def generate_sources_dict(paths):
                     csv_values = source[1:]
                     csv_values.append(SOURCE_DECK_POS[deck_index])
                     sources_dict[str(source[0])] = tuple(csv_values)
+                    part_dict['name'] = [str(source[0])]
+                    part_dict['well'] = [str(source[1])]
+                    if len(source) > 2:
+                        part_dict['concentration'] = [str(source[2])]
+                    else:
+                        part_dict['concentration'] = [PART_PER_CLIP]
+                    part_dict['plate'] = [SOURCE_DECK_POS[deck_index]]
+                    part_dict_list.append(pd.DataFrame.from_dict(part_dict))
+    parts_df = pd.concat(part_dict_list, ignore_index=True)
     print('essential: {}'.format(sources_dict))
-    return sources_dict
+    return sources_dict, parts_df
 
 
-def generate_clips_dict(clips_df, sources_dict):
+def fill_parts_df(clips_df, parts_df_temp):
+    """Fill dataframe of parts with metainformation.
+       Still need to add final assembly well.
+    """
+    parts_df = parts_df_temp.copy()
+    parts_df['clip_well'] = pd.Series(['0'] * len(parts_df.index),
+                                      index=parts_df.index)
+    parts_df['mag_well'] = pd.Series(['0'] * len(parts_df.index),
+                                     index=parts_df.index)
+    parts_df['total_vol'] = pd.Series(['0'] * len(parts_df.index),
+                                      index=parts_df.index)
+    parts_df['vol_per_clip'] = pd.Series(['0'] * len(parts_df.index),
+                                         index=parts_df.index)
+    parts_df['number'] = pd.Series(['0'] * len(parts_df.index),
+                                   index=parts_df.index)
+    # Iterate through clips dataframe
+    for index, row in clips_df.iterrows():
+        prefix_index = parts_df[
+                parts_df['name'] == row['prefixes']].index.values[0]
+        part_index = parts_df[
+                parts_df['name'] == row['parts']].index.values[0]
+        suffix_index = parts_df[
+                parts_df['name'] == row['suffixes']].index.values[0]
+        if parts_df.at[prefix_index, 'clip_well'] == '0':
+            parts_df.at[prefix_index, 'clip_well'] = list(row['clip_well'])
+        else:
+            parts_df.at[
+                prefix_index, 'clip_well'].extend(list(row['clip_well']))
+        if parts_df.at[part_index, 'clip_well'] == '0':
+            parts_df.at[part_index, 'clip_well'] = list(row['clip_well'])
+        else:
+            parts_df.at[
+                part_index, 'clip_well'].extend(list(row['clip_well']))
+        if parts_df.at[suffix_index, 'clip_well'] == '0':
+            parts_df.at[suffix_index, 'clip_well'] = list(row['clip_well'])
+        else:
+            parts_df.at[
+                suffix_index, 'clip_well'].extend(list(row['clip_well']))
+        
+        if parts_df.at[prefix_index, 'mag_well'] == '0':
+            parts_df.at[prefix_index, 'mag_well'] = list(row['mag_well'])
+        else:
+            parts_df.at[
+                prefix_index, 'mag_well'].extend(list(row['mag_well']))
+        if parts_df.at[part_index, 'mag_well'] == '0':
+            parts_df.at[part_index, 'mag_well'] = list(row['mag_well'])
+        else:
+            parts_df.at[
+                part_index, 'mag_well'].extend(list(row['mag_well']))
+        if parts_df.at[suffix_index, 'mag_well'] == '0':
+            parts_df.at[suffix_index, 'mag_well'] = list(row['mag_well'])
+        else:
+            parts_df.at[
+                suffix_index, 'mag_well'].extend(list(row['mag_well']))
+        
+        parts_df.at[prefix_index, 'number'] = int(
+            parts_df.at[prefix_index, 'number']) + int(row['number'])
+        parts_df.at[part_index, 'number'] = int(
+            parts_df.at[part_index, 'number']) + int(row['number'])
+        parts_df.at[suffix_index, 'number'] = int(
+            parts_df.at[suffix_index, 'number']) + int(row['number'])
+
+    for index, row in parts_df.iterrows():
+        noClips = int(row['number'])
+        if row['name'][len(row['name'])-2:len(row['name'])-1] == '-P':
+            vol_per_clip = 1
+        elif row['name'][len(row['name'])-2:len(row['name'])-1] == '-S':
+            vol_per_clip = 1
+        else:
+            vol_per_clip = int(round(
+                    PART_PER_CLIP / float(row['concentration']), 1))
+            if vol_per_clip < MIN_VOL:
+                vol_per_clip = MIN_VOL
+        parts_df.at[index, 'vol_per_clip'] = vol_per_clip
+        if noClips > 0:
+            parts_df.at[index, 'total_vol'] = vol_per_clip*noClips + \
+                PART_DEAD_VOL
+        else:
+            parts_df.at[index, 'total_vol'] = 0
+
+    return parts_df
+
+
+def generate_clips_dict(clips_df, sources_dict, parts_df):
     """Using clips_df and sources_dict, returns a clips_dict which acts as the 
     sole variable for the opentrons script "clip.ot2.py".
 
@@ -356,12 +503,9 @@ def generate_clips_dict(clips_df, sources_dict):
                                              * clip_info['number'])
             clips_dict['parts_plates'].append([handle_2_columns(sources_dict[part])[2]]
                                               * clip_info['number'])
-            if not sources_dict[part][1]:
-                clips_dict['parts_vols'].append([DEFAULT_PART_VOL] *
-                                                clip_info['number'])
-                clips_dict['water_vols'].append([max_part_vol - DEFAULT_PART_VOL]
-                                                * clip_info['number'])
-            else:
+            part_index = parts_df[parts_df['name'] == part].index.values[0]
+            part_concentration = parts_df.at[part_index, 'concentration']
+            if part_concentration != PART_PER_CLIP:
                 part_vol = round(
                     PART_PER_CLIP / float(sources_dict[part][1]), 1)
                 if part_vol < MIN_VOL:
@@ -373,6 +517,12 @@ def generate_clips_dict(clips_df, sources_dict):
                     [part_vol] * clip_info['number'])
                 clips_dict['water_vols'].append(
                     [water_vol] * clip_info['number'])
+            else:
+                clips_dict['parts_vols'].append([DEFAULT_PART_VOL] *
+                                                clip_info['number'])
+                clips_dict['water_vols'].append([max_part_vol - DEFAULT_PART_VOL]
+                                                * clip_info['number'])
+                
     except KeyError:
         sys.exit('likely part/linker not listed in sources.csv')
     for key, value in clips_dict.items():
@@ -380,7 +530,7 @@ def generate_clips_dict(clips_df, sources_dict):
     return clips_dict
 
 
-def generate_final_assembly_dict(constructs_list, clips_df):
+def generate_final_assembly_dict(constructs_list, clips_df, parts_df):
     """Using constructs_list and clips_df, returns a dictionary of final
     assemblies with keys defining destination plate well positions and values
     indicating which clip reaction wells are used.
@@ -388,6 +538,10 @@ def generate_final_assembly_dict(constructs_list, clips_df):
     """
     final_assembly_dict = {}
     clips_count = np.zeros(len(clips_df.index))
+    parts_df['construct_well'] = pd.Series(['0'] * len(parts_df.index),
+                                           index=parts_df.index)
+    clips_df['construct_well'] = pd.Series(['0'] * len(clips_df.index),
+                                           index=clips_df.index)
     for construct_index, construct_df in enumerate(constructs_list):
         construct_well_list = []
         for _, clip in construct_df.iterrows():
@@ -400,9 +554,42 @@ def generate_final_assembly_dict(constructs_list, clips_df):
                                        FINAL_ASSEMBLIES_PER_CLIP)]
             clips_count[clip_num] = clips_count[clip_num] + 1
             construct_well_list.append(clip_well)
+            if clips_df.at[clip_num, 'construct_well'] == '0':
+                clips_df.at[clip_num, 'construct_well'] = [str(
+                    final_well(construct_index + 1))]
+            else:
+                clips_df.at[clip_num, 'construct_well'].append(str(
+                    final_well(construct_index + 1)))
+            prefix_index = parts_df[
+                parts_df['name'] == clip['prefixes']].index.values[0]
+            part_index = parts_df[
+                parts_df['name'] == clip['parts']].index.values[0]
+            suffix_index = parts_df[
+                parts_df['name'] == clip['suffixes']].index.values[0]
+
+            if parts_df.at[prefix_index, 'construct_well'] == '0':
+                parts_df.at[prefix_index, 'construct_well'] = [str(
+                    final_well(construct_index + 1))]
+            else:
+                parts_df.at[prefix_index, 'construct_well'].append(str(
+                    final_well(construct_index + 1)))
+            if parts_df.at[part_index, 'construct_well'] == '0':
+                parts_df.at[part_index, 'construct_well'] = [str(
+                    final_well(construct_index + 1))]
+            else:
+                parts_df.at[part_index, 'construct_well'].append(str(
+                    final_well(construct_index + 1)))
+            if parts_df.at[suffix_index, 'construct_well'] == '0':
+                parts_df.at[suffix_index, 'construct_well'] = [str(
+                    final_well(construct_index + 1))]
+            else:
+                parts_df.at[suffix_index, 'construct_well'].append(str(
+                    final_well(construct_index + 1)))
+
         final_assembly_dict[final_well(
             construct_index + 1)] = construct_well_list
-    return final_assembly_dict
+
+    return final_assembly_dict, clips_df, parts_df
 
 
 def calculate_final_assembly_tipracks(final_assembly_dict):
@@ -473,7 +660,7 @@ def generate_ot2_script(ot2_script_path, template_path, **kwargs):
     os.makedirs(output_str)
     os.chdir(output_str)
 
-    full_file_path = os.path.join(output_str,ot2_script_path)
+    full_file_path = os.path.join(output_str, ot2_script_path)
 
 
 
@@ -560,6 +747,7 @@ def dfs_to_csv(path, index=True, **kw_dfs):
             value.to_csv(csvfile, index=index)
             csvwriter.writerow('')
 
+
 def handle_2_columns(datalist):
     """This function has the intent of changing:
     ('A8', '2') => ('A8', '', '2')
@@ -571,12 +759,12 @@ def handle_2_columns(datalist):
     of length 2 instead of 3
     """
     return_list = 0
-    if isinstance(datalist,list):
+    if isinstance(datalist, list):
         datalist = datalist[0]
         return_list = 1
     if len(datalist) == 2:
         datalist = list(datalist)
-        datalist.insert(1,"")
+        datalist.insert(1, "")
         datalist = tuple(datalist)
     if return_list:
         mylist = [""]
@@ -584,12 +772,14 @@ def handle_2_columns(datalist):
         return mylist
     return datalist
 
+
 def get_random_string(length):
     letters = string.ascii_lowercase
     result_str = ''.join(random.choice(letters) for i in range(length))
     #print("Random string of length", length, "is:", result_str)
     return result_str
 
-#if __name__ == '__main__':
-#    main()
+
+#dnabot('A11', '1', " C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv", [" C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv", " C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/part_plate_2_230419.csv"],
+       #**labware_dict)
 

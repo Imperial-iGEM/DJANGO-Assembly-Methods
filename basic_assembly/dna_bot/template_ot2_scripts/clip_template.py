@@ -1,10 +1,10 @@
 from opentrons import protocol_api
-from opentrons import legacy_api
 
 metadata = {'apiLevel': '2.2',
             'protocolName': 'Clip Template v2',
             'author': 'Gabrielle Johnston',
             'description': 'DNABot updated clip template'}
+
 
 def run(protocol: protocol_api.ProtocolContext):
     def clip(
@@ -16,7 +16,10 @@ def run(protocol: protocol_api.ProtocolContext):
         parts_plates,
         parts_vols,
         water_vols,
-        tiprack_type='opentrons_96_tiprack_10ul'):
+        tiprack_type='opentrons_96_tiprack_10ul',
+        p10_mount='right',
+        well_plate_type='biorad_96_wellplate_200ul_pcr',
+        tube_rack_type='opentrons_24_tuberack_nest_1.5ml_snapcap'):
     
         """Implements linker ligation reactions using an opentrons OT-2."""
 
@@ -24,11 +27,15 @@ def run(protocol: protocol_api.ProtocolContext):
         INITIAL_TIP = 'A1'
         CANDIDATE_TIPRACK_SLOTS = ['3', '6', '9']
         PIPETTE_TYPE = 'p10_single'
-        PIPETTE_MOUNT = 'right'
-        SOURCE_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
-        DESTINATION_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+        # PIPETTE_MOUNT = 'right'
+        PIPETTE_MOUNT = p10_mount
+        # SOURCE_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+        SOURCE_PLATE_TYPE = well_plate_type
+        # DESTINATION_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+        DESTINATION_PLATE_TYPE = well_plate_type
         DESTINATION_PLATE_POSITION = '1'
-        TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+        # TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+        TUBE_RACK_TYPE = tube_rack_type
         TUBE_RACK_POSITION = '4'
         MASTER_MIX_WELL = 'A1'
         WATER_WELL = 'A2'
@@ -40,7 +47,7 @@ def run(protocol: protocol_api.ProtocolContext):
         # Tiprack slots
         total_tips = 4 * len(parts_wells)
         letter_dict = {'A': 0, 'B': 1, 'C': 2,
-                    'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7}
+                       'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7}
 
         initial_destination_well_index = letter_dict[INITIAL_DESTINATION_WELL[0]]*12 \
             + int(INITIAL_DESTINATION_WELL[1]) - 1
@@ -55,15 +62,18 @@ def run(protocol: protocol_api.ProtocolContext):
         slots = CANDIDATE_TIPRACK_SLOTS[:tiprack_num]
 
         source_plates = {}
-        source_plates_keys = list(set((prefixes_plates + suffixes_plates + parts_plates)))
+        source_plates_keys = list(set((
+            prefixes_plates + suffixes_plates + parts_plates)))
         for key in source_plates_keys:
             source_plates[key] = protocol.load_labware(SOURCE_PLATE_TYPE, key)
 
-        tipracks = [protocol.load_labware(tiprack_type, slot) for slot in slots]
+        tipracks = [protocol.load_labware(tiprack_type, slot)
+                    for slot in slots]
         if PIPETTE_TYPE != 'p10_single':
             print('Define labware must be changed to use', PIPETTE_TYPE)
             exit()
-        pipette = protocol.load_instrument('p10_single', PIPETTE_MOUNT, tip_racks=tipracks)
+        pipette = protocol.load_instrument('p10_single', PIPETTE_MOUNT,
+                                           tip_racks=tipracks)
         #pipette.pick_up_tip(tipracks[0].well(INITIAL_TIP))
         destination_plate = protocol.load_labware(
             DESTINATION_PLATE_TYPE, DESTINATION_PLATE_POSITION)
@@ -73,22 +83,30 @@ def run(protocol: protocol_api.ProtocolContext):
         #destination_wells = destination_plate.wells(
             #INITIAL_DESTINATION_WELL, length=int(len(parts_wells)))
         destination_wells = destination_plate.wells()[
-            initial_destination_well_index:(initial_destination_well_index + int(len(parts_wells)))]
+            initial_destination_well_index:(
+                initial_destination_well_index + int(len(parts_wells)))]
 
         # Transfers
         #pipette.pick_up_tip()
         pipette.pick_up_tip(tipracks[0].well(INITIAL_TIP))
         pipette.transfer(MASTER_MIX_VOLUME, master_mix,
-                        destination_wells, new_tip='never')
+                         destination_wells, new_tip='never')
         pipette.drop_tip()
         pipette.transfer(water_vols, water,
-                        destination_wells, new_tip='always')
+                         destination_wells, new_tip='always')
         for clip_num in range(len(parts_wells)):
-            pipette.transfer(1, source_plates[prefixes_plates[clip_num]].wells(prefixes_wells[clip_num]),
-                            destination_wells[clip_num], mix_after=LINKER_MIX_SETTINGS)
-            pipette.transfer(1, source_plates[suffixes_plates[clip_num]].wells(suffixes_wells[clip_num]),
-                            destination_wells[clip_num], mix_after=LINKER_MIX_SETTINGS)
-            pipette.transfer(parts_vols[clip_num], source_plates[parts_plates[clip_num]].wells(parts_wells[clip_num]),
-                            destination_wells[clip_num], mix_after=PART_MIX_SETTINGS)
+            pipette.transfer(1, source_plates[prefixes_plates[clip_num]].wells(
+                prefixes_wells[clip_num]),
+                             destination_wells[clip_num],
+                             mix_after=LINKER_MIX_SETTINGS)
+            pipette.transfer(1, source_plates[suffixes_plates[clip_num]].wells(
+                suffixes_wells[clip_num]),
+                             destination_wells[clip_num],
+                             mix_after=LINKER_MIX_SETTINGS)
+            pipette.transfer(parts_vols[clip_num],
+                             source_plates[parts_plates[clip_num]].wells(
+                                 parts_wells[clip_num]),
+                             destination_wells[clip_num],
+                             mix_after=PART_MIX_SETTINGS)
         
-    clip(**clips_dict)
+    clip(**clips_dict, p10_mount=p10_mount, well_plate_type=well_plate_type, tube_rack_type=tube_rack_type)

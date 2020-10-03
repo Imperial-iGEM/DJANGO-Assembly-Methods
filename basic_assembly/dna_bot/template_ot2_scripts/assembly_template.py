@@ -9,7 +9,12 @@ metadata = {'apiLevel': '2.2',
     
 
 def run(protocol: protocol_api.ProtocolContext):
-    def final_assembly(final_assembly_dict, tiprack_num, tiprack_type='opentrons_96_tiprack_10ul'):
+    def final_assembly(final_assembly_dict, tiprack_num,
+                       tiprack_type='opentrons_96_tiprack_10ul',
+                       p10_mount='right',
+                       mag_plate_type='biorad_96_wellplate_200ul_pcr',
+                       tube_rack_type='opentrons_24_tuberack_nest_1.5ml_snapcap',
+                       aluminum_block_type='opentrons_96_aluminumblock_biorad_wellplate_200ul'):
         """Implements final assembly reactions using an opentrons OT-2.
 
         Args:
@@ -19,12 +24,16 @@ def run(protocol: protocol_api.ProtocolContext):
         """
         # Constants
         CANDIDATE_TIPRACK_SLOTS = ['3', '6', '9', '2', '5', '8', '11']
-        PIPETTE_MOUNT = 'right'
-        MAG_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+        # PIPETTE_MOUNT = 'right'
+        PIPETTE_MOUNT = p10_mount
+        # MAG_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+        MAG_PLATE_TYPE = mag_plate_type
         MAG_PLATE_POSITION = '1'
-        TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+        # TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+        TUBE_RACK_TYPE = tube_rack_type
         TUBE_RACK_POSITION = '7'
-        DESTINATION_PLATE_TYPE = 'opentrons_96_aluminumblock_biorad_wellplate_200ul'
+        # DESTINATION_PLATE_TYPE = 'opentrons_96_aluminumblock_biorad_wellplate_200ul'
+        DESTINATION_PLATE_TYPE = aluminum_block_type
         TEMPDECK_SLOT = '4'
         TEMP = 20
         TOTAL_VOL = 15
@@ -68,14 +77,16 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.drop_tip()
 
         # Part transfers
-        for key, values in list(final_assembly_dict.items()):
+        for key, values in final_assembly_dict.items():
             mag_bead_wells = [magbead_plate.wells_by_name()[value] for value in values]
             pipette.transfer(PART_VOL, mag_bead_wells,
-                            destination_plate.wells_by_name()[key], mix_after=MIX_SETTINGS,
-                            new_tip='always')
+                             destination_plate.wells_by_name()[key], mix_after=MIX_SETTINGS,
+                             new_tip='always')
 
         temp_mod.deactivate()
 
 
     final_assembly(final_assembly_dict=final_assembly_dict,
-               tiprack_num=tiprack_num)
+                   tiprack_num=tiprack_num, p10_mount=p10_mount,
+                   mag_plate_type=mag_plate_type, tube_rack_type=tube_rack_type,
+                   aluminum_block_type=aluminum_block_type)

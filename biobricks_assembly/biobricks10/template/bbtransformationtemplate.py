@@ -8,24 +8,30 @@ metadata = {'apiLevel': '2.2',
 
 # Labware constants
 PIPETTE_TYPE = 'p10_single'
-PIPETTE_MOUNT = 'right'
+# PIPETTE_MOUNT = 'right'
+PIPETTE_MOUNT = p10_mount
 PIPETTE_TYPE2 = 'p300_single'
-PIPETTE_MOUNT2 = 'left'
-DESTINATION_PLATE_TYPE = 'corning_96_wellplate_360ul_flat'
-SOURCE_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+PIPETTE_MOUNT2 = p300_mount
+# PIPETTE_MOUNT2 = 'left'
+# DESTINATION_PLATE_TYPE = 'corning_96_wellplate_360ul_flat'
+DESTINATION_PLATE_TYPE = transformation_plate_type
+# SOURCE_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+SOURCE_PLATE_TYPE = well_plate_type
 TIPRACK_TYPE = 'opentrons_96_tiprack_10ul'
 P300_TIPRACK_TYPE = 'opentrons_96_tiprack_300ul'
-TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+# TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+TUBE_RACK_TYPE = tube_rack_type
 INCUBATION_TEMP = 4
-SOC_PLATE_TYPE = 'usascientific_96_wellplate_2.4ml_deep'
+# SOC_PLATE_TYPE = 'usascientific_96_wellplate_2.4ml_deep'
+SOC_PLATE_TYPE = soc_plate_type
 SOC_PLATE_SLOT = '7'
 CANDIDATE_TIPRACK_SLOT = '3'
 SOURCE_PLATE_POSITION = '2'
 TUBE_RACK_POSITION = '4'
 
 # load in through opentrons app
-AGAR_PLATE_TYPE = 'thermofisher_96_wellplate_180ul'
-AGAR_PLATE_SLOT = '1'
+# AGAR_PLATE_TYPE = 'thermofisher_96_wellplate_180ul'
+# AGAR_PLATE_SLOT = '1'
 INCUBATION_TIME = 30
 SOC_VOL = 200
 SOC_MIX_SETTINGS = (4, 50)

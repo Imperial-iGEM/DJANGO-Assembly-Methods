@@ -4,6 +4,12 @@ import json
 import math
 import pandas as pd
 
+labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
+                'well_plate': 'biorad_96_wellplate_200ul_pcr',
+                'tube_rack': 'opentrons_24_tuberack_nest_1.5ml_snapcap',
+                'soc_plate': 'usascientific_96_wellplate_2.4ml_deep',
+                'transformation_plate': 'corning_96_wellplate_360ul_flat'}
+
 TEMPLATE_DIR_NAME = 'template'
 OUTPUT_DIR_NAME = 'output'
 REAGENTS_TUBE_MAX_VOL = 1500
@@ -49,7 +55,10 @@ def main():
     create_assembly_protocol(assembly_template_path, output_path,
                              source_to_digest, reagent_to_digest,
                              digest_to_storage, digest_to_construct,
-                             reagent_to_construct)
+                             reagent_to_construct,
+                             p10_mount=labware_dict['p10_mount'],
+                             well_plate_type=labware_dict['well_plate'],
+                             tube_rack_type=labware_dict['tube_rack'])
 
     competent_source_to_dest, control_source_to_dest, \
         assembly_source_to_dest, water_source_to_dest, transform_df \
@@ -64,7 +73,13 @@ def main():
                                    competent_source_to_dest,
                                    control_source_to_dest,
                                    assembly_source_to_dest,
-                                   water_source_to_dest)
+                                   water_source_to_dest,
+                                   p10_mount=labware_dict['p10_mount'],
+                                   p300_mount=labware_dict['p300_mount'],
+                                   well_plate_type=labware_dict['well_plate'],
+                                   transformation_plate_type=labware_dict['transformation_plate'],
+                                   tube_rack_type=labware_dict['tube_rack'],
+                                   soc_plate_type=labware_dict['soc_plate'])
 
 
 def get_constructs(path):
@@ -374,6 +389,7 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
 
 def create_tranformation_dicts(constructs, water_well='A1',
                                controls_per_cons=False):
+
     competent_source_to_dest = {}
     control_source_to_dest = {}
     assembly_source_to_dest = {}
@@ -460,7 +476,8 @@ def create_tranformation_dicts(constructs, water_well='A1',
 
 def create_assembly_protocol(template_path, output_path, source_to_digest,
                              reagent_to_digest, digest_to_storage,
-                             digest_to_construct, reagent_to_construct):
+                             digest_to_construct, reagent_to_construct,
+                             p10_mount, well_plate_type, tube_rack_type):
     with open(template_path) as template_file:
         template_string = template_file.read()
     with open(os.path.join(output_path, 'bb_assembly_protocol.py'),
@@ -476,6 +493,9 @@ def create_assembly_protocol(template_path, output_path, source_to_digest,
                             + json.dumps(digest_to_construct) + '\n\n')
         protocol_file.write('reagent_to_construct = '
                             + json.dumps(reagent_to_construct) + '\n\n')
+        protocol_file.write('p10_mount = "' + p10_mount + '"\n\n')
+        protocol_file.write('well_plate_type = "' + well_plate_type + '"\n\n')
+        protocol_file.write('tube_rack_type = "' + tube_rack_type + '"\n\n')
 
         # Paste the rest of the protocol.
         protocol_file.write(template_string)
@@ -485,7 +505,11 @@ def create_transformation_protocol(template_path, output_path,
                                    competent_source_to_dest,
                                    control_source_to_dest,
                                    assembly_source_to_dest,
-                                   water_source_to_dest):
+                                   water_source_to_dest, p10_mount,
+                                   p300_mount, well_plate_type,
+                                   transformation_plate_type,
+                                   tube_rack_type,
+                                   soc_plate_type):
 
     with open(template_path) as template_file:
         template_string = template_file.read()
@@ -500,6 +524,12 @@ def create_transformation_protocol(template_path, output_path,
                             + json.dumps(assembly_source_to_dest) + '\n\n')
         protocol_file.write('water_to_dest = '
                             + json.dumps(water_source_to_dest) + '\n\n')
+        protocol_file.write('p10_mount = "' + p10_mount + '"\n\n')
+        protocol_file.write('p300_mount = "' + p300_mount + '"\n\n')
+        protocol_file.write('well_plate_type = "' + well_plate_type + '"\n\n')
+        protocol_file.write('transformation_plate_type = "' + transformation_plate_type + '"\n\n')
+        protocol_file.write('tube_rack_type = "' + tube_rack_type + '"\n\n')
+        protocol_file.write('soc_plate_type = "' + soc_plate_type + '"\n\n')
 
         # Paste the rest of the protocol.
         protocol_file.write(template_string)

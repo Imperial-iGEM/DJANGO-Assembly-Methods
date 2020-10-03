@@ -20,16 +20,18 @@ metadata = {'apiLevel': '2.2',
 
 def run(protocol: protocol_api.ProtocolContext):
     def bbassemble(source_to_digest, digest_to_storage, digest_to_construct,
-                   reagent_to_digest, reagent_to_construct):
+                   reagent_to_digest, reagent_to_construct, p10_mount='right',
+                   well_plate_type='biorad_96_wellplate_200ul_pcr',
+                   tube_rack_type='opentrons_24_tuberack_nest_1.5ml_snapcap'):
         # Define constants
         CANDIDATE_TIPRACK_SLOT = '3'
         TIPRACK_TYPE = 'opentrons_96_tiprack_10ul'
         PIPETTE_TYPE = 'p10_single'
-        PIPETTE_MOUNT = 'right'
-        SOURCE_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+        PIPETTE_MOUNT = p10_mount
+        SOURCE_PLATE_TYPE = well_plate_type
         SOURCE_PLATE_POSITION = '2'
-        DESTINATION_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
-        TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+        DESTINATION_PLATE_TYPE = well_plate_type
+        TUBE_RACK_TYPE = tube_rack_type
         TUBE_RACK_POSITION = '4'
 
         # load labware
@@ -100,7 +102,7 @@ def run(protocol: protocol_api.ProtocolContext):
             vol = val[0][1]
             pipette.transfer(vol, digest_plate_well, construct_wells,
                              blow_out=True)
-
+   
         for digest_well in digest_to_storage.keys():
             digest_plate_well = dest_plate.wells_by_name()[digest_well]
             val = digest_to_storage[digest_well]
@@ -136,4 +138,5 @@ def run(protocol: protocol_api.ProtocolContext):
         tc_mod.open_lid()
 
     bbassemble(source_to_digest, digest_to_storage, digest_to_construct,
-               reagent_to_digest, reagent_to_construct)
+               reagent_to_digest, reagent_to_construct, p10_mount=p10_mount,
+               well_plate_type=well_plate_type, tube_rack_type=tube_rack_type)

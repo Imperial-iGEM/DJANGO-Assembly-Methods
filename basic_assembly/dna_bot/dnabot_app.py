@@ -10,8 +10,8 @@ import csv
 import numpy as np
 import json
 import sys
-# from .mplates import final_well
 from .mplates import final_well
+# from mplates import final_well
 import random
 import string
 
@@ -371,15 +371,20 @@ def generate_sources_dict(paths):
             csv_reader = csv.reader(csvfile)
             for index, source in enumerate(csv_reader):
                 if index != 0:
-                    csv_values = source[1:]
+                    if len(source) > 2:
+                        if source[2]:
+                            csv_values = source[1:]
+                            part_dict['concentration'] = [str(source[2])]
+                        else:
+                            csv_values = [source[1]]
+                            part_dict['concentration'] = [PART_PER_CLIP]
+                    else:
+                        csv_values = [source[1]]
+                        part_dict['concentration'] = [PART_PER_CLIP]
                     csv_values.append(SOURCE_DECK_POS[deck_index])
                     sources_dict[str(source[0])] = tuple(csv_values)
                     part_dict['name'] = [str(source[0])]
                     part_dict['well'] = [str(source[1])]
-                    if len(source) > 2:
-                        part_dict['concentration'] = [str(source[2])]
-                    else:
-                        part_dict['concentration'] = [PART_PER_CLIP]
                     part_dict['plate'] = [SOURCE_DECK_POS[deck_index]]
                     part_dict_list.append(pd.DataFrame.from_dict(part_dict))
     parts_df = pd.concat(part_dict_list, ignore_index=True)
@@ -780,6 +785,8 @@ def get_random_string(length):
     return result_str
 
 
-#dnabot('A11', '1', " C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv", [" C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv", " C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/part_plate_2_230419.csv"],
-       #**labware_dict)
+# dnabot('A11', '1', " C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv", [" C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv", " C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/part_plate_2_230419.csv"],
+       # **labware_dict)
 
+# dnabot('A11', '1', " C:/Users/gabri/Documents/Uni/iGEM/opencellrun/basic_constructs.csv", [" C:/Users/gabri/Documents/Uni/iGEM/opencellrun/basic_parts_linkers.csv"],
+# **labware_dict)

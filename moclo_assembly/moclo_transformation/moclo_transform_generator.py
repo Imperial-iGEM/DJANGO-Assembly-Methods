@@ -1,4 +1,4 @@
-# Modified version 08/08/20
+# Modified version 09/23/20
 
 import os
 import tkinter
@@ -25,21 +25,48 @@ CONFIG_PATH = "data/settings.yaml"
 ###############################################################################
 
 
-def main():
+def moclo_function(output_folder, single_or_triplicate, dna_plate_map, combinations_file):
 
     # GETTING USER INPUT
-    config = get_config(CONFIG_PATH)
-    combinations_limit = ask_single_or_triplicate()
 
-    multi = get_multi()
-    thermocycle = get_thermocycle()
-    p10Mount = get_pipette_mount('p10')
+    # config = get_config(CONFIG_PATH)
+    # ^ returns config just a read of setting.yaml hopefull try to set to
+    # string and still work
+    config = {'output_folder_path': output_folder,
+              'assembly_template_path':
+              'moclo_assembly/moclo_transformation/data/moclo_assembly_template.py',
+              'transform_template_path':
+              'moclo_assembly/moclo_transformation/data/transform_moclo_template.py'}
+
+    # combinations_limit = ask_single_or_triplicate()
+    # ^ return the string either 'single' or triplet
+    combinations_limit = single_or_triplicate
+
+    # whether user wants to use p300 multi or single channel
+    # multi = get_multi() in offline vers
+    multi = False
+
+    # whether user wants to use thermocycler module
+    # thermocycle = get_thermocycle() in offline vers
+    thermocycle = True
+
+    # whether to use left or right mount for p10 pipette
+    # p10Mount = get_pipette_mount('p10') in offline vers
+    p10Mount = 'left'
     labware_dict['p10_mount'] = p10Mount
-    p300Mount = get_pipette_mount('p300')
+
+    # whether to use left or right mount for p300 pipette
+    # p300Mount = get_pipette_mount('p300') in offline vers
+    p300Mount = 'right'
     labware_dict['p300_mount'] = p300Mount
 
-    dna_plate_map_filename = ask_dna_plate_map_filename()
-    combinations_filename = ask_combinations_filename()
+    # dna_plate_map_filename = ask_dna_plate_map_filename()
+    # ^ return string of full disk file path of dna plate map
+    dna_plate_map_filename = dna_plate_map
+
+    # combinations_filename = ask_combinations_filename()
+    # ^ returns string of full disk path of combinations file
+    combinations_filename = combinations_file
 
     # Load in CSV files as a dict containing lists of lists.
     dna_plate_map_dict = generate_plate_maps(dna_plate_map_filename)
@@ -49,8 +76,7 @@ def main():
     # Generate and save output plate maps.
     triplicate = generate_and_save_output_plate_maps(combinations_to_make,
                                                      combinations_limit,
-                                                     config[
-                                                         'output_folder_path'])
+                                                     config['output_folder_path'])
 
     parts, comb, mm, reagents = create_metainformation(
         config['output_folder_path'] + '/' + 'assembly_metainformation.csv',
@@ -302,6 +328,9 @@ def generate_and_save_output_plate_maps(combinations_to_make,
 def create_metainformation(output_path, dna_plate_map_dict,
                            combinations_to_make,
                            labware_dict, thermocycle, triplicate):
+    '''
+        Creates assembly metainformation and writes to output csv.
+    '''
 
     parts_df = create_parts_df(dna_plate_map_dict)
 
@@ -373,6 +402,10 @@ def create_metainformation(output_path, dna_plate_map_dict,
 
 def create_parts_df(dna_plate_map_dict):
 
+    '''
+        Creates dataframe of parts from dna_plate_map_dict
+    '''
+
     letter_dict = {'0': 'A', '1': 'B', '2': 'C', '3': 'D', '4': 'E', '5': 'F',
                    '6': 'G', '7': 'H'}
 
@@ -395,19 +428,30 @@ def create_parts_df(dna_plate_map_dict):
 
 
 def create_mm_df(combinations_df):
+    '''
+        Creates master mix (mm) dataframe and assigns wells.
+    '''
     TOT_VOL_PER_ASSEMBLY = 20
     BUFFER_VOL_PER_ASSEMBLY = 2
     LIGASE_VOL_PER_ASSEMBLY = 0.5
     ENZYME_VOL_PER_ASSEMBLY = 1
-    PART_VOL = 2
+    PART_VOL = 2  # 2 uL/per construct; not part of master mix
+    MAX_VOL_200UL_WELL = 180  # the maximum volume of mm per mm well
     avail_mm_wells_no = list(range(95, len(combinations_df)-2, -1))
     avail_mm_wells = [index_to_well_name(no) for no in avail_mm_wells_no]
     mm_df_list = []
+    '''
+        Start at 2 parts per construct (minimum) and end at 8 parts per
+        construct (maximum)
+    '''
     for i in range(2, 9):
         combinations_i = combinations_df[
             combinations_df['no_parts'] == i].index.values
+
+        # list of combinations with i parts
         combinations = [combinations_df.loc[i] for i in combinations_i]
         if len(combinations) > 0:
+            # initialise dictionary
             mm_dict = {}
             well = avail_mm_wells.pop(0)
             mm_dict['well'] = [well]
@@ -416,7 +460,7 @@ def create_mm_df(combinations_df):
             mm_vol_per_assembly = TOT_VOL_PER_ASSEMBLY - \
                 parts_per_assembly*PART_VOL
             mm_dict['vol_per_assembly'] = [mm_vol_per_assembly]
-            max_assemblies = 180 // mm_vol_per_assembly
+            max_assemblies = MAX_VOL_200UL_WELL // mm_vol_per_assembly
             mm_combinations = []
             if max_assemblies % 2 == 0:
                 max_assemblies = max_assemblies - 2
@@ -428,6 +472,8 @@ def create_mm_df(combinations_df):
                 if no_assemblies < max_assemblies:
                     mm_combinations.append(comb_row['name'])
                     no_assemblies += 1
+
+                    # if at the last assembly
                     if comb_index == tot_assemblies-1:
                         if no_assemblies % 2 == 0:
                             no = no_assemblies + 2
@@ -445,6 +491,7 @@ def create_mm_df(combinations_df):
                         mm_dict['plate'] = ['reaction_plate']
                         mm_df_list.append(pd.DataFrame.from_dict(mm_dict))
                 else:
+                    # fill in info then append mm_dict as df to mm_df_list
                     no = max_assemblies + 2
                     mm_dict['combinations'] = [mm_combinations]
                     mm_dict['no_assemblies'] = [no_assemblies]
@@ -457,6 +504,8 @@ def create_mm_df(combinations_df):
                     mm_dict['water_vol'] = [water_vol]
                     mm_dict['plate'] = ['reaction_plate']
                     mm_df_list.append(pd.DataFrame.from_dict(mm_dict))
+
+                    # initialise dictionary
                     mm_dict = {}
                     well = avail_mm_wells.pop(0)
                     mm_dict['well'] = [well]
@@ -464,12 +513,20 @@ def create_mm_df(combinations_df):
                     mm_dict['no_parts'] = [i]
                     mm_dict['vol_per_assembly'] = [mm_vol_per_assembly]
                     no_assemblies = 1
+
+    # convert to single df
     mm_df = pd.concat(mm_df_list, ignore_index=True)
     return mm_df
 
 
 def create_reagents_df(mm_df):
-    water_vol = 15000
+    '''
+        Creates a dataframe of reagents (ligase, restriction enzyme, buffer,
+        and water).
+        If necessary two wells of buffer are created.
+    '''
+    MAX_VOL_200UL_WELL = 180  # the maximum volume of reagent per mm well
+    water_vol = 15000  # arbitrary amount (trough well has 22 mL capacity)
     reagents_df_list = []
     ligase_dict = {'name': ['ligase'], 'well': ['H12'], 'plate':
                    ['reagents_plate']}
@@ -509,7 +566,7 @@ def create_reagents_df(mm_df):
     if tot_buffer % 10 > 0:
         tot_buffer = 10*((tot_buffer // 10) + 1)
 
-    if tot_buffer > 180:
+    if tot_buffer > MAX_VOL_200UL_WELL:
         for i in range(len(mm_df)-2, 0, -1):
             buffer_vol1 = mm_df.loc[0:i, 'buffer_vol'].sum()
             # buffer_dead_vol1 = 2*(buffer_vol1 // (i + 1))
@@ -518,7 +575,7 @@ def create_reagents_df(mm_df):
             if tot_buffer1 % 10 > 0:
                 tot_buffer1 = 10*((tot_buffer1 // 10) + 1)
 
-            if tot_buffer1 <= 180:
+            if tot_buffer1 <= MAX_VOL_200UL_WELL:
                 wells1 = list(mm_df.loc[0:i, 'well'])
                 buffer_vol2 = mm_df.loc[i+1:len(mm_df)-1, 'buffer_vol'].sum()
                 # buffer_dead_vol2 = 2*(buffer_vol2 // (len(mm_df)-i-1))
@@ -561,6 +618,10 @@ def create_reagents_df(mm_df):
 
 
 def get_mm_dicts(mm_df, reagents_df):
+    '''
+        Obtains dictionaries to be used in master mix creation and
+        distribution in the assembly protocol.
+    '''
     reagent_to_mm_dict = {}
     for index, row in reagents_df.iterrows():
         source_well = row['well']
@@ -585,6 +646,7 @@ def get_mm_dicts(mm_df, reagents_df):
 
 
 def index_to_well_name(no):
+    ''' Converts a well index into a well name e.g. A1'''
     sample_number = no + 1
     letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     final_well_column = sample_number // 8 + \
@@ -597,6 +659,7 @@ def index_to_well_name(no):
 def create_transform_metainformation(output_path, labware_dict, triplicate,
                                      multi):
     '''
+        Creates metainformation for transformation protocol and writes to csv.
         soc used in two steps: adding soc (150 uL) and dilution (45 uL)
         times by 96 as reaction plate has 96 wells
         add 300 (150*2) and 90 (45*2) as dead vols
@@ -691,12 +754,3 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
 
         # Paste the rest of the protocol.
         transform_file.write(transform_template_string)
-
-
-###############################################################################
-# Call main function
-###############################################################################
-
-
-if __name__ == '__main__':
-    main()

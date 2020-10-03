@@ -47,7 +47,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # p10 tiprack slots
         p10_tips = transformation_reactions + spotting_reactions
-        p10_tiprack_slots = p10_tips // 96 + 1 if p10_tips % 96 > 0 else p10_tips / 96
+        p10_tiprack_slots = p10_tips // 96 + 1 if p10_tips % 96 > 0 \
+            else p10_tips / 96
 
         # p300 tiprack slots
         p300_tips = transformation_reactions + spotting_reactions
@@ -153,7 +154,7 @@ def run(protocol: protocol_api.ProtocolContext):
         cols_list = []
         for spotting_tuple in spotting_tuples:
             source_wells_cols = [source_well[1:]
-                                for source_well in spotting_tuple[0]]
+                                 for source_well in spotting_tuple[0]]
             unique_cols = [int(col)-1 for i, col in enumerate(
                 source_wells_cols) if source_wells_cols.index(col) == i]
             cols_list.append(unique_cols)
@@ -273,21 +274,28 @@ def run(protocol: protocol_api.ProtocolContext):
     CANDIDATE_P300_SLOTS = ['3', '6']
     P10_TIPRACK_TYPE = 'opentrons_96_tiprack_10ul'
     P300_TIPRACK_TYPE = 'opentrons_96_tiprack_300ul'
-    P10_MOUNT = 'right'
-    P300_MOUNT = 'left'
-    ASSEMBLY_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+    # P10_MOUNT = 'right'
+    P10_MOUNT = p10_mount
+    # P300_MOUNT = 'left'
+    P300_MOUNT = p300_mount
+    # ASSEMBLY_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+    ASSEMBLY_PLATE_TYPE = well_plate_type
     ASSEMBLY_PLATE_SLOT = '8'
     TEMPDECK_SLOT = '10'
-    TRANSFORMATION_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
-    SOC_PLATE_TYPE = 'usascientific_96_wellplate_2.4ml_deep'
+    # TRANSFORMATION_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+    TRANSFORMATION_PLATE_TYPE = well_plate_type
+    # SOC_PLATE_TYPE = 'usascientific_96_wellplate_2.4ml_deep'
+    SOC_PLATE_TYPE = soc_plate_type
     SOC_PLATE_SLOT = '7'
-    TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+    # TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+    TUBE_RACK_TYPE = tube_rack_type
     TUBE_RACK_SLOT = '11'
     SPOTTING_WASTE_WELL = 'A1'
 
     # load in agar plate through opentrons app
     # Using opentrons_simulate have -L followed by custom labware path
-    AGAR_PLATE_TYPE = 'thermofisher_96_wellplate_180ul'
+    # AGAR_PLATE_TYPE = 'thermofisher_96_wellplate_180ul'
+    AGAR_PLATE_TYPE = agar_plate_type
     AGAR_PLATE_SLOT = '1'
 
     # Tiprack slots

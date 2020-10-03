@@ -8,91 +8,33 @@ metadata = {'apiLevel': '2.2',
 
 def run(protocol: protocol_api.ProtocolContext):
 
-    def define_master_mix(no_assemblies, parts_per_assembly, wells_open,
-                          pipette, reaction_plate, water, ligase, buffer,
-                          restriction_enzyme):
-        TOT_VOL_PER_ASSEMBLY = 20
-        BUFFER_VOL_PER_ASSEMBLY = 2
-        LIGASE_VOL_PER_ASSEMBLY = 0.5
-        ENZYME_VOL_PER_ASSEMBLY = 1
-        MAX_ASSEMBLIES_PER_MM_WELL = 11  # take into account dead vol
-        PART_VOL = 2
-        mm_dict_list = []
-        mm_vol_per_assembly = TOT_VOL_PER_ASSEMBLY - \
-            parts_per_assembly*PART_VOL
-        if mm_vol_per_assembly < 4:
-            raise ValueError('Too many parts in one step assembly')
-        rem_assemblies = no_assemblies
-        for i in range(7):
-            mm_dict = {}
-            if rem_assemblies > MAX_ASSEMBLIES_PER_MM_WELL:
-                mm_dict['well'] = wells_open[i]
-                mm_dict['no_assemblies'] = MAX_ASSEMBLIES_PER_MM_WELL
-                no = MAX_ASSEMBLIES_PER_MM_WELL + 1
-                mm_dict['buffer_vol'] = BUFFER_VOL_PER_ASSEMBLY*no
-                mm_dict['ligase_vol'] = LIGASE_VOL_PER_ASSEMBLY*no
-                mm_dict['enzyme_vol'] = ENZYME_VOL_PER_ASSEMBLY*no
-                mm_dict['water_vol'] = mm_vol_per_assembly*no - \
-                    mm_dict['buffer_vol'] - mm_dict['ligase_vol'] - \
-                    mm_dict['enzyme_vol']
-                mm_dict_list.append(mm_dict)
-                rem_assemblies = rem_assemblies - MAX_ASSEMBLIES_PER_MM_WELL
-            else:
-                mm_dict['well'] = wells_open[i]
-                mm_dict['no_assemblies'] = rem_assemblies
-                no = rem_assemblies + 1
-                if no % 2 != 0:
-                    no += 1
-                mm_dict['buffer_vol'] = BUFFER_VOL_PER_ASSEMBLY*no
-                mm_dict['ligase_vol'] = LIGASE_VOL_PER_ASSEMBLY*no
-                mm_dict['enzyme_vol'] = ENZYME_VOL_PER_ASSEMBLY*no
-                mm_dict['water_vol'] = mm_vol_per_assembly*no - \
-                    mm_dict['buffer_vol'] - mm_dict['ligase_vol'] - \
-                    mm_dict['enzyme_vol']
-                mm_dict_list.append(mm_dict)
-                break
+    def create_master_mix(reagent_to_mm_dict, master_mix_dicts, pipette,
+                          reaction_plate, reagents_plate, trough):
 
-        for i, mm_dict in enumerate(mm_dict_list):
+        for key, value in reagent_to_mm_dict.items():
             pipette.pick_up_tip()
-            pipette.transfer(mm_dict['water_vol'], water.bottom(),
-                             reaction_plate.wells()[
-                                 mm_dict['well']].bottom(0.5),
-                             new_tip='never')  # Water
+            for index, mm_dest in enumerate(value):
+                if index == 0:
+                    # only need to find source once
+                    if mm_dest[0] == 'reagents_plate':
+                        source = reagents_plate.wells_by_name()[key]
+                    else:
+                        if key == 'A1':
+                            source = trough.wells()[0]
+                        else:
+                            source = trough.wells_by_name()[key]
+                dest = reaction_plate.wells_by_name()[mm_dest[1]]
+                vol = float(mm_dest[2])
+                pipette.transfer(vol, source, dest, new_tip='never')
             pipette.blow_out()
             pipette.drop_tip()
 
+        for mm_dict in master_mix_dicts:
+            mm_well = reaction_plate.wells_by_name()[mm_dict['well']]
             pipette.pick_up_tip()
-            pipette.transfer(mm_dict['buffer_vol'], buffer.bottom(),
-                             reaction_plate.wells()[
-                                 mm_dict['well']].bottom(0.5),
-                             new_tip='never')  # Water
-            pipette.mix(2, 10, reaction_plate.wells()[
-                mm_dict['well']].bottom(0.5))
+            pipette.mix(2, 10, mm_well)
             pipette.blow_out()
             pipette.drop_tip()
-
-            pipette.pick_up_tip()
-            pipette.transfer(mm_dict['ligase_vol'], ligase.bottom(),
-                             reaction_plate.wells()[
-                                 mm_dict['well']].bottom(0.5),
-                             new_tip='never')  # Water
-            pipette.mix(2, 10, reaction_plate.wells()[
-                mm_dict['well']].bottom(0.5))
-            pipette.blow_out()
-            pipette.drop_tip()
-
-            pipette.pick_up_tip()
-            pipette.transfer(mm_dict['enzyme_vol'],
-                             restriction_enzyme.bottom(),
-                             reaction_plate.wells()[
-                                 mm_dict['well']].bottom(0.5),
-                             new_tip='never')  # Water
-            pipette.mix(2, 10, reaction_plate.wells()[
-                mm_dict['well']].bottom(0.5))
-            pipette.blow_out()
-            pipette.drop_tip()
-
-        return mm_dict_list, mm_vol_per_assembly
 
     def get_combination_well_no_parts(combinations_to_make):
         combination_well_dict = {}
@@ -125,22 +67,21 @@ def run(protocol: protocol_api.ProtocolContext):
         raise ValueError("Could not find combination \"{0}\".".format(name))
 
     def moclo_protocol(dna_plate_map_dict, combinations_to_make,
-                       thermocycle=False):
-
-        num_rxns = len(combinations_to_make)
+                       thermocycle=False,
+                       reaction_plate_type='biorad_96_wellplate_200ul_pcr',
+                       reagent_plate_type='biorad_96_wellplate_200ul_pcr',
+                       trough_type='usascientific_12_reservoir_22ml'):
 
         # Load in Bio-Rad 96 Well Plate on temp deck for moclos,
         # transformation, and outgrowth.
         if thermocycle:
             tc_mod = protocol.load_module('thermocycler')
             tc_mod.open_lid()
-            reaction_plate = tc_mod.load_labware(
-                'biorad_96_wellplate_200ul_pcr')
+            reaction_plate = tc_mod.load_labware(reaction_plate_type)
             tc_mod.set_block_temperature(10)
         else:
             temp_deck = protocol.load_module('tempdeck', 10)
-            reaction_plate = temp_deck.load_labware(
-                'biorad_96_wellplate_200ul_pcr')
+            reaction_plate = temp_deck.load_labware(reaction_plate_type)
             temp_deck.set_temperature(10)
 
         # Load in 2 10ul tipracks and 2 300ul tipracks
@@ -153,12 +94,8 @@ def run(protocol: protocol_api.ProtocolContext):
                                               tip_racks=tr_10)
 
         ''' Need to provide the instructions for loading reagent'''
-        reagents_plate = protocol.load_labware('biorad_96_wellplate_200ul_pcr',
+        reagents_plate = protocol.load_labware(reagent_plate_type,
                                                '4', 'Reagents Plate')
-        ligase = reagents_plate.wells_by_name()['H12']  # MoClo
-        restriction_enzyme = reagents_plate.wells_by_name()['G12']  # MoClo
-        buffer = reagents_plate.wells_by_name()['F12']  # MoClo
-
         '''
             This deck slot location is dedicated for the reaction plate after
             MoClo protocol is completed, so at the beginning of the protocol
@@ -169,9 +106,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # Load in water, SOC, and wash trough (USA Scientific 12 Well Reservoir
         # 22ml)
-        trough = protocol.load_labware('usascientific_12_reservoir_22ml', '5',
+        trough = protocol.load_labware(trough_type, '5',
                                        'Reagents trough')
-        water = trough.wells()[0]  # Well 1
         wash_0 = trough.wells()[1]  # Well 2
         wash_1 = trough.wells()[2]  # Well 3
         # soc = trough.wells()[3]  # Well 4
@@ -185,7 +121,7 @@ def run(protocol: protocol_api.ProtocolContext):
         dna_plate_dict = {}
         for plate_name in dna_plate_map_dict.keys():
             dna_plate_dict[plate_name] = protocol.load_labware(
-                'biorad_96_wellplate_200ul_pcr', '1', 'Input DNA Plate')
+                reaction_plate_type, '1', 'Input DNA Plate')
 
         no_assemblies_dict = {}
         for combinations in combinations_to_make:
@@ -195,32 +131,27 @@ def run(protocol: protocol_api.ProtocolContext):
             else:
                 no_assemblies_dict[str(no_parts)] = 1
 
-        wells_open_mm = list(range(95, num_rxns-2, -1))
         wells_assembly = get_combination_well_no_parts(combinations_to_make)
-        for no_parts, no_assemblies in no_assemblies_dict.items():
-            protocol.comment("--------------------------------------------")
-            protocol.comment(
-                "Creating mm for {0}-part assembly.".format(no_parts))
-            protocol.comment("--------------------------------------------")
-            mm_dict_list, mm_vol_per_assembly = define_master_mix(
-                no_assemblies, int(no_parts), wells_open_mm, p10_single,
-                reaction_plate, water, ligase, buffer,
-                restriction_enzyme)
-            for i in range(len(mm_dict_list)):
-                wells_open_mm.pop(0)
+        protocol.comment("--------------------------------------------")
+        protocol.comment("Creating master mix")
+        protocol.comment("--------------------------------------------")
+        create_master_mix(reagent_to_mm, master_mix_dicts, p10_single,
+                          reaction_plate, reagents_plate, trough)
 
+        for no_parts, no_assemblies in no_assemblies_dict.items():
+            n_part_mm_dicts = [mm_dict for mm_dict in master_mix_dicts
+                               if mm_dict['no_parts'] == no_parts]
             wells_open_assembly = wells_assembly[no_parts]
             protocol.comment("--------------------------------------------")
             protocol.comment(
                 "Transferring mm for {0}-part assembly.".format(no_parts))
             protocol.comment("--------------------------------------------")
-            for i, entries in enumerate(mm_dict_list):
+            for i, entries in enumerate(n_part_mm_dicts):
+                mm_vol_per_assembly = entries['vol_per_assembly']
                 p10_single.pick_up_tip()
                 mm_well = reagents_plate.wells()[entries['well']]
-                if i == 0:
-                    no_assemblies_mm = entries['no_assemblies']
-                    dest_wells = wells_open_assembly[0:no_assemblies_mm-1]
-                elif i == len(entries) - 1:
+                no_assemblies_mm = entries['no_assemblies']
+                if i == len(entries) - 1:
                     dest_wells = wells_open_assembly
                 else:
                     dest_wells = wells_open_assembly[0:no_assemblies_mm-1]
@@ -315,4 +246,5 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.comment(
             'Insert the reaction plate into deck positon 7')
 
-    moclo_protocol(dna_plate_map_dict, combinations_to_make, thermocycle)
+    moclo_protocol(dna_plate_map_dict, combinations_to_make, thermocycle,
+                   reaction_plate_type, reagent_plate_type, trough_type)

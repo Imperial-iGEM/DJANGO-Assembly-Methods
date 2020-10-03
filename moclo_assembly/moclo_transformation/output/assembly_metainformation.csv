@@ -1,0 +1,181 @@
+Single
+
+Using thermocycler module
+
+P10 Mount:,left
+
+
+Labware,Labware definition,Position
+DNA Source plate,biorad_96_wellplate_200ul_pcr,1
+Reaction plate,biorad_96_wellplate_200ul_pcr,thermocycler
+"Trough (contains water, washes)",usascientific_12_reservoir_22ml,5
+Reagents plate,biorad_96_wellplate_200ul_pcr,4
+
+
+PARTS
+name,well,plate,combinations
+I13453_AB-1,A1,input-dna-map,"['5-I13453-1', '8-I13453-1']"
+I13453_AB-2,A2,input-dna-map,"['5-I13453-2', '8-I13453-2']"
+I13453_AB-4,A3,input-dna-map,"['5-I13453-4', '8-I13453-4']"
+B0034m_BC-1,A4,input-dna-map,"['5-J23106-1', '5-I13453-1', '5-J23100-1', '5-J23102-1', '5-J23103-1', '5-J23107-1', '5-J23116-1', '5-R0040-1', '8--J23106-1', '8-I13453-1', '8-J23100-1', '8-J23102-1', '8-J23103-1', '8-J23107-1', '8-J23116-1', '8-R0040-1']"
+C0012m_CD-1,A5,input-dna-map,['2-C0012m-1']
+C0012m_CD-2,A6,input-dna-map,['2-C0012m-2']
+C0012m_CD-4,A7,input-dna-map,['2-C0012m-4']
+E0040m_C1N-1,A8,input-dna-map,"['8--J23106-1', '8-I13453-1', '8-J23100-1', '8-J23102-1', '8-J23103-1', '8-J23107-1', '8-J23116-1', '8-R0040-1']"
+E0040m_C1N-2,A9,input-dna-map,"['8--J23106-2', '8-I13453-2', '8-J23100-2', '8-J23102-2', '8-J23103-2', '8-J23107-2', '8-J23116-2', '8-R0040-2']"
+E0040m_C1N-4,A10,input-dna-map,"['8--J23106-4', '8-I13453-4', '8-J23100-4', '8-J23102-4', '8-J23103-4', '8-J23107-4', '8-J23116-4', '8-R0040-4']"
+J23100_AB-1,B1,input-dna-map,"['5-J23100-1', '8-J23100-1']"
+J23100_AB-2,B2,input-dna-map,"['5-J23100-2', '8-J23100-2']"
+J23100_AB-4,B3,input-dna-map,"['5-J23100-4', '8-J23100-4']"
+B0034m_BC-2,B4,input-dna-map,"['5-J23106-2', '5-I13453-2', '5-J23100-2', '5-J23102-2', '5-J23103-2', '5-J23107-2', '5-J23116-2', '5-R0040-2', '8--J23106-2', '8-I13453-2', '8-J23100-2', '8-J23102-2', '8-J23103-2', '8-J23107-2', '8-J23116-2', '8-R0040-2']"
+C0040_CD-1,B5,input-dna-map,['2-C0040-1']
+C0040_CD-2,B6,input-dna-map,['2-C0040-2']
+C0040_CD-4,B7,input-dna-map,['2-C0040-4']
+3xFLAG_CC1-1,B8,input-dna-map,"['8--J23106-1', '8-I13453-1', '8-J23100-1', '8-J23102-1', '8-J23103-1', '8-J23107-1', '8-J23116-1', '8-R0040-1']"
+3xFLAG_CC1-2,B9,input-dna-map,"['8--J23106-2', '8-I13453-2', '8-J23100-2', '8-J23102-2', '8-J23103-2', '8-J23107-2', '8-J23116-2', '8-R0040-2']"
+3xFLAG_CC1-4,B10,input-dna-map,"['8--J23106-4', '8-I13453-4', '8-J23100-4', '8-J23102-4', '8-J23103-4', '8-J23107-4', '8-J23116-4', '8-R0040-4']"
+J23102_AB-1,C1,input-dna-map,"['5-J23102-1', '8-J23102-1']"
+J23102_AB-2,C2,input-dna-map,"['5-J23102-2', '8-J23102-2']"
+J23102_AB-4,C3,input-dna-map,"['5-J23102-4', '8-J23102-4']"
+B0034m_BC-4,C4,input-dna-map,"['5-J23106-4', '5-I13453-4', '5-J23100-4', '5-J23102-4', '5-J23103-4', '5-J23107-4', '5-J23116-4', '5-R0040-4', '8--J23106-4', '8-I13453-4', '8-J23100-4', '8-J23102-4', '8-J23103-4', '8-J23107-4', '8-J23116-4', '8-R0040-4']"
+C0062_CD-1,C5,input-dna-map,['2-C0062-1']
+C0062_CD-2,C6,input-dna-map,['2-C0062-2']
+C0062_CD-4,C7,input-dna-map,['2-C0062-4']
+12 aa GS Linker_NO-1,C8,input-dna-map,"['8--J23106-1', '8-I13453-1', '8-J23100-1', '8-J23102-1', '8-J23103-1', '8-J23107-1', '8-J23116-1', '8-R0040-1']"
+12 aa GS Linker_NO-2,C9,input-dna-map,"['8--J23106-2', '8-I13453-2', '8-J23100-2', '8-J23102-2', '8-J23103-2', '8-J23107-2', '8-J23116-2', '8-R0040-2']"
+12 aa GS Linker_NO-4,C10,input-dna-map,"['8--J23106-4', '8-I13453-4', '8-J23100-4', '8-J23102-4', '8-J23103-4', '8-J23107-4', '8-J23116-4', '8-R0040-4']"
+J23103_AB-1,D1,input-dna-map,"['5-J23103-1', '8-J23103-1']"
+J23103_AB-2,D2,input-dna-map,"['5-J23103-2', '8-J23103-2']"
+J23103_AB-4,D3,input-dna-map,"['5-J23103-4', '8-J23103-4']"
+B0015_DE-1,D4,input-dna-map,"['5-J23106-1', '5-I13453-1', '5-J23100-1', '5-J23102-1', '5-J23103-1', '5-J23107-1', '5-J23116-1', '5-R0040-1', '8--J23106-1', '8-I13453-1', '8-J23100-1', '8-J23102-1', '8-J23103-1', '8-J23107-1', '8-J23116-1', '8-R0040-1']"
+C0080_CD-1,D5,input-dna-map,['2-C0080-1']
+C0080_CD-2,D6,input-dna-map,['2-C0080-2']
+C0080_CD-4,D7,input-dna-map,['2-C0080-4']
+6xHIS_OD-1,D8,input-dna-map,"['8--J23106-1', '8-I13453-1', '8-J23100-1', '8-J23102-1', '8-J23103-1', '8-J23107-1', '8-J23116-1', '8-R0040-1']"
+6xHIS_OD-2,D9,input-dna-map,"['8--J23106-2', '8-I13453-2', '8-J23100-2', '8-J23102-2', '8-J23103-2', '8-J23107-2', '8-J23116-2', '8-R0040-2']"
+6xHIS_OD-4,D10,input-dna-map,"['8--J23106-4', '8-I13453-4', '8-J23100-4', '8-J23102-4', '8-J23103-4', '8-J23107-4', '8-J23116-4', '8-R0040-4']"
+J23106_AB-1,E1,input-dna-map,"['5-J23106-1', '8--J23106-1']"
+J23106_AB-2,E2,input-dna-map,"['5-J23106-2', '8--J23106-2']"
+J23106_AB-4,E3,input-dna-map,"['5-J23106-4', '8--J23106-4']"
+B0015_DE-2,E4,input-dna-map,"['5-J23106-2', '5-I13453-2', '5-J23100-2', '5-J23102-2', '5-J23103-2', '5-J23107-2', '5-J23116-2', '5-R0040-2', '8--J23106-2', '8-I13453-2', '8-J23100-2', '8-J23102-2', '8-J23103-2', '8-J23107-2', '8-J23116-2', '8-R0040-2']"
+E0030_CD-1,E5,input-dna-map,['2-E0030-1']
+E0030_CD-2,E6,input-dna-map,['2-E0030-2']
+E0030_CD-4,E7,input-dna-map,['2-E0030-4']
+DVK_AE-1,E8,input-dna-map,"['5-J23106-1', '5-I13453-1', '5-J23100-1', '5-J23102-1', '5-J23103-1', '5-J23107-1', '5-J23116-1', '5-R0040-1', '8--J23106-1', '8-I13453-1', '8-J23100-1', '8-J23102-1', '8-J23103-1', '8-J23107-1', '8-J23116-1', '8-R0040-1']"
+DVK_AE-2,E9,input-dna-map,"['5-J23106-2', '5-I13453-2', '5-J23100-2', '5-J23102-2', '5-J23103-2', '5-J23107-2', '5-J23116-2', '5-R0040-2', '8--J23106-2', '8-I13453-2', '8-J23100-2', '8-J23102-2', '8-J23103-2', '8-J23107-2', '8-J23116-2', '8-R0040-2']"
+DVK_AE-4,E10,input-dna-map,"['5-J23106-4', '5-I13453-4', '5-J23100-4', '5-J23102-4', '5-J23103-4', '5-J23107-4', '5-J23116-4', '5-R0040-4', '8--J23106-4', '8-I13453-4', '8-J23100-4', '8-J23102-4', '8-J23103-4', '8-J23107-4', '8-J23116-4', '8-R0040-4']"
+J23107_AB-1,F1,input-dna-map,"['5-J23107-1', '8-J23107-1']"
+J23107_AB-2,F2,input-dna-map,"['5-J23107-2', '8-J23107-2']"
+J23107_AB-4,F3,input-dna-map,"['5-J23107-4', '8-J23107-4']"
+B0015_DE-4,F4,input-dna-map,"['5-J23106-4', '5-I13453-4', '5-J23100-4', '5-J23102-4', '5-J23103-4', '5-J23107-4', '5-J23116-4', '5-R0040-4', '8--J23106-4', '8-I13453-4', '8-J23100-4', '8-J23102-4', '8-J23103-4', '8-J23107-4', '8-J23116-4', '8-R0040-4']"
+E0040m_CD-1,F5,input-dna-map,"['2-E0040m-1', '5-J23106-1', '5-I13453-1', '5-J23100-1', '5-J23102-1', '5-J23103-1', '5-J23107-1', '5-J23116-1', '5-R0040-1']"
+E0040m_CD-2,F6,input-dna-map,"['2-E0040m-2', '5-J23106-2', '5-I13453-2', '5-J23100-2', '5-J23102-2', '5-J23103-2', '5-J23107-2', '5-J23116-2', '5-R0040-2']"
+E0040m_CD-4,F7,input-dna-map,"['2-E0040m-4', '5-J23106-4', '5-I13453-4', '5-J23100-4', '5-J23102-4', '5-J23103-4', '5-J23107-4', '5-J23116-4', '5-R0040-4']"
+DVK_CD-1,F8,input-dna-map,"['2-E0040m-1', '2-C0012m-1', '2-C0040-1', '2-C0062-1', '2-C0080-1', '2-E0030-1', '2-E1010m-1', '2-deGFP-1']"
+DVK_CD-2,F9,input-dna-map,"['2-E0040m-2', '2-C0012m-2', '2-C0040-2', '2-C0062-2', '2-C0080-2', '2-E0030-2', '2-E1010m-2', '2-deGFP-2']"
+DVK_CD-4,F10,input-dna-map,"['2-E0040m-4', '2-C0012m-4', '2-C0040-4', '2-C0062-4', '2-C0080-4', '2-E0030-4', '2-E1010m-4', '2-deGFP-4']"
+J23116_AB-1,G1,input-dna-map,"['5-J23116-1', '8-J23116-1']"
+J23116_AB-2,G2,input-dna-map,"['5-J23116-2', '8-J23116-2']"
+J23116_AB-4,G3,input-dna-map,"['5-J23116-4', '8-J23116-4']"
+E1010m_CD-1,G5,input-dna-map,['2-E1010m-1']
+E1010m_CD-2,G6,input-dna-map,['2-E1010m-2']
+E1010m_CD-4,G7,input-dna-map,['2-E1010m-4']
+R0040_AB-1,H1,input-dna-map,"['5-R0040-1', '8-R0040-1']"
+R0040_AB-2,H2,input-dna-map,"['5-R0040-2', '8-R0040-2']"
+R0040_AB-4,H3,input-dna-map,"['5-R0040-4', '8-R0040-4']"
+deGFP_CD-1,H5,input-dna-map,['2-deGFP-1']
+deGFP_CD-2,H6,input-dna-map,['2-deGFP-2']
+deGFP_CD-4,H7,input-dna-map,['2-deGFP-4']
+
+COMBINATIONS
+name,parts,well,no_parts,plate
+2-E0040m-1,"['E0040m_CD-1', 'DVK_CD-1']",A1,2,reaction_plate
+2-C0012m-1,"['C0012m_CD-1', 'DVK_CD-1']",B1,2,reaction_plate
+2-C0040-1,"['C0040_CD-1', 'DVK_CD-1']",C1,2,reaction_plate
+2-C0062-1,"['C0062_CD-1', 'DVK_CD-1']",D1,2,reaction_plate
+2-C0080-1,"['C0080_CD-1', 'DVK_CD-1']",E1,2,reaction_plate
+2-E0030-1,"['E0030_CD-1', 'DVK_CD-1']",F1,2,reaction_plate
+2-E1010m-1,"['E1010m_CD-1', 'DVK_CD-1']",G1,2,reaction_plate
+2-deGFP-1,"['deGFP_CD-1', 'DVK_CD-1']",H1,2,reaction_plate
+2-E0040m-2,"['E0040m_CD-2', 'DVK_CD-2']",A2,2,reaction_plate
+2-C0012m-2,"['C0012m_CD-2', 'DVK_CD-2']",B2,2,reaction_plate
+2-C0040-2,"['C0040_CD-2', 'DVK_CD-2']",C2,2,reaction_plate
+2-C0062-2,"['C0062_CD-2', 'DVK_CD-2']",D2,2,reaction_plate
+2-C0080-2,"['C0080_CD-2', 'DVK_CD-2']",E2,2,reaction_plate
+2-E0030-2,"['E0030_CD-2', 'DVK_CD-2']",F2,2,reaction_plate
+2-E1010m-2,"['E1010m_CD-2', 'DVK_CD-2']",G2,2,reaction_plate
+2-deGFP-2,"['deGFP_CD-2', 'DVK_CD-2']",H2,2,reaction_plate
+2-E0040m-4,"['E0040m_CD-4', 'DVK_CD-4']",A3,2,reaction_plate
+2-C0012m-4,"['C0012m_CD-4', 'DVK_CD-4']",B3,2,reaction_plate
+2-C0040-4,"['C0040_CD-4', 'DVK_CD-4']",C3,2,reaction_plate
+2-C0062-4,"['C0062_CD-4', 'DVK_CD-4']",D3,2,reaction_plate
+2-C0080-4,"['C0080_CD-4', 'DVK_CD-4']",E3,2,reaction_plate
+2-E0030-4,"['E0030_CD-4', 'DVK_CD-4']",F3,2,reaction_plate
+2-E1010m-4,"['E1010m_CD-4', 'DVK_CD-4']",G3,2,reaction_plate
+2-deGFP-4,"['deGFP_CD-4', 'DVK_CD-4']",H3,2,reaction_plate
+5-J23106-1,"['J23106_AB-1', 'B0034m_BC-1', 'E0040m_CD-1', 'B0015_DE-1', 'DVK_AE-1']",A4,5,reaction_plate
+5-I13453-1,"['I13453_AB-1', 'B0034m_BC-1', 'E0040m_CD-1', 'B0015_DE-1', 'DVK_AE-1']",B4,5,reaction_plate
+5-J23100-1,"['J23100_AB-1', 'B0034m_BC-1', 'E0040m_CD-1', 'B0015_DE-1', 'DVK_AE-1']",C4,5,reaction_plate
+5-J23102-1,"['J23102_AB-1', 'B0034m_BC-1', 'E0040m_CD-1', 'B0015_DE-1', 'DVK_AE-1']",D4,5,reaction_plate
+5-J23103-1,"['J23103_AB-1', 'B0034m_BC-1', 'E0040m_CD-1', 'B0015_DE-1', 'DVK_AE-1']",E4,5,reaction_plate
+5-J23107-1,"['J23107_AB-1', 'B0034m_BC-1', 'E0040m_CD-1', 'B0015_DE-1', 'DVK_AE-1']",F4,5,reaction_plate
+5-J23116-1,"['J23116_AB-1', 'B0034m_BC-1', 'E0040m_CD-1', 'B0015_DE-1', 'DVK_AE-1']",G4,5,reaction_plate
+5-R0040-1,"['R0040_AB-1', 'B0034m_BC-1', 'E0040m_CD-1', 'B0015_DE-1', 'DVK_AE-1']",H4,5,reaction_plate
+5-J23106-2,"['J23106_AB-2', 'B0034m_BC-2', 'E0040m_CD-2', 'B0015_DE-2', 'DVK_AE-2']",A5,5,reaction_plate
+5-I13453-2,"['I13453_AB-2', 'B0034m_BC-2', 'E0040m_CD-2', 'B0015_DE-2', 'DVK_AE-2']",B5,5,reaction_plate
+5-J23100-2,"['J23100_AB-2', 'B0034m_BC-2', 'E0040m_CD-2', 'B0015_DE-2', 'DVK_AE-2']",C5,5,reaction_plate
+5-J23102-2,"['J23102_AB-2', 'B0034m_BC-2', 'E0040m_CD-2', 'B0015_DE-2', 'DVK_AE-2']",D5,5,reaction_plate
+5-J23103-2,"['J23103_AB-2', 'B0034m_BC-2', 'E0040m_CD-2', 'B0015_DE-2', 'DVK_AE-2']",E5,5,reaction_plate
+5-J23107-2,"['J23107_AB-2', 'B0034m_BC-2', 'E0040m_CD-2', 'B0015_DE-2', 'DVK_AE-2']",F5,5,reaction_plate
+5-J23116-2,"['J23116_AB-2', 'B0034m_BC-2', 'E0040m_CD-2', 'B0015_DE-2', 'DVK_AE-2']",G5,5,reaction_plate
+5-R0040-2,"['R0040_AB-2', 'B0034m_BC-2', 'E0040m_CD-2', 'B0015_DE-2', 'DVK_AE-2']",H5,5,reaction_plate
+5-J23106-4,"['J23106_AB-4', 'B0034m_BC-4', 'E0040m_CD-4', 'B0015_DE-4', 'DVK_AE-4']",A6,5,reaction_plate
+5-I13453-4,"['I13453_AB-4', 'B0034m_BC-4', 'E0040m_CD-4', 'B0015_DE-4', 'DVK_AE-4']",B6,5,reaction_plate
+5-J23100-4,"['J23100_AB-4', 'B0034m_BC-4', 'E0040m_CD-4', 'B0015_DE-4', 'DVK_AE-4']",C6,5,reaction_plate
+5-J23102-4,"['J23102_AB-4', 'B0034m_BC-4', 'E0040m_CD-4', 'B0015_DE-4', 'DVK_AE-4']",D6,5,reaction_plate
+5-J23103-4,"['J23103_AB-4', 'B0034m_BC-4', 'E0040m_CD-4', 'B0015_DE-4', 'DVK_AE-4']",E6,5,reaction_plate
+5-J23107-4,"['J23107_AB-4', 'B0034m_BC-4', 'E0040m_CD-4', 'B0015_DE-4', 'DVK_AE-4']",F6,5,reaction_plate
+5-J23116-4,"['J23116_AB-4', 'B0034m_BC-4', 'E0040m_CD-4', 'B0015_DE-4', 'DVK_AE-4']",G6,5,reaction_plate
+5-R0040-4,"['R0040_AB-4', 'B0034m_BC-4', 'E0040m_CD-4', 'B0015_DE-4', 'DVK_AE-4']",H6,5,reaction_plate
+8--J23106-1,"['J23106_AB-1', 'B0034m_BC-1', '3xFLAG_CC1-1', 'E0040m_C1N-1', '12 aa GS Linker_NO-1', '6xHIS_OD-1', 'B0015_DE-1', 'DVK_AE-1']",A7,8,reaction_plate
+8-I13453-1,"['I13453_AB-1', 'B0034m_BC-1', '3xFLAG_CC1-1', 'E0040m_C1N-1', '12 aa GS Linker_NO-1', '6xHIS_OD-1', 'B0015_DE-1', 'DVK_AE-1']",B7,8,reaction_plate
+8-J23100-1,"['J23100_AB-1', 'B0034m_BC-1', '3xFLAG_CC1-1', 'E0040m_C1N-1', '12 aa GS Linker_NO-1', '6xHIS_OD-1', 'B0015_DE-1', 'DVK_AE-1']",C7,8,reaction_plate
+8-J23102-1,"['J23102_AB-1', 'B0034m_BC-1', '3xFLAG_CC1-1', 'E0040m_C1N-1', '12 aa GS Linker_NO-1', '6xHIS_OD-1', 'B0015_DE-1', 'DVK_AE-1']",D7,8,reaction_plate
+8-J23103-1,"['J23103_AB-1', 'B0034m_BC-1', '3xFLAG_CC1-1', 'E0040m_C1N-1', '12 aa GS Linker_NO-1', '6xHIS_OD-1', 'B0015_DE-1', 'DVK_AE-1']",E7,8,reaction_plate
+8-J23107-1,"['J23107_AB-1', 'B0034m_BC-1', '3xFLAG_CC1-1', 'E0040m_C1N-1', '12 aa GS Linker_NO-1', '6xHIS_OD-1', 'B0015_DE-1', 'DVK_AE-1']",F7,8,reaction_plate
+8-J23116-1,"['J23116_AB-1', 'B0034m_BC-1', '3xFLAG_CC1-1', 'E0040m_C1N-1', '12 aa GS Linker_NO-1', '6xHIS_OD-1', 'B0015_DE-1', 'DVK_AE-1']",G7,8,reaction_plate
+8-R0040-1,"['R0040_AB-1', 'B0034m_BC-1', '3xFLAG_CC1-1', 'E0040m_C1N-1', '12 aa GS Linker_NO-1', '6xHIS_OD-1', 'B0015_DE-1', 'DVK_AE-1']",H7,8,reaction_plate
+8--J23106-2,"['J23106_AB-2', 'B0034m_BC-2', '3xFLAG_CC1-2', 'E0040m_C1N-2', '12 aa GS Linker_NO-2', '6xHIS_OD-2', 'B0015_DE-2', 'DVK_AE-2']",A8,8,reaction_plate
+8-I13453-2,"['I13453_AB-2', 'B0034m_BC-2', '3xFLAG_CC1-2', 'E0040m_C1N-2', '12 aa GS Linker_NO-2', '6xHIS_OD-2', 'B0015_DE-2', 'DVK_AE-2']",B8,8,reaction_plate
+8-J23100-2,"['J23100_AB-2', 'B0034m_BC-2', '3xFLAG_CC1-2', 'E0040m_C1N-2', '12 aa GS Linker_NO-2', '6xHIS_OD-2', 'B0015_DE-2', 'DVK_AE-2']",C8,8,reaction_plate
+8-J23102-2,"['J23102_AB-2', 'B0034m_BC-2', '3xFLAG_CC1-2', 'E0040m_C1N-2', '12 aa GS Linker_NO-2', '6xHIS_OD-2', 'B0015_DE-2', 'DVK_AE-2']",D8,8,reaction_plate
+8-J23103-2,"['J23103_AB-2', 'B0034m_BC-2', '3xFLAG_CC1-2', 'E0040m_C1N-2', '12 aa GS Linker_NO-2', '6xHIS_OD-2', 'B0015_DE-2', 'DVK_AE-2']",E8,8,reaction_plate
+8-J23107-2,"['J23107_AB-2', 'B0034m_BC-2', '3xFLAG_CC1-2', 'E0040m_C1N-2', '12 aa GS Linker_NO-2', '6xHIS_OD-2', 'B0015_DE-2', 'DVK_AE-2']",F8,8,reaction_plate
+8-J23116-2,"['J23116_AB-2', 'B0034m_BC-2', '3xFLAG_CC1-2', 'E0040m_C1N-2', '12 aa GS Linker_NO-2', '6xHIS_OD-2', 'B0015_DE-2', 'DVK_AE-2']",G8,8,reaction_plate
+8-R0040-2,"['R0040_AB-2', 'B0034m_BC-2', '3xFLAG_CC1-2', 'E0040m_C1N-2', '12 aa GS Linker_NO-2', '6xHIS_OD-2', 'B0015_DE-2', 'DVK_AE-2']",H8,8,reaction_plate
+8--J23106-4,"['J23106_AB-4', 'B0034m_BC-4', '3xFLAG_CC1-4', 'E0040m_C1N-4', '12 aa GS Linker_NO-4', '6xHIS_OD-4', 'B0015_DE-4', 'DVK_AE-4']",A9,8,reaction_plate
+8-I13453-4,"['I13453_AB-4', 'B0034m_BC-4', '3xFLAG_CC1-4', 'E0040m_C1N-4', '12 aa GS Linker_NO-4', '6xHIS_OD-4', 'B0015_DE-4', 'DVK_AE-4']",B9,8,reaction_plate
+8-J23100-4,"['J23100_AB-4', 'B0034m_BC-4', '3xFLAG_CC1-4', 'E0040m_C1N-4', '12 aa GS Linker_NO-4', '6xHIS_OD-4', 'B0015_DE-4', 'DVK_AE-4']",C9,8,reaction_plate
+8-J23102-4,"['J23102_AB-4', 'B0034m_BC-4', '3xFLAG_CC1-4', 'E0040m_C1N-4', '12 aa GS Linker_NO-4', '6xHIS_OD-4', 'B0015_DE-4', 'DVK_AE-4']",D9,8,reaction_plate
+8-J23103-4,"['J23103_AB-4', 'B0034m_BC-4', '3xFLAG_CC1-4', 'E0040m_C1N-4', '12 aa GS Linker_NO-4', '6xHIS_OD-4', 'B0015_DE-4', 'DVK_AE-4']",E9,8,reaction_plate
+8-J23107-4,"['J23107_AB-4', 'B0034m_BC-4', '3xFLAG_CC1-4', 'E0040m_C1N-4', '12 aa GS Linker_NO-4', '6xHIS_OD-4', 'B0015_DE-4', 'DVK_AE-4']",F9,8,reaction_plate
+8-J23116-4,"['J23116_AB-4', 'B0034m_BC-4', '3xFLAG_CC1-4', 'E0040m_C1N-4', '12 aa GS Linker_NO-4', '6xHIS_OD-4', 'B0015_DE-4', 'DVK_AE-4']",G9,8,reaction_plate
+8-R0040-4,"['R0040_AB-4', 'B0034m_BC-4', '3xFLAG_CC1-4', 'E0040m_C1N-4', '12 aa GS Linker_NO-4', '6xHIS_OD-4', 'B0015_DE-4', 'DVK_AE-4']",H9,8,reaction_plate
+
+MASTER_MIX
+well,no_parts,vol_per_assembly,combinations,no_assemblies,buffer_vol,ligase_vol,enzyme_vol,water_vol,plate
+H12,2,16,"['2-E0040m-1', '2-C0012m-1', '2-C0040-1', '2-C0062-1', '2-C0080-1', '2-E0030-1', '2-E1010m-1', '2-deGFP-1']",8,20,5.0,10,125.0,reaction_plate
+G12,2,16,"['2-E0040m-2', '2-C0012m-2', '2-C0040-2', '2-C0062-2', '2-C0080-2', '2-E0030-2', '2-E1010m-2', '2-deGFP-2']",8,20,5.0,10,125.0,reaction_plate
+F12,2,16,"['2-E0040m-4', '2-C0012m-4', '2-C0040-4', '2-C0062-4', '2-C0080-4', '2-E0030-4', '2-E1010m-4', '2-deGFP-4']",8,20,5.0,10,125.0,reaction_plate
+E12,5,10,"['5-J23106-1', '5-I13453-1', '5-J23100-1', '5-J23102-1', '5-J23103-1', '5-J23107-1', '5-J23116-1', '5-R0040-1', '5-J23106-2', '5-I13453-2', '5-J23100-2', '5-J23102-2', '5-J23103-2', '5-J23107-2', '5-J23116-2', '5-R0040-2']",16,36,9.0,18,117.0,reaction_plate
+D12,5,10,"['5-J23106-4', '5-I13453-4', '5-J23100-4', '5-J23102-4', '5-J23103-4', '5-J23107-4', '5-J23116-4', '5-R0040-4']",8,20,5.0,10,65.0,reaction_plate
+C12,8,4,"['8--J23106-1', '8-I13453-1', '8-J23100-1', '8-J23102-1', '8-J23103-1', '8-J23107-1', '8-J23116-1', '8-R0040-1', '8--J23106-2', '8-I13453-2', '8-J23100-2', '8-J23102-2', '8-J23103-2', '8-J23107-2', '8-J23116-2', '8-R0040-2', '8--J23106-4', '8-I13453-4', '8-J23100-4', '8-J23102-4', '8-J23103-4', '8-J23107-4', '8-J23116-4', '8-R0040-4']",24,52,13.0,26,13.0,reaction_plate
+
+REAGENTS
+name,well,plate,volume,mm_wells
+ligase,H12,reagents_plate,60.0,"['H12', 'G12', 'F12', 'E12', 'D12', 'C12']"
+restriction_enzyme,G12,reagents_plate,120.0,"['H12', 'G12', 'F12', 'E12', 'D12', 'C12']"
+buffer-1,F12,reagents_plate,180.0,"['H12', 'G12', 'F12', 'E12', 'D12']"
+buffer-2,E12,reagents_plate,110.0,['C12']
+water,A1,trough,15000.0,"['H12', 'G12', 'F12', 'E12', 'D12', 'C12']"
+

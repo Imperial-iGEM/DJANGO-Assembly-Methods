@@ -1,4 +1,3 @@
-import sbol2
 import plateo
 import plateo.containers
 import plateo.tools
@@ -9,17 +8,17 @@ import numpy as np
 import os
 from typing import List, Dict
 from rdflib import URIRef
-from sbol2.constants import *
+from sbol2 import *
 
 
 class ParserSBOL:
 
-    def __init__(self, sbolDocument: sbol2.document.Document):
+    def __init__(self, sbolDocument: Document):
         self.doc = sbolDocument
 
     def generateCsv_for_DNABot(
             self,
-            linkerFile: sbol2.document.Document
+            linkerFile: Document
     ):
         """Create construct and parts/linkers CSVs for DNABot input
 
@@ -69,12 +68,12 @@ class ParserSBOL:
 
     def getRootComponenentDefinitions(
             self,
-            sbolDocument: sbol2.document.Document = None
-    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+            sbolDocument: Document = None
+    ) -> List[ComponentDefinition]:
         """Get the root component definitions of an SBOL document.
 
         Args:
-            sbolDocument (sbol2.document.Document): SBOL document from
+            sbolDocument (Document): SBOL document from
                 which to get root component definitions (default: self.doc)
 
         Returns:
@@ -85,30 +84,31 @@ class ParserSBOL:
         # Remove child components of component definitions
         for obj in document.componentDefinitions:
             for component in obj.components:
-                childDefinition = document.getComponentDefinition(component.definition)
-                if(childDefinition is not None
-                        and childDefinition in componentDefs):
+                childDefinition = \
+                    document.getComponentDefinition(component.definition)
+                if(childDefinition
+                        is not None and childDefinition in componentDefs):
                     componentDefs.remove(childDefinition)
         # Remove child components of combinatorial derivations
         for obj in document.combinatorialderivations:
             for variableComponent in obj.variableComponents:
                 for variant in variableComponent.variants:
                     childDefinition = document.getComponentDefinition(variant)
-                    if(childDefinition is not None
-                            and childDefinition in componentDefs):
+                    if(childDefinition
+                            is not None and childDefinition in componentDefs):
                         componentDefs.remove(childDefinition)
         # Remove Templates
         for obj in document.combinatorialderivations:
             template = document.getComponentDefinition(obj.masterTemplate)
-            if (template is not None
-                    and template in componentDefs):
-                    componentDefs.remove(template)
+            if (template
+                    is not None and template in componentDefs):
+                componentDefs.remove(template)
         return list(componentDefs)
 
     def getRootCombinatorialDerivations(
         self,
-        sbolDocument: sbol2.document.Document = None
-    ) -> List[sbol2.combinatorialderivation.CombinatorialDerivation]:
+        sbolDocument: Document = None
+    ) -> List[CombinatorialDerivation]:
         document = self.doc if sbolDocument is None else sbolDocument
         combDerivs = list(document.combinatorialderivations)
         for obj in document.combinatorialderivations:
@@ -116,8 +116,8 @@ class ParserSBOL:
                 if vc.variantDerivations is not None:
                     for vd in vc.variantDerivations:
                         childDeriv = document.combinatorialderivations.get(vd)
-                        if (childDeriv is not None
-                                and childDeriv in combDerivs):
+                        if (childDeriv
+                                is not None and childDeriv in combDerivs):
                             combDerivs.remove(childDeriv)
         return combDerivs
 
@@ -125,7 +125,7 @@ class ParserSBOL:
             self,
             listOfNonCombUris: List[str] = [],
             listOfCombUris: List[str] = []
-    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+    ) -> List[ComponentDefinition]:
         """Get the list of constructs (component definitions) specified by
         the list of non-combinatorial URIs and combinatorial derivation URIs.
 
@@ -165,27 +165,49 @@ class ParserSBOL:
 
     def enumerator(
         self,
-        derivation: sbol2.combinatorialderivation.CombinatorialDerivation
-    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        derivation: CombinatorialDerivation
+    ) -> List[ComponentDefinition]:
         parents = []
         template = self.doc.getComponentDefinition(derivation.masterTemplate)
-        templateCopy = self.createTemplateCopy(template, template.displayId + "_Var", "1")
+        templateCopy =\
+            self.createTemplateCopy(template, template.displayId + "_Var", "1")
         parents.append(templateCopy)
         for vc in derivation.variableComponents:
             newParents = []
             for parent in parents:
-                for children in self.group(self.collectVariants(vc), "http://sbols.org/v2#one"):
+                for children in self.group(
+                        self.collectVariants(vc),
+                        "http://sbols.org/v2#one"):
                     varDisplayId = self.concatenateChildrenDisplayId(children)
-                    if parent.persistentIdentity + "_" + varDisplayId + "/1" not in [cd.identity for cd in self.doc.componentDefinitions]:
+                    if parent.persistentIdentity + "_" + varDisplayId + "/1" \
+                            not in [cd.identity for cd in self.doc.componentDefinitions]:
                         # Create parent copy
-                        uniqueId = self.getUniqueDisplayId(None, None, parent.displayId + "_" + varDisplayId, parent.version, "CD", self.doc)
-                        newParent = self.createTemplateCopy(parent, uniqueId, "1")
+                        uniqueId = self.getUniqueDisplayId(
+                            None,
+                            None,
+                            parent.displayId + "_" + varDisplayId,
+                            parent.version,
+                            "CD",
+                            self.doc
+                        )
+                        newParent = self.createTemplateCopy(
+                            parent,
+                            uniqueId,
+                            "1"
+                        )
                         self.doc.add(newParent)
                     else:
                         # Set newParent to existing CD
-                        newParent = self.doc.getComponentDefinition(parent.persistentIdentity + "_" + varDisplayId + "/1")
+                        newParent = self.doc.getComponentDefinition(
+                            parent.persistentIdentity + "_" + varDisplayId + "/1"
+                        )
                     # Add children
-                    self.addChildren(template, template.components[vc.variable], newParent, children)
+                    self.addChildren(
+                        template,
+                        template.components[vc.variable],
+                        newParent,
+                        children
+                    )
                     # Add to newParents
                     newParents.append(newParent)
             parents = newParents
@@ -193,29 +215,36 @@ class ParserSBOL:
 
     def addChildren(
         self,
-        originalTemplate: sbol2.componentdefinition.ComponentDefinition,
-        originalComponent: sbol2.component.Component,
-        newParent: sbol2.componentdefinition.ComponentDefinition,
-        children: List[sbol2.componentdefinition.ComponentDefinition]
+        originalTemplate: ComponentDefinition,
+        originalComponent: Component,
+        newParent: ComponentDefinition,
+        children: List[ComponentDefinition]
     ):
         newComponent = newParent.components[originalComponent.displayId]
         newComponent.wasDerivedFrom = originalComponent.identity
         if children is None:
             self.removeConstraintReferences(newParent, newComponent)
             for sa in newParent.sequenceAnnotations:
-                if sa.component is not None and sa.component == newComponent.identity:
+                if sa.component \
+                        is not None and sa.component == newComponent.identity:
                     newParent.sequenceAnnotations.remove(sa.identity)
             newParent.components.remove(newComponent.identity)
             return
         first = True
         for child in children:
             if first:
-                # Take over definition of newParent's version of original component
+                # Take over definition of
+                # newParent's version of original component
                 newComponent.definition = child.identity
                 first = False
             else:
                 # Create new component
-                uniqueId = self.getUniqueDisplayId(newParent, None, child.displayId + "_Component", "1", "Component", None)
+                uniqueId = self.getUniqueDisplayId(
+                    newParent,
+                    None,
+                    child.displayId + "_Component", "1",
+                    "Component",
+                    None)
                 link = newParent.components.create(uniqueId)
                 link.definition = child.persistentIdentity
                 link.access = SBOL_ACCESS_PUBLIC
@@ -223,29 +252,49 @@ class ParserSBOL:
                 link.wasDerivedFrom = originalComponent.identity
                 # Create a new 'prev precedes link' constraint
                 if originalTemplate.hasUpstreamComponent(originalComponent):
-                    oldPrev = originalTemplate.getUpstreamComponent(originalComponent)
+                    oldPrev = \
+                        originalTemplate.getUpstreamComponent(originalComponent)
                     if oldPrev.identity in newParent.components:
                         newPrev = newParent.components[oldPrev.identity]
-                        uniqueId = self.getUniqueDisplayId(newParent, None, newParent.displayId + "_SequenceConstraint", None, "SequenceConstraint", None)
-                        newSequenceConstraint = newParent.sequenceConstraints.create(uniqueId)
+                        uniqueId = self.getUniqueDisplayId(
+                            newParent,
+                            None,
+                            newParent.displayId + "_SequenceConstraint",
+                            None,
+                            "SequenceConstraint",
+                            None
+                        )
+                        newSequenceConstraint = \
+                            newParent.sequenceConstraints.create(uniqueId)
                         newSequenceConstraint.subject = newPrev.identity
                         newSequenceConstraint.object = link.identity
-                        newSequenceConstraint.restriction = SBOL_RESTRICTION_PRECEDES
+                        newSequenceConstraint.restriction = \
+                            SBOL_RESTRICTION_PRECEDES
                 # Create new 'link precedes next' constraint
                 if originalTemplate.hasDownstreamComponent(originalComponent):
-                    oldNext = originalTemplate.getDownstreamComponent(originalComponent)
+                    oldNext = \
+                        originalTemplate.getDownstreamComponent(originalComponent)
                     if oldNext.identity in newParent.components:
                         newNext = newParent.components[oldNext.identity]
-                        uniqueId = self.getUniqueDisplayId(newParent, None, newParent.displayId + "_SeqeunceConstraint", None, "SequenceConstraint", None)
-                        newSequenceConstraint = newParent.sequenceConstraints.create(uniqueId)
+                        uniqueId = self.getUniqueDisplayId(
+                            newParent,
+                            None,
+                            newParent.displayId + "_SeqeunceConstraint",
+                            None,
+                            "SequenceConstraint",
+                            None
+                        )
+                        newSequenceConstraint = \
+                            newParent.sequenceConstraints.create(uniqueId)
                         newSequenceConstraint.subject = link.identity
                         newSequenceConstraint.object = newNext.identity
-                        newSequenceConstraint.restriction = SBOL_RESTRICTION_PRECEDES
+                        newSequenceConstraint.restriction = \
+                            SBOL_RESTRICTION_PRECEDES
 
     def removeConstraintReferences(
         self,
-        newParent: sbol2.componentdefinition.ComponentDefinition,
-        newComponent: sbol2.component.Component
+        newParent: ComponentDefinition,
+        newComponent: Component
     ):
         subj = None
         obj = None
@@ -269,12 +318,16 @@ class ParserSBOL:
 
     def createTemplateCopy(
         self,
-        template: sbol2.componentdefinition.ComponentDefinition,
+        template: ComponentDefinition,
         displayId: str,
         version: str
-    ) -> sbol2.componentdefinition.ComponentDefinition:
+    ) -> ComponentDefinition:
         newDisplayId = URIRef(displayId)
-        templateCopy = sbol2.componentdefinition.ComponentDefinition(newDisplayId, template.types, version)
+        templateCopy = ComponentDefinition(
+            newDisplayId,
+            template.types,
+            version
+        )
         templateCopy.roles = template.roles
         primaryStructure = template.getPrimaryStructureComponents()
         curr = None
@@ -290,7 +343,8 @@ class ParserSBOL:
                     templateCopy.displayId + "_SequenceConstraint",
                     None,
                     "SequenceConstraint",
-                    None)
+                    None
+                )
                 sc = templateCopy.sequenceConstraints.create(uniqueId)
                 sc.subject = prev.identity
                 sc.object = curr.identity
@@ -304,26 +358,29 @@ class ParserSBOL:
 
     def getUniqueDisplayId(
         self,
-        comp: sbol2.componentdefinition.ComponentDefinition = None,
-        derivation: sbol2.combinatorialderivation.CombinatorialDerivation = None,
+        comp: ComponentDefinition = None,
+        derivation: CombinatorialDerivation = None,
         displayId: str = None,
         version: str = None,
         dataType: str = None,
-        doc: sbol2.document.Document = None
+        doc: Document = None
     ) -> str:
         i = 1
         if dataType == "CD":
-            uniqueUri = sbol2.getHomespace() + displayId + "/" + version
+            uniqueUri = getHomespace() + displayId + "/" + version
             # while doc.find(uniqueUri):
-            while uniqueUri in [cd.displayId for cd in doc.componentDefinitions]:
+            while uniqueUri \
+                    in [cd.displayId for cd in doc.componentDefinitions]:
                 i += 1
-                uniqueUri = sbol2.getHomespace() + "%s_%d/%s" % (displayId, i, version)
+                uniqueUri = \
+                    getHomespace() + "%s_%d/%s" % (displayId, i, version)
             if i == 1:
                 return displayId
             else:
                 return displayId + "_" + str(i)
         elif dataType == "SequenceAnnotation":
-            while displayId in [sa.displayId for sa in comp.sequenceAnnotations]:
+            while displayId \
+                    in [sa.displayId for sa in comp.sequenceAnnotations]:
                 i += 1
                 displayId = displayId + str(i)
             if i == 1:
@@ -331,7 +388,8 @@ class ParserSBOL:
             else:
                 return displayId
         elif dataType == "SequenceConstraint":
-            while displayId in [sc.displayId for sc in comp.sequenceConstraints]:
+            while displayId \
+                    in [sc.displayId for sc in comp.sequenceConstraints]:
                 i += 1
                 displayId = displayId + str(i)
             if i == 1:
@@ -347,26 +405,29 @@ class ParserSBOL:
             else:
                 return displayId
         elif dataType == "Sequence":
-            uniqueUri = sbol2.getHomespace() + displayId + "/" + version
+            uniqueUri = getHomespace() + displayId + "/" + version
             while doc.find(uniqueUri):
                 i += 1
-                uniqueUri = sbol2.getHomespace() + "%s_%d/%s" % (displayId, i, version)
+                uniqueUri = \
+                    getHomespace() + "%s_%d/%s" % (displayId, i, version)
             if i == 1:
                 return displayId
             else:
                 return displayId + str(i)
         # TODO: Range
         elif dataType == "CombinatorialDerivation":
-            uniqueUri = sbol2.getHomespace() + displayId + "/" + version
+            uniqueUri = getHomespace() + displayId + "/" + version
             while doc.find(uniqueUri):
                 i += 1
-                uniqueUri = sbol2.getHomespace() + "%s_%d/%s" % (displayId, i, version)
+                uniqueUri = \
+                    getHomespace() + "%s_%d/%s" % (displayId, i, version)
             if i == 1:
                 return displayId
             else:
                 return displayId + str(i)
         elif dataType == "VariableComponent":
-            while displayId + str(i) in [vc.displayId for vc in derivation.variableComponents]:
+            while displayId + str(i) \
+                    in [vc.displayId for vc in derivation.variableComponents]:
                 i += 1
                 displayId = displayId + str(i)
             if i == 1:
@@ -378,7 +439,7 @@ class ParserSBOL:
 
     def concatenateChildrenDisplayId(
         self,
-        children: List[sbol2.componentdefinition.ComponentDefinition]
+        children: List[ComponentDefinition]
     ) -> str:
         concDisplayId = ""
         for child in children:
@@ -387,8 +448,8 @@ class ParserSBOL:
 
     def collectVariants(
         self,
-        vc: sbol2.combinatorialderivation.VariableComponent
-    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        vc
+    ) -> List[ComponentDefinition]:
         variants = []
         # Add all variants
         for v in vc.variants:
@@ -398,7 +459,7 @@ class ParserSBOL:
         for c in vc.variantCollections:
             for m in c.members:
                 tl = self.doc.get(m)
-                if type(tl) == sbol2.componentdefinition.ComponentDefinition:
+                if type(tl) == ComponentDefinition:
                     variants.add(tl)
         for derivation in vc.variantDerivations:
             variants.extend(self.enumerator(self.doc.get(derivation)))
@@ -406,9 +467,9 @@ class ParserSBOL:
 
     def group(
         self,
-        variants: List[sbol2.componentdefinition.ComponentDefinition],
+        variants: List[ComponentDefinition],
         repeat: str
-    ) -> List[List[sbol2.componentdefinition.ComponentDefinition]]:
+    ) -> List[List[ComponentDefinition]]:
         groups = []
         for cd in variants:
             group = []
@@ -429,28 +490,96 @@ class ParserSBOL:
 
     def generateCombinations(
         self,
-        groups: List[List[sbol2.componentdefinition.ComponentDefinition]],
-        variants: List[sbol2.componentdefinition.ComponentDefinition],
+        groups: List[List[ComponentDefinition]],
+        variants: List[ComponentDefinition],
         i: int,
-        sets: List[sbol2.componentdefinition.ComponentDefinition]
+        sets: List[ComponentDefinition]
     ):
         if i == len(variants):
             if not sets:
                 groups.add(sets)
             return
         no = sets.copy()
-        self.generateCombinations(groups, variants, i+1, no)
+        self.generateCombinations(groups, variants, i + 1, no)
         yes = sets.copy()
         yes.add(variants[i])
-        self.generateCombinations(groups, variants, i+1, yes)
+        self.generateCombinations(groups, variants, i + 1, yes)
 
     # TODO: Implement a Filter class?
     def filterConstructs(self):
         raise NotImplementedError("Not yet implemented")
 
+    # TODO: Test if robust to multiple nested variant derivations
+    def displayListOfParts(self) -> List[str]:
+
+        def getExtendedDisplayId(
+            combDeriv: CombinatorialDerivation
+        ) -> List[str]:
+            extDisplayIds = []
+            for vc in combDeriv.variableComponents:
+                for v in vc.variants:
+                    cd = self.doc.getComponentDefinition(v)
+                    extDisplayIds.append("_Var_" + cd.displayId)
+                for c in vc.variantCollections:
+                    for m in c.members:
+                        tl = self.doc.get(m)
+                        if type(tl) == ComponentDefinition:
+                            extDisplayIds.append("_Var_" + tl.displayId)
+                for vd in vc.variantDerivations:
+                    cDeriv = self.doc.get(vd)
+                    template = cDeriv.masterTemplate
+                    extDisplayIds.extend(
+                        [template.displayId + edi
+                            for edi in getExtendedDisplayId(cDeriv)]
+                    )
+            return extDisplayIds
+
+        listOfParts = []
+        rootCds = []
+        # Get all root component definitions from document
+        rootCds.extend(self.getRootComponenentDefinitions())
+        # Add all parts in each root cds
+        for cd in rootCds:
+            for c in cd.components:
+                listOfParts.append(
+                    self.doc.getComponentDefinition(c.definition)
+                )
+        # Get all root combinatorial derivations
+        rootCombDerivs = self.getRootCombinatorialDerivations()
+        for rootCombDeriv in rootCombDerivs:
+            # Get master template
+            template = \
+                self.doc.getComponentDefinition(rootCombDeriv.masterTemplate)
+            variables = \
+                [vc.variable for vc in rootCombDeriv.variableComponents]
+            # Add components of template that are not variables
+            for c in template.components:
+                if c.identity not in variables:
+                    listOfParts.append(c.displayId)
+            # Append variants
+            for vc in rootCombDeriv.variableComponents:
+                for v in vc.variants:
+                    cd = self.doc.getComponentDefinition(v)
+                    listOfParts.append(cd.displayId)
+                for c in vc.variantCollections:
+                    for m in c.members:
+                        tl = self.doc.get(m)
+                        if type(tl) == ComponentDefinition:
+                            listOfParts.append(tl.displayId)
+                for vd in vc.variantDerivations:
+                    deriv = self.doc.get(vd)
+                    template = \
+                        self.doc.getComponentDefinition(deriv.masterTemplate)
+                    listOfParts.extend(
+                        [template.displayId + edi
+                            for edi in getExtendedDisplayId(deriv)]
+                    )
+        return listOfParts
+
     def getListOfParts(
-            self,
-            allConstructs: List[sbol2.componentdefinition.ComponentDefinition] = []) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        self,
+        allConstructs: List[ComponentDefinition] = []
+    ) -> List[ComponentDefinition]:
         """Get list of parts (component defintions) from the list of
         all constructs.
 
@@ -466,15 +595,16 @@ class ParserSBOL:
         for construct in allConstructs:
             for component in construct.components:
                 listOfParts.append(
-                    self.doc.getComponentDefinition(component.definition))
+                    self.doc.getComponentDefinition(component.definition)
+                )
         # Remove duplicate components
         listOfParts = list(dict.fromkeys(listOfParts))
         return listOfParts
 
     def getSortedListOfParts(
-            self,
-            listOfParts: List[sbol2.componentdefinition.ComponentDefinition]
-    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        self,
+        listOfParts: List[ComponentDefinition]
+    ) -> List[ComponentDefinition]:
         """Get a sorted list of parts (str) from the list of parts.
         Sort by sbol2 displayId
 
@@ -489,8 +619,9 @@ class ParserSBOL:
         return listOfParts
 
     def getDictOfComponents(
-            self,
-            listOfConstructs: List[sbol2.componentdefinition.ComponentDefinition]) -> Dict[str, sbol2.componentdefinition.ComponentDefinition]:
+        self,
+        listOfConstructs: List[ComponentDefinition]
+    ) -> Dict[str, ComponentDefinition]:
         """Get a dictionary of components (as component definitions)
         from the list of constructs as
         {construct.displayId: construct.components (as component definitions)}
@@ -504,12 +635,12 @@ class ParserSBOL:
         return {x.displayId: x.getPrimaryStructure() for x in listOfConstructs}
 
     def fillPlateoPlates(
-            self,
-            allContent: List[sbol2.componentdefinition.ComponentDefinition],
-            contentName: str,
-            numPlate: int = None,
-            plate_class: plateo.Plate = None,
-            maxWellsFilled: int = None
+        self,
+        allContent: List[ComponentDefinition],
+        contentName: str,
+        numPlate: int = None,
+        plate_class: plateo.Plate = None,
+        maxWellsFilled: int = None
     ) -> List[plateo.Plate]:
         """Generate a list of plateo plate objects from list of constructs
 
@@ -530,7 +661,7 @@ class ParserSBOL:
         numPlate = 1 if numPlate is None else numPlate
         plate_class = (
             plateo.containers.Plate96 if plate_class is None else plate_class)
-        num_wells = plate_class.num_rows*plate_class.num_columns
+        num_wells = plate_class.num_rows * plate_class.num_columns
         maxWellsFilled = (
             num_wells if maxWellsFilled is None
             else maxWellsFilled)
@@ -540,18 +671,19 @@ class ParserSBOL:
                 "ValueError: maxWellsFilled must be less than"
                 " plate_class.num_wells")
         # Check if numPlate*maxWellsFilled less than len(allContent)
-        if numPlate*maxWellsFilled < len(allContent):
+        if numPlate * maxWellsFilled < len(allContent):
             raise ValueError(
                 "ValueError: Length of allContent must be"
                 " less than numPlate*maxWellsFilled")
         # Check if there will be empty plates
-        if len(allContent) < (numPlate-1)*maxWellsFilled:
-            warnings.warn("Number of "+contentName+"s cannot fill all plates.")
+        if len(allContent) < (numPlate - 1) * maxWellsFilled:
+            warnings.warn("Number of " + contentName + "s \
+                            cannot fill all plates.")
         plates = [
             plate_class(name="Plate %d" % index)
             for index in range(1, numPlate + 1)]
         for plate in plates:
-            for i in range(1, maxWellsFilled+1):
+            for i in range(1, maxWellsFilled + 1):
                 if copyAllContent:
                     well = plate.wells[
                         plateo.tools.index_to_wellname(i, plate.num_wells)]
@@ -561,7 +693,7 @@ class ParserSBOL:
     def getAllContentFromPlateoPlate(
         self,
         contentPlate: plateo.Plate
-    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+    ) -> List[ComponentDefinition]:
         '''Get a list of all content (as component definitions) from a
         Plateo plate.
 
@@ -579,7 +711,7 @@ class ParserSBOL:
 
     def getMinNumberOfBasicParts(
         self,
-        allConstructs: List[sbol2.componentdefinition.ComponentDefinition]
+        allConstructs: List[ComponentDefinition]
     ) -> int:
         '''Get the minimum number of Part/Linker pairs required to perform
         BASIC assembly for all constructs.
@@ -621,7 +753,7 @@ class ParserSBOL:
     def getWellComponentDictFromPlateoPlate(
         self,
         constructPlate: plateo.Plate
-    ) -> Dict[str, List[sbol2.componentdefinition.ComponentDefinition]]:
+    ) -> Dict[str, List[ComponentDefinition]]:
         '''Get a dictionary of wells containing components comprising
         constructs (as component definitions) in the form
         {Wellname:[Components]}
@@ -641,7 +773,7 @@ class ParserSBOL:
 
     def getListFromWellComponentDict(
         self,
-        dictWellComponent: Dict[str, sbol2.componentdefinition.ComponentDefinition]
+        dictWellComponent: Dict[str, ComponentDefinition]
     ) -> List[str]:
         '''Get a concatenated list of wellname and components (as display ID)
         comprising the construct from the dictionary of wells containing
@@ -673,8 +805,10 @@ class ParserSBOL:
         allComponents = self.getAllContentFromPlateoPlate(constructPlate)
         minNumberOfBasicParts = self.getMinNumberOfBasicParts(allComponents)
         header = self.getConstructCsvHeader(minNumberOfBasicParts)
-        dictWellComponent = self.getWellComponentDictFromPlateoPlate(constructPlate)
-        listWellComponent = self.getListFromWellComponentDict(dictWellComponent)
+        dictWellComponent = \
+            self.getWellComponentDictFromPlateoPlate(constructPlate)
+        listWellComponent = \
+            self.getListFromWellComponentDict(dictWellComponent)
         # Create sparse array from list
         sparr = pd.arrays.SparseArray(listWellComponent)
         # Create df from sparr
@@ -700,8 +834,8 @@ class ParserSBOL:
 
     def isLinker(
         self,
-        part: sbol2.componentdefinition.ComponentDefinition,
-        linkerFile: sbol2.document.Document
+        part: ComponentDefinition,
+        linkerFile: Document
     ) -> bool:
         linkers = self.getRootComponenentDefinitions(linkerFile)
         if part.identity in [linker.identity for linker in linkers]:
@@ -711,8 +845,8 @@ class ParserSBOL:
 
     def getLinkerSP(
         self,
-        linker: sbol2.componentdefinition.ComponentDefinition,
-    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        linker: ComponentDefinition,
+    ) -> List[ComponentDefinition]:
         linkersp = []
         for component in linker.components:
             linkersp.append(
@@ -721,9 +855,9 @@ class ParserSBOL:
 
     def convertLinkerToSuffixPrefix(
         self,
-        listOfParts: List[sbol2.componentdefinition.ComponentDefinition],
-        linkerFile: sbol2.document.Document
-    ) -> List[sbol2.componentdefinition.ComponentDefinition]:
+        listOfParts: List[ComponentDefinition],
+        linkerFile: Document
+    ) -> List[ComponentDefinition]:
         newListOfParts = []
         for part in listOfParts:
             if self.isLinker(part, linkerFile):
@@ -736,7 +870,7 @@ class ParserSBOL:
         self,
         plateoPlate: plateo.Plate,
         contentName: str
-    ) -> Dict[str, List[sbol2.componentdefinition.ComponentDefinition]]:
+    ) -> Dict[str, List[ComponentDefinition]]:
         # TODO: Add option to include content vol/qty?
         # FIXME: Function works, but only outside of module?
         dictWellContent = {}
@@ -747,7 +881,7 @@ class ParserSBOL:
 
     def getListFromWellPartDict(
         self,
-        dictWellPart: Dict[str, List[sbol2.componentdefinition.ComponentDefinition]]
+        dictWellPart: Dict[str, List[ComponentDefinition]]
     ) -> List[str]:
         listWellPart = []
         for k, v in dictWellPart.items():
@@ -759,7 +893,10 @@ class ParserSBOL:
         partPlate: plateo.Plate
     ) -> pd.DataFrame:
         header = ["Part/linker", "Well", "Part concentration (ng/uL)"]
-        dictWellPart = self.getWellContentDictFromPlateoPlate(partPlate, "Part")
+        dictWellPart = self.getWellContentDictFromPlateoPlate(
+            partPlate,
+            "Part"
+        )
         listWellPart = self.getListFromWellPartDict(dictWellPart)
         sparr = pd.arrays.SparseArray(listWellPart)
         df = pd.DataFrame(data=sparr, columns=header)
@@ -768,7 +905,7 @@ class ParserSBOL:
     def getPartLinkerCsvFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
-        linkerFile: sbol2.document.Document,
+        linkerFile: Document,
         uniqueId: str = None
     ):
         # Obtain all constructs from plate
@@ -793,6 +930,6 @@ class ParserSBOL:
             # Create df
             partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
             partLinkerDf.to_csv(
-                "./" + uniqueId + "/part_linker_" + str(partPlates.index(plate)+1) + ".csv",
+                "./" + uniqueId + "/part_linker_" + str(partPlates.index(plate) + 1) + ".csv",
                 index=False
             )

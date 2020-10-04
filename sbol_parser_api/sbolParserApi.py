@@ -942,3 +942,43 @@ class ParserSBOL:
                 "./" + uniqueId + "/part_linker_" + str(partPlates.index(plate) + 1) + ".csv",
                 index=False
             )
+
+    def is_linkers_order_correct(self, construct):
+        """ Make sure input construct has the order of -part-linker- """
+
+        def _get_linker_names(SBOL_file_name):
+            """ Open standard linker document and extract all displayIds """
+            temp_doc = sbol2.Document()  # _open_internal_sbol_file(self, SBOL_file_name)
+            temp_doc.read(SBOL_file_name)
+
+            linker_names = []
+            for obj in temp_doc:
+                if obj.displayId not in linker_names:
+                    linker_names.append(obj.displayId)
+
+            return linker_names
+
+        Linkers_file_name = './examples/sbol/basic_linkers_standard.xml'
+        linker_names = _get_linker_names(Linkers_file_name)
+
+        # Check if even number of parts
+        if np.mod(len(construct), 2) != 0:
+            raise NotImplementedError
+
+        # Compare each part displayId in 'construct' to available linkers
+        def _is_linker(part, linker_names):
+            if part.displayId in linker_names:
+                return True
+            return False
+
+        is_first_part_linker = False
+        is_prev_part_linker = False
+        for i, part in enumerate(construct):
+            is_curr_part_linker = _is_linker(part, linker_names)
+            if i == 0:
+                is_first_part_linker = is_curr_part_linker
+                is_prev_part_linker = not is_curr_part_linker
+                continue
+            if is_prev_part_linker is not is_curr_part_linker:
+                raise NotImplementedError
+            is_prev_part_linker = is_curr_part_linker

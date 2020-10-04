@@ -696,6 +696,28 @@ class ParserSBOL:
                         well = plate.wells[
                             plateo.tools.index_to_wellname(i, plate.num_wells)]
                         well.data = {contentName: copyAllContent.pop(0)}
+        else:
+            if copyAllContent:
+                content = copyAllContent.pop(0)
+                if content.displayId in dictOfParts.keys():
+                    plateNum = dictOfParts[content.displayId]['Plate']
+                    plate = plates[plateNum - 1]
+                    wellname = dictOfParts[content.displayId]['Well']
+                    well = plate.wells[wellname]
+                    conc = dictOfParts[content.displayId]['Concentration']
+                    well.data = {contentName: content, "Concentration": conc}
+                else:
+                    # Find first empty well in ordered list of plates
+                    selectedWell = None
+                    for plate in plates:
+                        for well in plate.iter_wells(direction='row'):
+                            if well.is_empty:
+                                selectedWell = well
+                                break
+                        if selectedWell:
+                            break
+                    selectedWell.data = \
+                        {contentName: content, "Concentration": ''}
         return plates
 
     def getAllContentFromPlateoPlate(
@@ -925,12 +947,15 @@ class ParserSBOL:
         listOfParts = self.convertLinkerToSuffixPrefix(listOfParts, linkerFile)
         # Sort list of parts and linkers
         self.getSortedListOfParts(listOfParts)
+        # Determine number of plates from dict of parts
+        plates = [info["Plate"] for part, info in dictOfParts.items()]
+        plates = list(dict.fromkeys(plates))
+        numPlates = len(plates)
         # Add parts and linkers to plate
-        # TODO: Determine number of plates from dict of parts
         partPlates = self.fillPlateoPlates(
             listOfParts,
             "Part",
-            1,
+            numPlates,
             plateo.containers.Plate96,
             96,
             dictOfParts
@@ -948,7 +973,7 @@ class ParserSBOL:
 
         def _get_linker_names(SBOL_file_name):
             """ Open standard linker document and extract all displayIds """
-            temp_doc = sbol2.Document()  # _open_internal_sbol_file(self, SBOL_file_name)
+            temp_doc = Document()  # _open_internal_sbol_file(self, SBOL_file_name)
             temp_doc.read(SBOL_file_name)
 
             linker_names = []
@@ -958,7 +983,7 @@ class ParserSBOL:
 
             return linker_names
 
-        Linkers_file_name = './examples/sbol/basic_linkers_standard.xml'
+        Linkers_file_name = '../examples/sbol/basic_linkers_standard.xml'
         linker_names = _get_linker_names(Linkers_file_name)
 
         # Check if even number of parts

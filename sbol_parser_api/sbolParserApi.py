@@ -18,10 +18,10 @@ class ParserSBOL:
 
     def generateCsv_for_DNABot(
             self,
+            dictOfParts: Dict[str, float],
             linkerFile: Document
     ):
         """Create construct and parts/linkers CSVs for DNABot input
-
         Args:
             listOfNonCombUris (list): List of component definition
                 URIs pointing to non-combinatorial designs.
@@ -43,7 +43,7 @@ class ParserSBOL:
 
         # Create plateo construct plates
         constructPlates = self.fillPlateoPlates(
-            allConstructs[0:87],
+            allConstructs,
             "Construct",
             1,
             plateo.containers.Plate96,
@@ -61,7 +61,12 @@ class ParserSBOL:
             # Create construct CSV
             self.getConstructCsvFromPlateoPlate(plate, uniqueId)
             # Write parts/linkers csv
-            self.getPartLinkerCsvFromPlateoPlate(plate, linkerFile, uniqueId)
+            self.getPartLinkerCsvFromPlateoPlate(
+                plate,
+                dictOfParts,
+                linkerFile,
+                uniqueId
+            )
 
     def generateCsv_for_MoClo(self):
         raise NotImplementedError("Not yet implemented")
@@ -71,11 +76,9 @@ class ParserSBOL:
             sbolDocument: Document = None
     ) -> List[ComponentDefinition]:
         """Get the root component definitions of an SBOL document.
-
         Args:
             sbolDocument (Document): SBOL document from
                 which to get root component definitions (default: self.doc)
-
         Returns:
             list: List of root component definitions.
         """
@@ -128,15 +131,12 @@ class ParserSBOL:
     ) -> List[ComponentDefinition]:
         """Get the list of constructs (component definitions) specified by
         the list of non-combinatorial URIs and combinatorial derivation URIs.
-
         Expands combinatorial derivations.
-
         Args:
             listOfNonCombUris (list): List of component definition
                 URIs pointing to non-combinatorial designs.
             listOfCombUris (list): List of combinatorial derivation
                 URIs pointing to combinatorial designs.
-
         Returns:
             list: List of component definitions specifying constructs
                 to be assembled
@@ -541,9 +541,8 @@ class ParserSBOL:
         # Add all parts in each root cds
         for cd in rootCds:
             for c in cd.components:
-                listOfParts.append(
-                    self.doc.getComponentDefinition(c.definition)
-                )
+                compdef = self.doc.getComponentDefinition(c.definition)
+                listOfParts.append(compdef.displayId)
         # Get all root combinatorial derivations
         rootCombDerivs = self.getRootCombinatorialDerivations()
         for rootCombDeriv in rootCombDerivs:
@@ -574,7 +573,8 @@ class ParserSBOL:
                         [template.displayId + edi
                             for edi in getExtendedDisplayId(deriv)]
                     )
-        return listOfParts
+        listOfParts = list(dict.fromkeys(listOfParts))
+        return sorted(listOfParts)
 
     def getListOfParts(
         self,
@@ -582,10 +582,8 @@ class ParserSBOL:
     ) -> List[ComponentDefinition]:
         """Get list of parts (component defintions) from the list of
         all constructs.
-
         Args:
             allConstructs (list): List of all constructs to be assembled.
-
         Returns:
             list: List of component definitions specifying parts used across
                 all constructs to be assembled.
@@ -607,11 +605,9 @@ class ParserSBOL:
     ) -> List[ComponentDefinition]:
         """Get a sorted list of parts (str) from the list of parts.
         Sort by sbol2 displayId
-
         Args:
             listOfParts (list): List of parts to be sorted. (generated
             by getListOfConstructs)
-
         Returns:
             list: List of sorted parts (str)
         """
@@ -625,10 +621,8 @@ class ParserSBOL:
         """Get a dictionary of components (as component definitions)
         from the list of constructs as
         {construct.displayId: construct.components (as component definitions)}
-
         Args:
             listOfConstructs (list): List of constructs
-
         Returns:
             dict: Dictionary of components
         """
@@ -640,10 +634,10 @@ class ParserSBOL:
         contentName: str,
         numPlate: int = None,
         plate_class: plateo.Plate = None,
-        maxWellsFilled: int = None
+        maxWellsFilled: int = None,
+        dictOfParts: Dict[str, float] = None
     ) -> List[plateo.Plate]:
         """Generate a list of plateo plate objects from list of constructs
-
         Args:
             allContent (list): List of constructs
             contentName (str): Name of content (Construct or Part)
@@ -651,7 +645,6 @@ class ParserSBOL:
             plate_class (plateo.Plate):
                 Class of plateo plate (default = Plate96)
             maxWellsFilled (int): Maximum number of filled wells on a plate
-
         Returns:
             list: List of plates
         """
@@ -682,12 +675,13 @@ class ParserSBOL:
         plates = [
             plate_class(name="Plate %d" % index)
             for index in range(1, numPlate + 1)]
-        for plate in plates:
-            for i in range(1, maxWellsFilled + 1):
-                if copyAllContent:
-                    well = plate.wells[
-                        plateo.tools.index_to_wellname(i, plate.num_wells)]
-                    well.data = {contentName: copyAllContent.pop(0)}
+        if dictOfParts is None:
+            for plate in plates:
+                for i in range(1, maxWellsFilled + 1):
+                    if copyAllContent:
+                        well = plate.wells[
+                            plateo.tools.index_to_wellname(i, plate.num_wells)]
+                        well.data = {contentName: copyAllContent.pop(0)}
         return plates
 
     def getAllContentFromPlateoPlate(
@@ -696,10 +690,8 @@ class ParserSBOL:
     ) -> List[ComponentDefinition]:
         '''Get a list of all content (as component definitions) from a
         Plateo plate.
-
         Args:
             contentPlate (plateo.Plate): Plateo plate containing content
-
         Returns:
             list: List of all content (as component definitions)
         '''
@@ -715,11 +707,9 @@ class ParserSBOL:
     ) -> int:
         '''Get the minimum number of Part/Linker pairs required to perform
         BASIC assembly for all constructs.
-
         Args:
             allConstructs (list): List of all constructs as component
                 definitions
-
         Returns:
             int: Number of Part/Linker paris for BASIC assembly
         '''
@@ -737,11 +727,9 @@ class ParserSBOL:
         minNumberOfBasicParts: int
     ) -> List[str]:
         '''Create header for Construct CSV for DNABot
-
         Args:
             minNumberOfBasicParts (int): Minimum number of of Part/Linker
                 pairs required to perform BASIC assembly for all constructs
-
         Returns:
             List[str]: List of strings describing header for Construct CSV
         '''
@@ -757,10 +745,8 @@ class ParserSBOL:
         '''Get a dictionary of wells containing components comprising
         constructs (as component definitions) in the form
         {Wellname:[Components]}
-
         Args:
             constructPlate (plateo.Plate): Plateo plate containing constructs
-
         Returns:
             dict: Dictionary of wells containing constructs
         '''
@@ -778,10 +764,8 @@ class ParserSBOL:
         '''Get a concatenated list of wellname and components (as display ID)
         comprising the construct from the dictionary of wells containing
         constructs.
-
         Args:
             dictWellComponent: Dictionary of wells containing constructs
-
         Returns:
             List[str]: List of wellnames and components (as display ID)
         '''
@@ -795,10 +779,8 @@ class ParserSBOL:
         constructPlate: plateo.Plate
     ) -> pd.DataFrame:
         '''Get dataframe of constructs from Plateo plate containing constructs
-
         Args:
             constructPlate (plateo.Plate): Plateo plate containing constructs
-
         Returns:
             pd.DataFrame: Dataframe of constructs
         '''
@@ -822,7 +804,6 @@ class ParserSBOL:
     ):
         '''Convert construct dataframe into CSV and creates CSV file in the same
         directory.
-
         Args:
             constructPlate (plateo.Plate): Plateo plate containing constructs
             uniqueId (str): Unique ID appended to filename
@@ -905,6 +886,7 @@ class ParserSBOL:
     def getPartLinkerCsvFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
+        dictOfParts: Dict[str, float],
         linkerFile: Document,
         uniqueId: str = None
     ):
@@ -917,14 +899,14 @@ class ParserSBOL:
         # Sort list of parts and linkers
         self.getSortedListOfParts(listOfParts)
         # Add parts and linkers to plate
-        # TODO: Determine number of plates from number of parts
-        # TODO: Add part/linker concentration to plate
+        # TODO: Determine number of plates from dict of parts
         partPlates = self.fillPlateoPlates(
             listOfParts,
             "Part",
             1,
             plateo.containers.Plate96,
-            96
+            96,
+            dictOfParts
         )
         for plate in partPlates:
             # Create df
@@ -934,7 +916,7 @@ class ParserSBOL:
                 index=False
             )
 
-    def is_linkers_order_correct(self, construct):
+    def is_linkers_order_correct(self, construct: ComponentDefinition):
         """ Make sure input construct has the order of -part-linker- """
 
         def _get_linker_names(SBOL_file_name):
@@ -966,10 +948,10 @@ class ParserSBOL:
         is_prev_part_linker = False
         for i, part in enumerate(construct):
             is_curr_part_linker = _is_linker(part, linker_names)
-            if i == 0:
+            if i == 0:  # initialise
                 is_first_part_linker = is_curr_part_linker
-                is_prev_part_linker = not is_curr_part_linker
+                is_prev_part_linker = is_curr_part_linker
                 continue
-            if is_prev_part_linker is not is_curr_part_linker:
+            if is_prev_part_linker == is_curr_part_linker:
                 raise NotImplementedError
             is_prev_part_linker = is_curr_part_linker

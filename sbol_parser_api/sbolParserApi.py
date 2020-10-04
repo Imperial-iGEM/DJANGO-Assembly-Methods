@@ -18,6 +18,7 @@ class ParserSBOL:
 
     def generateCsv_for_DNABot(
             self,
+            dictOfParts: Dict[str, float],
             linkerFile: Document
     ):
         """Create construct and parts/linkers CSVs for DNABot input
@@ -43,7 +44,7 @@ class ParserSBOL:
 
         # Create plateo construct plates
         constructPlates = self.fillPlateoPlates(
-            allConstructs[0:87],
+            allConstructs,
             "Construct",
             1,
             plateo.containers.Plate96,
@@ -61,7 +62,12 @@ class ParserSBOL:
             # Create construct CSV
             self.getConstructCsvFromPlateoPlate(plate, uniqueId)
             # Write parts/linkers csv
-            self.getPartLinkerCsvFromPlateoPlate(plate, linkerFile, uniqueId)
+            self.getPartLinkerCsvFromPlateoPlate(
+                plate,
+                dictOfParts,
+                linkerFile,
+                uniqueId
+            )
 
     def generateCsv_for_MoClo(self):
         raise NotImplementedError("Not yet implemented")
@@ -541,9 +547,8 @@ class ParserSBOL:
         # Add all parts in each root cds
         for cd in rootCds:
             for c in cd.components:
-                listOfParts.append(
-                    self.doc.getComponentDefinition(c.definition)
-                )
+                compdef = self.doc.getComponentDefinition(c.definition)
+                listOfParts.append(compdef.displayId)
         # Get all root combinatorial derivations
         rootCombDerivs = self.getRootCombinatorialDerivations()
         for rootCombDeriv in rootCombDerivs:
@@ -574,7 +579,8 @@ class ParserSBOL:
                         [template.displayId + edi
                             for edi in getExtendedDisplayId(deriv)]
                     )
-        return listOfParts
+        listOfParts = list(dict.fromkeys(listOfParts))
+        return sorted(listOfParts)
 
     def getListOfParts(
         self,
@@ -640,7 +646,8 @@ class ParserSBOL:
         contentName: str,
         numPlate: int = None,
         plate_class: plateo.Plate = None,
-        maxWellsFilled: int = None
+        maxWellsFilled: int = None,
+        dictOfParts: Dict[str, float] = None
     ) -> List[plateo.Plate]:
         """Generate a list of plateo plate objects from list of constructs
 
@@ -682,12 +689,13 @@ class ParserSBOL:
         plates = [
             plate_class(name="Plate %d" % index)
             for index in range(1, numPlate + 1)]
-        for plate in plates:
-            for i in range(1, maxWellsFilled + 1):
-                if copyAllContent:
-                    well = plate.wells[
-                        plateo.tools.index_to_wellname(i, plate.num_wells)]
-                    well.data = {contentName: copyAllContent.pop(0)}
+        if dictOfParts is None:
+            for plate in plates:
+                for i in range(1, maxWellsFilled + 1):
+                    if copyAllContent:
+                        well = plate.wells[
+                            plateo.tools.index_to_wellname(i, plate.num_wells)]
+                        well.data = {contentName: copyAllContent.pop(0)}
         return plates
 
     def getAllContentFromPlateoPlate(
@@ -905,6 +913,7 @@ class ParserSBOL:
     def getPartLinkerCsvFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
+        dictOfParts: Dict[str, float],
         linkerFile: Document,
         uniqueId: str = None
     ):
@@ -917,14 +926,14 @@ class ParserSBOL:
         # Sort list of parts and linkers
         self.getSortedListOfParts(listOfParts)
         # Add parts and linkers to plate
-        # TODO: Determine number of plates from number of parts
-        # TODO: Add part/linker concentration to plate
+        # TODO: Determine number of plates from dict of parts
         partPlates = self.fillPlateoPlates(
             listOfParts,
             "Part",
             1,
             plateo.containers.Plate96,
-            96
+            96,
+            dictOfParts
         )
         for plate in partPlates:
             # Create df

@@ -939,19 +939,22 @@ class ParserSBOL:
             raise NotImplementedError
 
         # Compare each part displayId in 'construct' to available linkers
-        def _is_linker(part, linker_names):
-            if part.displayId in linker_names:
+        def _is_linker(comp, linker_names):
+            if comp.displayId in linker_names:
                 return True
             return False
 
+        primary_structure = construct.getPrimaryStructureComponents()
+
         is_first_part_linker = False
         is_prev_part_linker = False
-        for i, part in enumerate(construct):
-            is_curr_part_linker = _is_linker(part, linker_names)
+        for i, comp in enumerate(primary_structure):
+            compdef = doc.componentDefinitions.get(comp.definition)
+            is_curr_comp_linker = _is_linker(compdef, linker_names)
             if i == 0:  # initialise
-                is_first_part_linker = is_curr_part_linker
-                is_prev_part_linker = is_curr_part_linker
+                is_first_comp_linker = is_curr_comp_linker
+                is_prev_comp_linker = is_curr_comp_linker
                 continue
-            if is_prev_part_linker == is_curr_part_linker:
+            if is_prev_comp_linker == is_curr_comp_linker:
                 raise NotImplementedError
-            is_prev_part_linker = is_curr_part_linker
+            is_prev_comp_linker = is_curr_comp_linker

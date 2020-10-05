@@ -18,8 +18,8 @@ class ParserSBOL:
 
     def generateCsv_for_DNABot(
             self,
-            dictOfParts: Dict[str, float],
-            linkerFile: Document
+            linkerFile: Document,
+            dictOfParts: Dict[str, float] = None
     ):
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
@@ -557,7 +557,8 @@ class ParserSBOL:
             # Add components of template that are not variables
             for c in template.components:
                 if c.identity not in variables:
-                    listOfParts.append(c.displayId)
+                    cd = self.doc.getComponentDefinition(c.definition)
+                    listOfParts.append(cd.displayId)
             # Append variants
             for vc in rootCombDeriv.variableComponents:
                 for v in vc.variants:
@@ -984,6 +985,7 @@ class ParserSBOL:
         linkerFile: Document,
         uniqueId: str = None
     ):
+        # TODO: Determine plate class?
         # Obtain all constructs from plate
         allConstructs = self.getAllContentFromPlateoPlate(constructPlate, 'Construct')
         # Obtain parts and linkers from all constructs
@@ -992,10 +994,14 @@ class ParserSBOL:
         listOfParts = self.convertLinkerToSuffixPrefix(listOfParts, linkerFile)
         # Sort list of parts and linkers
         self.getSortedListOfParts(listOfParts)
-        # Determine number of plates from dict of parts
-        plates = [info["Plate"] for part, info in dictOfParts.items()]
-        plates = list(dict.fromkeys(plates))
-        numPlates = len(plates)
+        # Determine number of plates if dict is None
+        if dictOfParts is None:
+            numPlates = len(listOfParts) // 96 + (len(listOfParts) % 96 > 0)
+        else:
+            # Determine number of plates from dict of parts
+            plates = [info["Plate"] for part, info in dictOfParts.items()]
+            plates = list(dict.fromkeys(plates))
+            numPlates = len(plates)
         # Add parts and linkers to plate
         partPlates = self.fillPlateoPlates(
             listOfParts,

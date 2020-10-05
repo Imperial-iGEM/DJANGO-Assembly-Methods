@@ -664,6 +664,32 @@ class ParserSBOL:
         Returns:
             list: List of plates
         """
+
+        def firstEmptyWell(
+            plates: List[plateo.Plate],
+            plateNum: int = None
+        ) -> plateo.Well:
+            selectedWell = None
+            if plateNum is None:
+                # Find first empty well in ordered list of plates
+                for plate in plates:
+                    for well in plate.iter_wells(direction='row'):
+                        if well.data == {}:
+                            selectedWell = well
+                            break
+                    if selectedWell:
+                        break
+            else:
+                # Find first empty well in plate specified
+                plate = plates[plateNum - 1]
+                for well in plate.iter_wells(direction='row'):
+                    if well.data == {}:
+                        selectedWell = well
+                        break
+            if selectedWell is None:
+                raise ValueError("No empty wells in plates or plate specified")
+            return selectedWell
+
         # TODO: Infer numPlate or plate_class?
         # TODO: Input well content vol and qty
         copyAllContent = allContent.copy()
@@ -700,23 +726,51 @@ class ParserSBOL:
                         well.data = {contentName: copyAllContent.pop(0)}
         else:
             for content in copyAllContent:
-                if content.displayId in dictOfParts.keys():
-                    plateNum = dictOfParts[content.displayId]['Plate']
+                # TODO: Test all cases
+                name = content.displayId
+                listed = \
+                    True if name in dictOfParts.keys() else False
+                plated = \
+                    True if listed and dictOfParts[name]['Plate'] else False
+                welled = \
+                    True if listed and dictOfParts[name]['Well'] else False
+                if listed and plated and welled:
+                    plateNum = dictOfParts[name]['Plate']
                     plate = plates[plateNum - 1]
-                    wellname = dictOfParts[content.displayId]['Well']
+                    wellname = dictOfParts[name]['Well']
                     well = plate.wells[wellname]
-                    conc = dictOfParts[content.displayId]['Concentration']
+                    conc = dictOfParts[name]['Concentration']
                     well.data = {contentName: content, "Concentration": conc}
+                elif listed and welled and not plated:
+                    selectedPlate = None
+                    wellname = dictOfParts[name]['Well']
+                    # Find suitable plate
+                    for plate in plates:
+                        well = plate.wells[wellname]
+                        if well.data == {}:
+                            selectedPlate = plate
+                            break
+                    if selectedPlate is None:
+                        return ValueError(
+                            "Specified well is "
+                            "not empty in all plates"
+                        )
+                    else:
+                        well = selectedPlate.wells[wellname]
+                        conc = dictOfParts[name]['Concentration']
+                        well.data = \
+                            {contentName: content, "Concentration": conc}
+                elif listed and plated and not welled:
+                    plateNum = dictOfParts[name]['Plate']
+                    plate = plates[plateNum - 1]
+                    # Find first empty well in plate
+                    selectedWell = firstEmptyWell(plates, plateNum)
+                    conc = dictOfParts[name]['Concentration']
+                    selectedWell.data = \
+                        {contentName: content, "Concentration": conc}
                 else:
                     # Find first empty well in ordered list of plates
-                    selectedWell = None
-                    for plate in plates:
-                        for well in plate.iter_wells(direction='row'):
-                            if well.data == {}:
-                                selectedWell = well
-                                break
-                        if selectedWell:
-                            break
+                    selectedWell = firstEmptyWell(plates)
                     selectedWell.data = \
                         {contentName: content, "Concentration": ''}
         return plates

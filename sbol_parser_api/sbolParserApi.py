@@ -72,7 +72,7 @@ class ParserSBOL:
     def generateCsv_for_MoClo(self):
         raise NotImplementedError("Not yet implemented")
 
-    def getRootComponenentDefinitions(
+    def getRootComponentDefinitions(
             self,
             sbolDocument: Document = None
     ) -> List[ComponentDefinition]:
@@ -151,7 +151,7 @@ class ParserSBOL:
         # Add non-combinatorial constructs to list
         if listOfNonCombUris == []:
             # Get all root component definitions and append to list
-            listOfConstructs.extend(self.getRootComponenentDefinitions())
+            listOfConstructs.extend(self.getRootComponentDefinitions())
         else:
             for uri in listOfNonCombUris:
                 listOfConstructs.append(self.doc.getComponentDefinition(uri))
@@ -516,7 +516,10 @@ class ParserSBOL:
         raise NotImplementedError("Not yet implemented")
 
     # TODO: Test if robust to multiple nested variant derivations
-    def displayListOfParts(self) -> List[str]:
+    def displayListOfParts(
+        self,
+        linkerFile: Document
+    ) -> List[str]:
 
         def getExtendedDisplayId(
             combDeriv: CombinatorialDerivation
@@ -543,7 +546,7 @@ class ParserSBOL:
         listOfParts = []
         rootCds = []
         # Get all root component definitions from document
-        rootCds.extend(self.getRootComponenentDefinitions())
+        rootCds.extend(self.getRootComponentDefinitions())
         # Add all parts in each root cds
         for cd in rootCds:
             for c in cd.components:
@@ -580,7 +583,20 @@ class ParserSBOL:
                             for edi in getExtendedDisplayId(deriv)]
                     )
         listOfParts = list(dict.fromkeys(listOfParts))
-        return sorted(listOfParts)
+        # Get list of linkers from linkerfile
+        # FIXME: linker sbol document not read properly by pysbol2
+        linkers = self.getRootComponentDefinitions(linkerFile)
+        # Temp workaround: Remove suffixes and prefixes manually
+        linkers = [linker for linker in linkers if "_" not in linker.displayId]
+        # Convert linkers into linker suffix and prefix and add to new list
+        newListOfParts = []
+        for part in listOfParts:
+            if part in [linker.displayId for linker in linkers]:
+                newListOfParts.append(part + "_Suffix")
+                newListOfParts.append(part + "_Prefix")
+            else:
+                newListOfParts.append(part)
+        return sorted(newListOfParts)
 
     def getListOfParts(
         self,
@@ -697,8 +713,7 @@ class ParserSBOL:
                             plateo.tools.index_to_wellname(i, plate.num_wells)]
                         well.data = {contentName: copyAllContent.pop(0)}
         else:
-            if copyAllContent:
-                content = copyAllContent.pop(0)
+            for content in copyAllContent:
                 if content.displayId in dictOfParts.keys():
                     plateNum = dictOfParts[content.displayId]['Plate']
                     plate = plates[plateNum - 1]
@@ -711,7 +726,7 @@ class ParserSBOL:
                     selectedWell = None
                     for plate in plates:
                         for well in plate.iter_wells(direction='row'):
-                            if well.is_empty:
+                            if well.data == {}:
                                 selectedWell = well
                                 break
                         if selectedWell:
@@ -722,21 +737,23 @@ class ParserSBOL:
 
     def getAllContentFromPlateoPlate(
         self,
-        contentPlate: plateo.Plate
+        contentPlate: plateo.Plate,
+        contentName: str
     ) -> List[ComponentDefinition]:
         '''Get a list of all content (as component definitions) from a
         Plateo plate.
 
         Args:
             contentPlate (plateo.Plate): Plateo plate containing content
+            contentName (str): Name of content (Construct or Part)
 
         Returns:
             list: List of all content (as component definitions)
         '''
         allContent = []
         for well in contentPlate.iter_wells():
-            for key, value in well.data.items():
-                allContent.append(value)
+            if well.data:
+                allContent.append(well.data[contentName])
         return allContent
 
     def getMinNumberOfBasicParts(
@@ -832,7 +849,7 @@ class ParserSBOL:
         Returns:
             pd.DataFrame: Dataframe of constructs
         '''
-        allComponents = self.getAllContentFromPlateoPlate(constructPlate)
+        allComponents = self.getAllContentFromPlateoPlate(constructPlate, 'Construct')
         minNumberOfBasicParts = self.getMinNumberOfBasicParts(allComponents)
         header = self.getConstructCsvHeader(minNumberOfBasicParts)
         dictWellComponent = \
@@ -867,7 +884,7 @@ class ParserSBOL:
         part: ComponentDefinition,
         linkerFile: Document
     ) -> bool:
-        linkers = self.getRootComponenentDefinitions(linkerFile)
+        linkers = self.getRootComponentDefinitions(linkerFile)
         if part.identity in [linker.identity for linker in linkers]:
             return True
         else:
@@ -940,7 +957,7 @@ class ParserSBOL:
         uniqueId: str = None
     ):
         # Obtain all constructs from plate
-        allConstructs = self.getAllContentFromPlateoPlate(constructPlate)
+        allConstructs = self.getAllContentFromPlateoPlate(constructPlate, 'Construct')
         # Obtain parts and linkers from all constructs
         listOfParts = self.getListOfParts(allConstructs)
         # Change linker to linker-s and linker-p

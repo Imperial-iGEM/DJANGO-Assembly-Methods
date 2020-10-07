@@ -1019,45 +1019,59 @@ class ParserSBOL:
                 index=False
             )
 
-    def is_linkers_order_correct(self, construct: ComponentDefinition):
-        """ Make sure input construct has the order of -part-linker- """
+    def is_linkers_order_correct(
+        self,
+        construct: ComponentDefinition,
+        linkerFile: Document
+    ) -> bool:
+        """
+        Make sure input construct components
+        has the order of -linker-part-...
+        """
 
-        def _get_linker_names(SBOL_file_name):
+        def _get_linker_names(linkerFile):
             """ Open standard linker document and extract all displayIds """
-            temp_doc = Document()  # _open_internal_sbol_file(self, SBOL_file_name)
-            temp_doc.read(SBOL_file_name)
-
-            linker_names = []
-            for obj in temp_doc:
-                if obj.displayId not in linker_names:
-                    linker_names.append(obj.displayId)
-
-            return linker_names
-
-        Linkers_file_name = '../examples/sbol/basic_linkers_standard.xml'
-        linker_names = _get_linker_names(Linkers_file_name)
-
-        # Check if even number of parts
-        if np.mod(len(construct), 2) != 0:
-            raise NotImplementedError
+            # Get list of linkers from linkerfile
+            # FIXME: linker sbol document not read properly by pysbol2
+            linkers = self.getRootComponentDefinitions(linkerFile)
+            # Temp workaround: Remove suffixes and prefixes manually
+            linkers = [
+                linker.displayId
+                for linker in linkers if "_" not in linker.displayId
+            ]
+            return linkers
 
         # Compare each part displayId in 'construct' to available linkers
-        def _is_linker(comp, linker_names):
-            if comp.displayId in linker_names:
+        def _is_linker(comp, linkers):
+            if comp.displayId in linkers:
                 return True
             return False
 
+        linkers = _get_linker_names(linkerFile)
+
+        # Check if even number of parts
+        if np.mod(len(construct.components), 2) != 0:
+            raise ValueError(
+                "Construct contains insufficient number"
+                "of parts or linkers"
+            )
+
         primary_structure = construct.getPrimaryStructureComponents()
 
-        is_first_part_linker = False
-        is_prev_part_linker = False
+        is_first_comp_linker = False
+        is_prev_comp_linker = False
         for i, comp in enumerate(primary_structure):
-            compdef = doc.componentDefinitions.get(comp.definition)
-            is_curr_comp_linker = _is_linker(compdef, linker_names)
-            if i == 0:  # initialise
+            compdef = self.doc.componentDefinitions.get(comp.definition)
+            is_curr_comp_linker = _is_linker(compdef, linkers)
+            # initialise
+            if i == 0:
                 is_first_comp_linker = is_curr_comp_linker
                 is_prev_comp_linker = is_curr_comp_linker
                 continue
             if is_prev_comp_linker == is_curr_comp_linker:
-                raise NotImplementedError
+                raise ValueError("Order of components is not alternating")
             is_prev_comp_linker = is_curr_comp_linker
+        if is_first_comp_linker:
+            return True
+        else:
+            return False

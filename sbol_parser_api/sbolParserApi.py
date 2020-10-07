@@ -9,17 +9,25 @@ import os
 from typing import List, Dict
 from rdflib import URIRef
 from sbol2 import *
+from collections import deque
+from random import sample
 
 
 class ParserSBOL:
 
-    def __init__(self, sbolDocument: Document):
+    def __init__(
+        self,
+        sbolDocument: Document,
+        linkerFile: Document = None
+    ):
         self.doc = sbolDocument
+        self.linkerFile = linkerFile
 
     def generateCsv_for_DNABot(
             self,
-            linkerFile: Document,
-            dictOfParts: Dict[str, float] = None
+            dictOfParts: Dict[str, float] = None,
+            maxWellsFilled: int = None,
+            numRuns: int = None
     ):
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
@@ -28,26 +36,39 @@ class ParserSBOL:
             listOfCombUris (list): List of combinatorial derivation
                 URIs pointing to combinatorial designs.
         """
+        maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
+        numRuns = 1 if numRuns is None else numRuns
+        numSamples = maxWellsFilled * numRuns
+
         allConstructs = []
 
         # Get list of constructs
         allConstructs = self.getListOfConstructs()
 
-        # TODO: Filter constructs - to improve
+        # Remove constructs with repeated parts using a filter
+        allConstructs = self.filterConstructs(allConstructs)
 
-        # TODO: Select constructs - implement in filter?
+        # Sample constructs
+        if len(allConstructs) < numSamples:
+            numSamples = len(allConstructs)
+            print(
+                "Number of constructs specified is greater than number "
+                "of constructs contained within SBOL Document provided."
+            )
+            print("All constructs will be assembled.")
+        sampled = sample(allConstructs, numSamples)
 
         # Display number of Component Definitions to be constructed
-        numberOfDesigns = len(allConstructs)
+        numberOfDesigns = len(sampled)
         print(numberOfDesigns, "construct(s) will be assembled.")
 
         # Create plateo construct plates
         constructPlates = self.fillPlateoPlates(
-            allConstructs,
+            sampled,
             "Construct",
-            1,
+            numRuns,
             plateo.containers.Plate96,
-            88
+            maxWellsFilled
         )
 
         # Create construct and parts/linkers CSVs from plateo plates
@@ -59,12 +80,11 @@ class ParserSBOL:
             if not os.path.exists(outdir):
                 os.mkdir(outdir)
             # Create construct CSV
-            self.getConstructCsvFromPlateoPlate(plate, linkerFile, uniqueId)
+            self.getConstructCsvFromPlateoPlate(plate, uniqueId)
             # Write parts/linkers csv
             self.getPartLinkerCsvFromPlateoPlate(
                 plate,
                 dictOfParts,
-                linkerFile,
                 uniqueId
             )
 
@@ -142,6 +162,7 @@ class ParserSBOL:
                 to be assembled
         """
         listOfConstructs = []
+        print("Obtaining constructs from SBOL Document...")
         # Add non-combinatorial constructs to list
         if listOfNonCombUris == []:
             # Get all root component definitions and append to list
@@ -150,6 +171,7 @@ class ParserSBOL:
             for uri in listOfNonCombUris:
                 listOfConstructs.append(self.doc.getComponentDefinition(uri))
         # Add combinatorial constructs to list
+        print("Enumerating Combinatorial Derivations...")
         if listOfCombUris == []:
             # Get all root combinatorial derivations
             combDerivs = self.getRootCombinatorialDerivations()
@@ -161,6 +183,7 @@ class ParserSBOL:
                 # Enumerate Combinatorial Derivations and add to allConstructs
                 listOfConstructs.extend(self.enumerator(
                     self.doc.combinatorialderivations.get(uri)))
+        print("Completed.")
         return listOfConstructs
 
     def enumerator(
@@ -505,14 +528,50 @@ class ParserSBOL:
         yes.add(variants[i])
         self.generateCombinations(groups, variants, i + 1, yes)
 
-    # TODO: Implement a Filter class?
-    def filterConstructs(self):
-        raise NotImplementedError("Not yet implemented")
+    def filterConstructs(
+        self,
+        allConstructs: List[ComponentDefinition]
+    ) -> List[ComponentDefinition]:
+        """
+        Removes constructs with repeated components
+        # TODO: Filter constructs based on more user specifications
+        """
+        filtered = []
+        print("Removing designs with repeated parts...")
+        for construct in allConstructs:
+            # Flatten construct
+            flattened = self.flatten(construct)
+            # Get list of displayIds
+            ids = [cd.displayId for cd in flattened]
+            # Check for repeats
+            if len(ids) == len(set(ids)):
+                filtered.append(construct)
+        print("Completed.")
+        return filtered
+
+    def flatten(
+        self,
+        construct: ComponentDefinition
+    ) -> List[ComponentDefinition]:
+        """
+        Flattens a heirarchical component definition
+        Returns a list of component definitions corresponding to
+        the components contained within the component definition
+        including all nested components.
+        """
+        d = deque(construct.getPrimaryStructure())
+        allComponents = []
+        while(d):
+            comp = d.popleft()
+            if(comp.components):
+                d.extendleft(reversed(comp.getPrimaryStructure()))
+            else:
+                allComponents.append(comp)
+        return allComponents
 
     # TODO: Test if robust to multiple nested variant derivations
     def displayListOfParts(
         self,
-        linkerFile: Document
     ) -> List[str]:
 
         def getExtendedDisplayId(
@@ -580,7 +639,7 @@ class ParserSBOL:
         listOfParts = list(dict.fromkeys(listOfParts))
         # Get list of linkers from linkerfile
         # FIXME: linker sbol document not read properly by pysbol2
-        linkers = self.getRootComponentDefinitions(linkerFile)
+        linkers = self.getRootComponentDefinitions(self.linkerFile)
         # Temp workaround: Remove suffixes and prefixes manually
         linkers = [linker for linker in linkers if "_" not in linker.displayId]
         # Convert linkers into linker suffix and prefix and add to new list
@@ -836,7 +895,6 @@ class ParserSBOL:
     def getWellComponentDictFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
-        linkerFile: Document
     ) -> Dict[str, List[ComponentDefinition]]:
         '''Get a dictionary of wells containing components comprising
         constructs (as component definitions) in the form
@@ -851,7 +909,7 @@ class ParserSBOL:
             for key, value in well.data.items():
                 # Move linker at last position to front of the list
                 primaryStructure = value.getPrimaryStructure()
-                if not self.is_linkers_order_correct(value, linkerFile):
+                if not self.is_linkers_order_correct(value):
                     primaryStructure.insert(0, primaryStructure.pop())
                 dictWellComponent[wellname] = primaryStructure
         return dictWellComponent
@@ -876,7 +934,6 @@ class ParserSBOL:
     def getConstructDfFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
-        linkerFile: Document
     ) -> pd.DataFrame:
         '''Get dataframe of constructs from Plateo plate containing constructs
         Args:
@@ -888,7 +945,7 @@ class ParserSBOL:
         minNumberOfBasicParts = self.getMinNumberOfBasicParts(allComponents)
         header = self.getConstructCsvHeader(minNumberOfBasicParts)
         dictWellComponent = \
-            self.getWellComponentDictFromPlateoPlate(constructPlate, linkerFile)
+            self.getWellComponentDictFromPlateoPlate(constructPlate)
         listWellComponent = \
             self.getListFromWellComponentDict(dictWellComponent)
         # Create sparse array from list
@@ -900,7 +957,6 @@ class ParserSBOL:
     def getConstructCsvFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
-        linkerFile: Document,
         uniqueId: str = None
     ):
         '''Convert construct dataframe into CSV and creates CSV file in the same
@@ -909,7 +965,7 @@ class ParserSBOL:
             constructPlate (plateo.Plate): Plateo plate containing constructs
             uniqueId (str): Unique ID appended to filename
         '''
-        constructDf = self.getConstructDfFromPlateoPlate(constructPlate, linkerFile)
+        constructDf = self.getConstructDfFromPlateoPlate(constructPlate)
         constructDf.to_csv(
             "./" + uniqueId + "/construct.csv",
             index=False)
@@ -917,9 +973,8 @@ class ParserSBOL:
     def isLinker(
         self,
         part: ComponentDefinition,
-        linkerFile: Document
     ) -> bool:
-        linkers = self.getRootComponentDefinitions(linkerFile)
+        linkers = self.getRootComponentDefinitions(self.linkerFile)
         if part.identity in [linker.identity for linker in linkers]:
             return True
         else:
@@ -938,11 +993,10 @@ class ParserSBOL:
     def convertLinkerToSuffixPrefix(
         self,
         listOfParts: List[ComponentDefinition],
-        linkerFile: Document
     ) -> List[ComponentDefinition]:
         newListOfParts = []
         for part in listOfParts:
-            if self.isLinker(part, linkerFile):
+            if self.isLinker(part):
                 newListOfParts.extend(self.getLinkerSP(part))
             else:
                 newListOfParts.append(part)
@@ -954,6 +1008,7 @@ class ParserSBOL:
         contentName: str
     ) -> Dict[str, List[ComponentDefinition]]:
         # TODO: Add option to include content vol/qty?
+        # TODO: Add option to include concentration
         # FIXME: Function works, but only outside of module?
         dictWellContent = {}
         for wellname, well in plateoPlate.wells.items():
@@ -966,6 +1021,7 @@ class ParserSBOL:
         dictWellPart: Dict[str, List[ComponentDefinition]]
     ) -> List[str]:
         listWellPart = []
+        # TODO: Include concentration data
         for k, v in dictWellPart.items():
             listWellPart.append([v.displayId, k, np.nan])
         return listWellPart
@@ -988,7 +1044,6 @@ class ParserSBOL:
         self,
         constructPlate: plateo.Plate,
         dictOfParts: Dict[str, float],
-        linkerFile: Document,
         uniqueId: str = None
     ):
         # TODO: Determine plate class?
@@ -997,7 +1052,7 @@ class ParserSBOL:
         # Obtain parts and linkers from all constructs
         listOfParts = self.getListOfParts(allConstructs)
         # Change linker to linker-s and linker-p
-        listOfParts = self.convertLinkerToSuffixPrefix(listOfParts, linkerFile)
+        listOfParts = self.convertLinkerToSuffixPrefix(listOfParts)
         # Sort list of parts and linkers
         self.getSortedListOfParts(listOfParts)
         # Determine number of plates if dict is None
@@ -1028,18 +1083,17 @@ class ParserSBOL:
     def is_linkers_order_correct(
         self,
         construct: ComponentDefinition,
-        linkerFile: Document
     ) -> bool:
         """
         Make sure input construct components
         has the order of -linker-part-...
         """
 
-        def _get_linker_names(linkerFile):
+        def _get_linker_names():
             """ Open standard linker document and extract all displayIds """
             # Get list of linkers from linkerfile
             # FIXME: linker sbol document not read properly by pysbol2
-            linkers = self.getRootComponentDefinitions(linkerFile)
+            linkers = self.getRootComponentDefinitions(self.linkerFile)
             # Temp workaround: Remove suffixes and prefixes manually
             linkers = [
                 linker.displayId
@@ -1053,7 +1107,7 @@ class ParserSBOL:
                 return True
             return False
 
-        linkers = _get_linker_names(linkerFile)
+        linkers = _get_linker_names()
 
         # Check if even number of parts
         if np.mod(len(construct.components), 2) != 0:
@@ -1062,13 +1116,12 @@ class ParserSBOL:
                 "of parts or linkers"
             )
 
-        primary_structure = construct.getPrimaryStructureComponents()
+        primary_structure = construct.getPrimaryStructure()
 
         is_first_comp_linker = False
         is_prev_comp_linker = False
         for i, comp in enumerate(primary_structure):
-            compdef = self.doc.componentDefinitions.get(comp.definition)
-            is_curr_comp_linker = _is_linker(compdef, linkers)
+            is_curr_comp_linker = _is_linker(comp, linkers)
             # initialise
             if i == 0:
                 is_first_comp_linker = is_curr_comp_linker

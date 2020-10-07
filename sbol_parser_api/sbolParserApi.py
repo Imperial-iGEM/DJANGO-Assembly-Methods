@@ -6,7 +6,7 @@ import pandas as pd
 import uuid
 import numpy as np
 import os
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from rdflib import URIRef
 from sbol2 import *
 from collections import deque
@@ -1006,24 +1006,29 @@ class ParserSBOL:
         self,
         plateoPlate: plateo.Plate,
         contentName: str
-    ) -> Dict[str, List[ComponentDefinition]]:
+    ) -> Dict[str, Tuple[ComponentDefinition, float]]:
         # TODO: Add option to include content vol/qty?
-        # TODO: Add option to include concentration
         # FIXME: Function works, but only outside of module?
         dictWellContent = {}
         for wellname, well in plateoPlate.wells.items():
             if contentName in well.data.keys():
-                dictWellContent[wellname] = well.data[contentName]
+                cd = well.data[contentName]
+                if "Concentration" in well.data.keys():
+                    conc = well.data['Concentration']
+                else:
+                    conc = np.nan
+                dictWellContent[wellname] = (cd, conc)
         return dictWellContent
 
     def getListFromWellPartDict(
         self,
-        dictWellPart: Dict[str, List[ComponentDefinition]]
+        dictWellPart: Dict[str, Tuple[ComponentDefinition, float]]
     ) -> List[str]:
         listWellPart = []
-        # TODO: Include concentration data
         for k, v in dictWellPart.items():
-            listWellPart.append([v.displayId, k, np.nan])
+            cd = v[0]
+            conc = v[1]
+            listWellPart.append([cd.displayId, k, conc])
         return listWellPart
 
     def getPartLinkerDfFromPlateoPlate(

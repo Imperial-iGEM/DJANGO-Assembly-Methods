@@ -13,8 +13,8 @@ def run(protocol: protocol_api.ProtocolContext):
         """Evaluates spotting_tuples and returns transformation wells.
 
         Args:
-        spotting_tuples (list): Sets of spotting reactions are given 
-            in the form: ((source wells), (target wells), (spotting volumes)). 
+        spotting_tuples (list): Sets of spotting reactions are given
+            in the form: ((source wells), (target wells), (spotting volumes)).
             Each unique transformation well is resuspended once prior to spotting.
 
         """
@@ -26,7 +26,6 @@ def run(protocol: protocol_api.ProtocolContext):
             wells) if wells.index(well) == i]
         return transformation_wells
 
-        
     def tiprack_slots(spotting_tuples, max_spot_vol=5):
         """Calculates p10 and p300 tiprack slots required.
 
@@ -48,7 +47,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # p10 tiprack slots
         p10_tips = transformation_reactions + spotting_reactions
-        p10_tiprack_slots = p10_tips // 96 + 1 if p10_tips % 96 > 0 else p10_tips / 96
+        p10_tiprack_slots = p10_tips // 96 + 1 if p10_tips % 96 > 0 \
+            else p10_tips / 96
 
         # p300 tiprack slots
         p300_tips = transformation_reactions + spotting_reactions
@@ -56,7 +56,6 @@ def run(protocol: protocol_api.ProtocolContext):
             1 if p300_tips % 96 > 0 else p300_tips / 96
         return int(p10_tiprack_slots), int(p300_tiprack_slots)
 
-    
     def transformation_setup(transformation_wells):
         """Sets up transformation reactions
 
@@ -76,24 +75,24 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.pause()
         protocol.comment('Load competent cells, uncap and resume run')
 
-        assembly_plate_transformation_wells = [assembly_plate.wells_by_name()[well]
-        for well in transformation_wells]
-        transformation_plate_transformation_wells = [transformation_plate.wells_by_name()[well]
-        for well in transformation_wells]
+        assembly_plate_transformation_wells = [
+            assembly_plate.wells_by_name()[well]
+            for well in transformation_wells]
+        transformation_plate_transformation_wells = [
+            transformation_plate.wells_by_name()[well]
+            for well in transformation_wells]
 
         # Transfer final assemblies
         p10_pipette.transfer(ASSEMBLY_VOL,
-                            assembly_plate_transformation_wells,
-                            transformation_plate_transformation_wells,
-                            new_tip='always',
-                            mix_after=(MIX_SETTINGS))
+                             assembly_plate_transformation_wells,
+                             transformation_plate_transformation_wells,
+                             new_tip='always',
+                             mix_after=(MIX_SETTINGS))
+
         # Incubate for 20 minutes and remove competent cells for heat shock
         protocol.delay(minutes=INCUBATION_TIME)
-        #legacy_api.api.robot.pause()
         protocol.pause()
         protocol.comment('Remove transformation reactions, conduct heatshock and replace.')
-        #legacy_api.api.robot.comment(
-            #'Remove transformation reactions, conduct heatshock and replace.')
 
     def phase_switch(comment='Remove final assembly plate. Introduce agar tray and deep well plate containing SOC media. Resume run.'):
         """Function pauses run enabling addition/removal of labware.
@@ -102,11 +101,8 @@ def run(protocol: protocol_api.ProtocolContext):
         comment (str): string to be displayed during run following pause.
 
         """
-        #legacy_api.api.robot.pause()
         protocol.pause()
-        #legacy_api.api.robot.comment(comment)
         protocol.comment(comment)
-
 
     def outgrowth(
             cols,
@@ -114,7 +110,8 @@ def run(protocol: protocol_api.ProtocolContext):
         """Outgrows transformed cells.
 
         Args:
-        cols (list of str): list of cols in transformation plate containing samples.
+        cols (list of str): list of cols in transformation plate containing
+        samples.
         soc_well (str): Well containing SOC media in relevant plate.
 
         """
@@ -128,13 +125,14 @@ def run(protocol: protocol_api.ProtocolContext):
         P300_DEFAULT_ASPIRATION_RATE = 150
 
         # Define wells
-        transformation_cols = transformation_plate.rows()[0][cols]
+        transformation_cols = [transformation_plate.rows()[0][col]
+                               for col in cols]
         soc = soc_plate.wells_by_name()[soc_well]
 
         # Add SOC to transformed cells
         p300_pipette.flow_rate.aspirate = SOC_ASPIRATION_RATE
         p300_pipette.transfer(SOC_VOL, soc, transformation_cols,
-                            new_tip='always', mix_after=SOC_MIX_SETTINGS)
+                              new_tip='always', mix_after=SOC_MIX_SETTINGS)
         p300_pipette.flow_rate.aspirate = P300_DEFAULT_ASPIRATION_RATE
 
         # Incubate for 1 hour at 37 °C
@@ -142,26 +140,25 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(minutes=OUTGROWTH_TIME)
         tempdeck.deactivate()
 
-
     def spotting_cols(spotting_tuples):
-        """Evaluates spotting_tuples and returns unique cols (str) 
+        """Evaluates spotting_tuples and returns unique cols (str)
         associated with each spotting_tuple's source wells.
 
         Args:
-        spotting_tuples (list): Sets of spotting reactions are given 
-            in the form: ((source wells), (target wells), (spotting volumes)). 
-            Each unique transformation well is resuspended once prior to spotting.
+        spotting_tuples (list): Sets of spotting reactions are given
+            in the form: ((source wells), (target wells), (spotting volumes)).
+            Each unique transformation well is resuspended once prior to
+            spotting.
 
         """
         cols_list = []
         for spotting_tuple in spotting_tuples:
             source_wells_cols = [source_well[1:]
-                                for source_well in spotting_tuple[0]]
-            unique_cols = [col for i, col in enumerate(
+                                 for source_well in spotting_tuple[0]]
+            unique_cols = [int(col)-1 for i, col in enumerate(
                 source_wells_cols) if source_wells_cols.index(col) == i]
             cols_list.append(unique_cols)
         return cols_list
-
 
     def spot_transformations(
             spotting_tuples,
@@ -172,13 +169,15 @@ def run(protocol: protocol_api.ProtocolContext):
         """Spots transformation reactions.
 
         Args:
-        spotting_tuples (list): Sets of spotting reactions are given 
-            in the form: ((source wells), (target wells), (spotting volumes)). 
+        spotting_tuples (list): Sets of spotting reactions are given
+            in the form: ((source wells), (target wells), (spotting volumes)).
             Each unique source well is resuspended once prior to spotting.
         dead_vol (float): Dead volume aspirated during spotting.
-        spotting_dispense_rate (float): Rate p10_pipette dispenses at during spotting.
-        stabbing_depth (float): Depth p10_pipette moves into agar during spotting.
-        max_spot_vol (float): Maximum volume that is spotted per spot reaction. 
+        spotting_dispense_rate (float): Rate p10_pipette dispenses at during
+        spotting.
+        stabbing_depth (float): Depth p10_pipette moves into agar during
+        spotting.
+        max_spot_vol (float): Maximum volume that is spotted per spot reaction.
 
         """
 
@@ -189,16 +188,18 @@ def run(protocol: protocol_api.ProtocolContext):
             """Spots an individual reaction using the p10 pipette.
 
             Args:
-            source (str): Well containing the transformation reaction to be spotted.
+            source (str): Well containing the transformation reaction to be
+            spotted.
             target (str): Well transformation reaction is to be spotted to.
-            spot_vol (float): Volume of transformation reaction to be spotted (uL).  
+            spot_vol (float): Volume of transformation reaction to be spotted
+            (uL).
 
             """
             # Constants
             DEFAULT_HEAD_SPEED = {'x': 400, 'y': 400,
-                                'z': 125, 'a': 125}
+                                  'z': 125, 'a': 125}
             SPOT_HEAD_SPEED = {'x': 400, 'y': 400, 'z': 125,
-                            'a': 125 // 4}
+                               'a': 125 // 4}
             DISPENSING_HEIGHT = 5
             SAFE_HEIGHT = 15  # height avoids collision with agar tray.
 
@@ -221,10 +222,12 @@ def run(protocol: protocol_api.ProtocolContext):
             p10_pipette.drop_tip()
 
         def spot_tuple(spotting_tuple):
-            """Spots all reactions defined by the spotting tuple. Requires the function spot.
+            """Spots all reactions defined by the spotting tuple.
+               Requires the function spot.
 
                 Args:
-                spotting_tuple (tuple): Spotting reactions given in the form: (source wells), (target wells), (spotting volumes).
+                spotting_tuple (tuple): Spotting reactions given in the form:
+                (source wells), (target wells), (spotting volumes).
 
             """
             source_wells = spotting_tuple[0]
@@ -235,9 +238,14 @@ def run(protocol: protocol_api.ProtocolContext):
                     if spot_vol == 0:
                         pass
                     else:
-                        vol = spot_vol if spot_vol <= max_spot_vol else max_spot_vol
-                        spot(transformation_plate.wells_by_name()[source_wells[index]],
-                            agar_plate.wells_by_name()[target_wells[index]], vol)
+                        if spot_vol <= max_spot_vol:
+                            vol = spot_vol
+                        else:
+                            vol = max_spot_vol
+                        spot(transformation_plate.wells_by_name()[
+                            source_wells[index]],
+                            agar_plate.wells_by_name()[target_wells[index]],
+                            vol)
                         spot_vols[index] = spot_vols[index] - vol
 
         # Constants
@@ -246,15 +254,16 @@ def run(protocol: protocol_api.ProtocolContext):
         # Spot transformation reactions
         for spotting_tuple in spotting_tuples:
             source_wells_cols = [source_well[1:]
-                                for source_well in spotting_tuple[0]]
-            unique_cols = [col for i, col in enumerate(
+                                 for source_well in spotting_tuple[0]]
+            unique_cols = [int(col)-1 for i, col in enumerate(
                 source_wells_cols) if source_wells_cols.index(col) == i]
             for col in unique_cols:
-                transformation_plate_mix_well = transformation_plate.rows()[0][int(col)-1]
+                transformation_plate_mix_well = transformation_plate.rows(
+                )[0][col]
                 p300_pipette.pick_up_tip()
                 p300_pipette.mix(TRANSFORMATION_MIX_SETTINGS[0],
-                                TRANSFORMATION_MIX_SETTINGS[1],
-                                transformation_plate_mix_well)
+                                 TRANSFORMATION_MIX_SETTINGS[1],
+                                 transformation_plate_mix_well)
                 p300_pipette.drop_tip()
             spot_tuple(spotting_tuple)
 
@@ -265,18 +274,28 @@ def run(protocol: protocol_api.ProtocolContext):
     CANDIDATE_P300_SLOTS = ['3', '6']
     P10_TIPRACK_TYPE = 'opentrons_96_tiprack_10ul'
     P300_TIPRACK_TYPE = 'opentrons_96_tiprack_300ul'
-    P10_MOUNT = 'right'
-    P300_MOUNT = 'left'
-    ASSEMBLY_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+    # P10_MOUNT = 'right'
+    P10_MOUNT = p10_mount
+    # P300_MOUNT = 'left'
+    P300_MOUNT = p300_mount
+    # ASSEMBLY_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+    ASSEMBLY_PLATE_TYPE = well_plate_type
     ASSEMBLY_PLATE_SLOT = '8'
     TEMPDECK_SLOT = '10'
-    TRANSFORMATION_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
-    SOC_PLATE_TYPE = 'usascientific_96_wellplate_2.4ml_deep'
+    # TRANSFORMATION_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+    TRANSFORMATION_PLATE_TYPE = well_plate_type
+    # SOC_PLATE_TYPE = 'usascientific_96_wellplate_2.4ml_deep'
+    SOC_PLATE_TYPE = soc_plate_type
     SOC_PLATE_SLOT = '7'
-    TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+    # TUBE_RACK_TYPE = 'opentrons_24_tuberack_nest_1.5ml_snapcap'
+    TUBE_RACK_TYPE = tube_rack_type
     TUBE_RACK_SLOT = '11'
     SPOTTING_WASTE_WELL = 'A1'
-    AGAR_PLATE_TYPE = 'thermofisher_96_wellplate_180ul' # load in through opentrons app
+
+    # load in agar plate through opentrons app
+    # Using opentrons_simulate have -L followed by custom labware path
+    # AGAR_PLATE_TYPE = 'thermofisher_96_wellplate_180ul'
+    AGAR_PLATE_TYPE = agar_plate_type
     AGAR_PLATE_SLOT = '1'
 
     # Tiprack slots
@@ -290,17 +309,15 @@ def run(protocol: protocol_api.ProtocolContext):
     p10_tipracks = [protocol.load_labware(P10_TIPRACK_TYPE, slot)
                     for slot in p10_slots]
     p300_tipracks = [protocol.load_labware(P300_TIPRACK_TYPE, slot)
-                    for slot in p300_slots]
-    p10_pipette = protocol.load_instrument('p10_single',
-        P10_MOUNT, tip_racks=p10_tipracks)
-    p300_pipette = protocol.load_instrument('p300_multi',
-        P300_MOUNT, tip_racks=p300_tipracks)
+                     for slot in p300_slots]
+    p10_pipette = protocol.load_instrument('p10_single', P10_MOUNT,
+                                           tip_racks=p10_tipracks)
+    p300_pipette = protocol.load_instrument('p300_multi', P300_MOUNT,
+                                            tip_racks=p300_tipracks)
 
-    assembly_plate = protocol.load_labware(ASSEMBLY_PLATE_TYPE, ASSEMBLY_PLATE_SLOT)
+    assembly_plate = protocol.load_labware(ASSEMBLY_PLATE_TYPE,
+                                           ASSEMBLY_PLATE_SLOT)
     tempdeck = protocol.load_module('temperature module', TEMPDECK_SLOT)
-    #tempdeck = modules.load('tempdeck', TEMPDECK_SLOT)
-    #transformation_plate = protocol.load_labware(TRANSFORMATION_PLATE_TYPE,
-                                       # TEMPDECK_SLOT, share=True)
     transformation_plate = tempdeck.load_labware(TRANSFORMATION_PLATE_TYPE)
     soc_plate = protocol.load_labware(SOC_PLATE_TYPE, SOC_PLATE_SLOT)
     tube_rack = protocol.load_labware(TUBE_RACK_TYPE, TUBE_RACK_SLOT)
@@ -310,13 +327,12 @@ def run(protocol: protocol_api.ProtocolContext):
     # Register agar_plate for calibration
     p10_pipette.transfer(1, agar_plate.wells_by_name()[
         'A1'], agar_plate.wells_by_name()['H12'], trash=False)
-    #p10_pipette.pick_up_tip(p10_tipracks[0][0])
 
     # Run functions
     transformation_setup(generate_transformation_wells(spotting_tuples))
     phase_switch()
-    spotting_tuples_cols = [col for cols in spotting_cols(
-        spotting_tuples) for col in cols]
+    spotting_tuples_cols = [col for cols in spotting_cols(spotting_tuples)
+                            for col in cols]
     unique_cols = [col for i, col in enumerate(
         spotting_tuples_cols) if spotting_tuples_cols.index(col) == i]
     outgrowth(unique_cols, soc_well=soc_well)

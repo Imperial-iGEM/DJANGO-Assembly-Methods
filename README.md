@@ -86,10 +86,10 @@ Once these four attributes of the GUI's post request are filled we can submit th
 
 ### Moclo DNA Assembly 🧑‍🔬
 You can acess the root of the end point on your local machine when the server is running by navigating to the link
-> http://127.0.0.1:8000/Moclo
+> http://127.0.0.1:8000/
 
-and click on the `/Basic` end point or alternatively navigate directly to
-> http://127.0.0.1:8000/Moclo/Moclo
+and click on the `/Moclo` end point or alternatively navigate directly to
+> http://127.0.0.1:8000/Moclo
 
 Whilst here you can post a request to our backend with the test parameters
 

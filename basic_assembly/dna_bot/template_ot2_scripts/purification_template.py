@@ -20,7 +20,11 @@ def run(protocol: protocol_api.ProtocolContext):
         drying_time=5,
         elution_time=2,
         sample_offset=0,
-        tiprack_type='opentrons_96_tiprack_300ul'):
+        tiprack_type='opentrons_96_tiprack_300ul',
+        p300_mount='left',
+        well_plate_type='biorad_96_wellplate_200ul_pcr',
+        reagent_plate_type='usascientific_12_reservoir_22ml',
+        bead_container_type='usascientific_96_wellplate_2.4ml_deep'):
         """Implements magbead purification reactions for BASIC assembly using an opentrons OT-2.
 
         Selected args:
@@ -31,16 +35,21 @@ def run(protocol: protocol_api.ProtocolContext):
         """
 
         # Constants
+        # PIPETTE_MOUNT = 'left'
+        PIPETTE_MOUNT = p300_mount
         PIPETTE_ASPIRATE_RATE = 25
         PIPETTE_DISPENSE_RATE = 150
         TIPS_PER_SAMPLE = 9
         CANDIDATE_TIPRACK_SLOTS = ['3', '6', '9', '2', '5']
         MAGDECK_POSITION = '1'
-        MIX_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+        # MIX_PLATE_TYPE = 'biorad_96_wellplate_200ul_pcr'
+        MIX_PLATE_TYPE = well_plate_type
         MIX_PLATE_POSITION = '4'
-        REAGENT_CONTAINER_TYPE = 'usascientific_12_reservoir_22ml'
+        # REAGENT_CONTAINER_TYPE = 'usascientific_12_reservoir_22ml'
+        REAGENT_CONTAINER_TYPE = reagent_plate_type
         REAGENT_CONTAINER_POSITION = '7'
-        BEAD_CONTAINER_TYPE = 'usascientific_96_wellplate_2.4ml_deep'
+        # BEAD_CONTAINER_TYPE = 'usascientific_96_wellplate_2.4ml_deep'
+        BEAD_CONTAINER_TYPE = bead_container_type
         BEAD_CONTAINER_POSITION = '8'
         LIQUID_WASTE_WELL = 'A12'
         BEADS_WELL = 'A1'
@@ -68,7 +77,9 @@ def run(protocol: protocol_api.ProtocolContext):
         slots = CANDIDATE_TIPRACK_SLOTS[:tiprack_num]
         tipracks = [protocol.load_labware(tiprack_type, slot)
                     for slot in slots]
-        pipette = protocol.load_instrument('p300_multi', 'left', tip_racks=tipracks)
+        pipette = protocol.load_instrument('p300_multi', PIPETTE_MOUNT,
+                                               tip_racks=tipracks)
+
         pipette.flow_rate.aspirate = PIPETTE_ASPIRATE_RATE
         pipette.flow_rate.dispense = PIPETTE_DISPENSE_RATE
 
@@ -77,14 +88,19 @@ def run(protocol: protocol_api.ProtocolContext):
         mag_mod.disengage()
         #mag_plate = protocol.load_labware(MIX_PLATE_TYPE, MAGDECK_POSITION, share=True)
         mag_plate = mag_mod.load_labware(MIX_PLATE_TYPE)
-        mix_plate = protocol.load_labware(MIX_PLATE_TYPE, MIX_PLATE_POSITION, label = 'mixing plate')
+        mix_plate = protocol.load_labware(MIX_PLATE_TYPE, MIX_PLATE_POSITION, label='mixing plate')
         reagent_container = protocol.load_labware(
             REAGENT_CONTAINER_TYPE, REAGENT_CONTAINER_POSITION)
-        bead_container = protocol.load_labware(BEAD_CONTAINER_TYPE, BEAD_CONTAINER_POSITION)
+        bead_container = protocol.load_labware(BEAD_CONTAINER_TYPE,
+                                               BEAD_CONTAINER_POSITION)
         col_num = sample_number // 8 + (1 if sample_number % 8 > 0 else 0)
-        samples = [col for col in mag_plate.rows()[0][sample_offset:sample_offset+col_num]]
-        mixing = [col for col in mix_plate.rows()[0][sample_offset:sample_offset+col_num]]
-        output = [col for col in mag_plate.rows()[0][sample_offset+6:sample_offset+6+col_num]]
+
+        samples = [col for col in mag_plate.rows()[0][
+            sample_offset:sample_offset+col_num]]
+        mixing = [col for col in mix_plate.rows()[0][
+            sample_offset:sample_offset+col_num]]
+        output = [col for col in mag_plate.rows()[0][
+            sample_offset+6:sample_offset+6+col_num]]
 
         # Define reagents and liquid waste
         liquid_waste = reagent_container.wells_by_name()[LIQUID_WASTE_WELL]
@@ -102,16 +118,17 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # Mix beads and PCR samples and incubate
         for target, dest in zip(samples, output):
-        # Aspirate beads
+            # Aspirate beads
             pipette.pick_up_tip()
             pipette.mix(5, mix_vol, beads)
-            pipette.transfer(bead_volume, beads, dest, new_tip = 'never')
+            pipette.transfer(bead_volume, beads, dest, new_tip='never')
 
             for key in SLOW_HEAD_SPEEDS.keys():
                 protocol.max_speeds[key] = SLOW_HEAD_SPEEDS[key]
-            
+
             # Transfer and mix on  mix_plate
-            pipette.transfer(sample_volume + DEAD_TOTAL_VOL, target, dest, new_tip = 'never')
+            pipette.transfer(sample_volume + DEAD_TOTAL_VOL, target, dest,
+                             new_tip='never')
             pipette.mix(IMMOBILISE_MIX_REPS, mix_vol)
             pipette.blow_out()
 
@@ -126,7 +143,7 @@ def run(protocol: protocol_api.ProtocolContext):
         # Transfer sample back to magdeck
         for target in range(int(len(samples))):
             pipette.transfer(total_vol, mixing[target], samples[target],
-                            blow_out=True)
+                             blow_out=True)
 
         # Engagae MagDeck and incubate
         mag_mod.engage(height=MAGDECK_HEIGHT)
@@ -159,7 +176,7 @@ def run(protocol: protocol_api.ProtocolContext):
             mix_vol = elution_buffer_volume / 2
         for target in samples:
             pipette.transfer(elution_buffer_volume, elution_buffer,
-                            target, mix_after=(ELUTION_MIX_REPS, mix_vol))
+                             target, mix_after=(ELUTION_MIX_REPS, mix_vol))
 
         # Incubate at RT for "elution_time" minutes
         protocol.delay(minutes=elution_time)
@@ -171,11 +188,14 @@ def run(protocol: protocol_api.ProtocolContext):
         # Transfer clean PCR product to a new well
         for target, dest in zip(samples, output):
             pipette.transfer(elution_buffer_volume - ELUTION_DEAD_VOL, target,
-                            dest, blow_out=False)
+                             dest, blow_out=False)
 
         # Disengage MagDeck
         mag_mod.disengage()
 
 
     magbead(sample_number=sample_number,
-            ethanol_well=ethanol_well, elution_buffer_well='A1')
+            ethanol_well=ethanol_well, elution_buffer_well='A1',
+            p300_mount=p300_mount,
+            well_plate_type=well_plate_type, reagent_plate_type=reagent_plate_type,
+            bead_container_type=bead_container_type)

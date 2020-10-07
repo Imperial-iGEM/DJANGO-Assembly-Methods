@@ -59,7 +59,7 @@ class ParserSBOL:
             if not os.path.exists(outdir):
                 os.mkdir(outdir)
             # Create construct CSV
-            self.getConstructCsvFromPlateoPlate(plate, uniqueId)
+            self.getConstructCsvFromPlateoPlate(plate, linkerFile, uniqueId)
             # Write parts/linkers csv
             self.getPartLinkerCsvFromPlateoPlate(
                 plate,
@@ -835,7 +835,8 @@ class ParserSBOL:
 
     def getWellComponentDictFromPlateoPlate(
         self,
-        constructPlate: plateo.Plate
+        constructPlate: plateo.Plate,
+        linkerFile: Document
     ) -> Dict[str, List[ComponentDefinition]]:
         '''Get a dictionary of wells containing components comprising
         constructs (as component definitions) in the form
@@ -848,8 +849,11 @@ class ParserSBOL:
         dictWellComponent = {}
         for wellname, well in constructPlate.wells.items():
             for key, value in well.data.items():
-                # TODO: Move linker at last position to front of the list
-                dictWellComponent[wellname] = value.getPrimaryStructure()
+                # Move linker at last position to front of the list
+                primaryStructure = value.getPrimaryStructure()
+                if not self.is_linkers_order_correct(value, linkerFile):
+                    primaryStructure.insert(0, primaryStructure.pop())
+                dictWellComponent[wellname] = primaryStructure
         return dictWellComponent
 
     def getListFromWellComponentDict(
@@ -871,7 +875,8 @@ class ParserSBOL:
 
     def getConstructDfFromPlateoPlate(
         self,
-        constructPlate: plateo.Plate
+        constructPlate: plateo.Plate,
+        linkerFile: Document
     ) -> pd.DataFrame:
         '''Get dataframe of constructs from Plateo plate containing constructs
         Args:
@@ -883,7 +888,7 @@ class ParserSBOL:
         minNumberOfBasicParts = self.getMinNumberOfBasicParts(allComponents)
         header = self.getConstructCsvHeader(minNumberOfBasicParts)
         dictWellComponent = \
-            self.getWellComponentDictFromPlateoPlate(constructPlate)
+            self.getWellComponentDictFromPlateoPlate(constructPlate, linkerFile)
         listWellComponent = \
             self.getListFromWellComponentDict(dictWellComponent)
         # Create sparse array from list
@@ -895,6 +900,7 @@ class ParserSBOL:
     def getConstructCsvFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
+        linkerFile: Document,
         uniqueId: str = None
     ):
         '''Convert construct dataframe into CSV and creates CSV file in the same
@@ -903,7 +909,7 @@ class ParserSBOL:
             constructPlate (plateo.Plate): Plateo plate containing constructs
             uniqueId (str): Unique ID appended to filename
         '''
-        constructDf = self.getConstructDfFromPlateoPlate(constructPlate)
+        constructDf = self.getConstructDfFromPlateoPlate(constructPlate, linkerFile)
         constructDf.to_csv(
             "./" + uniqueId + "/construct.csv",
             index=False)

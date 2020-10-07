@@ -1,0 +1,19 @@
+Required SOC volume (uL):,19110
+
+SOC well index (in trough):,3
+
+Single
+
+P300 pipette type:,p300 single
+
+P10 Mount:,left
+
+P300 Mount:,right
+
+
+Labware,Labware definition,Position
+New reaction plate (for competent cells),biorad_96_wellplate_200ul_pcr,tempdeck (10)
+Post-MoClo reaction plate (from assembly),biorad_96_wellplate_200ul_pcr,7
+"Trough (contains washes, SOC)",usascientific_12_reservoir_22ml,5
+Agar plate,thermofisher_96_wellplate_180ul,2
+

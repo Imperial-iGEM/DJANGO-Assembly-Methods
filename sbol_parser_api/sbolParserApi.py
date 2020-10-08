@@ -11,6 +11,7 @@ from rdflib import URIRef
 from sbol2 import *
 from collections import deque
 from random import sample
+from plateo.exporters import plate_to_platemap_spreadsheet
 
 
 class ParserSBOL:
@@ -26,28 +27,23 @@ class ParserSBOL:
     def generateCsv_for_DNABot(
             self,
             dictOfParts: Dict[str, float] = None,
+            repeat: bool = None,
             maxWellsFilled: int = None,
             numRuns: int = None
     ):
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
-            listOfNonCombUris (list): List of component definition
-                URIs pointing to non-combinatorial designs.
-            listOfCombUris (list): List of combinatorial derivation
-                URIs pointing to combinatorial designs.
         """
         maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
         numRuns = 1 if numRuns is None else numRuns
         numSamples = maxWellsFilled * numRuns
-
+        repeat = False if repeat is None else True
         allConstructs = []
-
         # Get list of constructs
         allConstructs = self.getListOfConstructs()
-
         # Remove constructs with repeated parts using a filter
-        allConstructs = self.filterConstructs(allConstructs)
-
+        if not repeat:
+            allConstructs = self.filterConstructs(allConstructs)
         # Sample constructs
         if len(allConstructs) < numSamples:
             numSamples = len(allConstructs)
@@ -57,11 +53,9 @@ class ParserSBOL:
             )
             print("All constructs will be assembled.")
         sampled = sample(allConstructs, numSamples)
-
         # Display number of Component Definitions to be constructed
         numberOfDesigns = len(sampled)
         print(numberOfDesigns, "construct(s) will be assembled.")
-
         # Create plateo construct plates
         constructPlates = self.fillPlateoPlates(
             sampled,
@@ -70,7 +64,6 @@ class ParserSBOL:
             plateo.containers.Plate96,
             maxWellsFilled
         )
-
         # Create construct and parts/linkers CSVs from plateo plates
         for plate in constructPlates:
             # Create UUID
@@ -80,16 +73,69 @@ class ParserSBOL:
             if not os.path.exists(outdir):
                 os.mkdir(outdir)
             # Create construct CSV
-            self.getConstructCsvFromPlateoPlate(plate, uniqueId)
+            self.getConstructCsvFromPlateoPlate(plate, "BASIC", uniqueId)
             # Write parts/linkers csv
             self.getPartLinkerCsvFromPlateoPlate(
                 plate,
+                "BASIC",
                 dictOfParts,
                 uniqueId
             )
 
-    def generateCsv_for_MoClo(self):
-        raise NotImplementedError("Not yet implemented")
+    def generateCsv_for_MoClo(
+        self,
+        dictOfParts: Dict[str, float] = None,
+        repeat: bool = None,
+        maxWellsFilled: int = None,
+        numRuns: int = None
+    ):
+        maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
+        numRuns = 1 if numRuns is None else numRuns
+        numSamples = maxWellsFilled * numRuns
+        repeat = False if repeat is None else True
+        allConstructs = []
+        # Get list of constructs
+        allConstructs = self.getListOfConstructs()
+        # Remove constructs with repeated parts using a filter
+        if not repeat:
+            allConstructs = self.filterConstructs(allConstructs)
+        # Sample constructs
+        if len(allConstructs) < numSamples:
+            numSamples = len(allConstructs)
+            print(
+                "Number of constructs specified is greater than number "
+                "of constructs contained within SBOL Document provided."
+            )
+            print("All constructs will be assembled.")
+        sampled = sample(allConstructs, numSamples)
+        # Display number of Component Definitions to be constructed
+        numberOfDesigns = len(sampled)
+        print(numberOfDesigns, "construct(s) will be assembled.")
+        # Create plateo construct plates
+        constructPlates = self.fillPlateoPlates(
+            sampled,
+            "Construct",
+            numRuns,
+            plateo.containers.Plate96,
+            maxWellsFilled
+        )
+        # TODO: Custom csv generation for moclo
+        for plate in constructPlates:
+            # Create UUID
+            uniqueId = uuid.uuid4().hex
+            # Create new directory
+            outdir = "./" + uniqueId
+            if not os.path.exists(outdir):
+                os.mkdir(outdir)
+            # Create construct CSV
+            self.getConstructCsvFromPlateoPlate(plate, "MoClo", uniqueId)
+            # Write parts/linkers csv
+            self.getPartLinkerCsvFromPlateoPlate(
+                plate,
+                "MoClo",
+                dictOfParts,
+                uniqueId
+            )
 
     def getRootComponentDefinitions(
             self,
@@ -895,6 +941,7 @@ class ParserSBOL:
     def getWellComponentDictFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
+        assembly: str
     ) -> Dict[str, List[ComponentDefinition]]:
         '''Get a dictionary of wells containing components comprising
         constructs (as component definitions) in the form
@@ -909,8 +956,9 @@ class ParserSBOL:
             for key, value in well.data.items():
                 # Move linker at last position to front of the list
                 primaryStructure = value.getPrimaryStructure()
-                if not self.is_linkers_order_correct(value):
-                    primaryStructure.insert(0, primaryStructure.pop())
+                if assembly == "BASIC":
+                    if not self.is_linkers_order_correct(value):
+                        primaryStructure.insert(0, primaryStructure.pop())
                 dictWellComponent[wellname] = primaryStructure
         return dictWellComponent
 
@@ -934,6 +982,7 @@ class ParserSBOL:
     def getConstructDfFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
+        assembly: str
     ) -> pd.DataFrame:
         '''Get dataframe of constructs from Plateo plate containing constructs
         Args:
@@ -941,22 +990,31 @@ class ParserSBOL:
         Returns:
             pd.DataFrame: Dataframe of constructs
         '''
-        allComponents = self.getAllContentFromPlateoPlate(constructPlate, 'Construct')
-        minNumberOfBasicParts = self.getMinNumberOfBasicParts(allComponents)
-        header = self.getConstructCsvHeader(minNumberOfBasicParts)
+        allComponents = \
+            self.getAllContentFromPlateoPlate(constructPlate, 'Construct')
         dictWellComponent = \
-            self.getWellComponentDictFromPlateoPlate(constructPlate)
+            self.getWellComponentDictFromPlateoPlate(constructPlate, assembly)
         listWellComponent = \
             self.getListFromWellComponentDict(dictWellComponent)
         # Create sparse array from list
         sparr = pd.arrays.SparseArray(listWellComponent)
-        # Create df from sparr
-        df = pd.DataFrame(data=sparr, columns=header)
+        if assembly == "BASIC":
+            minNumberOfBasicParts = \
+                self.getMinNumberOfBasicParts(allComponents)
+            header = self.getConstructCsvHeader(minNumberOfBasicParts)
+            # Create df from sparr
+            df = pd.DataFrame(data=sparr, columns=header)
+        elif assembly == "MoClo":
+            df = pd.DataFrame(data=sparr)
+            df = df.iloc[:, 1:]
+        elif assembly == "BioBricks":
+            raise NotImplementedError
         return df
 
     def getConstructCsvFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
+        assembly: str,
         uniqueId: str = None
     ):
         '''Convert construct dataframe into CSV and creates CSV file in the same
@@ -965,10 +1023,25 @@ class ParserSBOL:
             constructPlate (plateo.Plate): Plateo plate containing constructs
             uniqueId (str): Unique ID appended to filename
         '''
-        constructDf = self.getConstructDfFromPlateoPlate(constructPlate)
-        constructDf.to_csv(
-            "./" + uniqueId + "/construct.csv",
-            index=False)
+        constructDf = \
+            self.getConstructDfFromPlateoPlate(constructPlate, assembly)
+        if uniqueId:
+            prefix = "./" + uniqueId + "/"
+        else:
+            prefix = ""
+        if assembly == "BASIC":
+            constructDf.to_csv(
+                prefix + "construct.csv",
+                index=False,
+            )
+        elif assembly == "MoClo":
+            constructDf.to_csv(
+                prefix + "construct.csv",
+                index=False,
+                header=False
+            )
+        elif assembly == "BioBricks":
+            raise NotImplementedError
 
     def isLinker(
         self,
@@ -1048,12 +1121,22 @@ class ParserSBOL:
     def getPartLinkerCsvFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
-        dictOfParts: Dict[str, float],
+        assembly,
+        dictOfParts: Dict[str, float] = None,
         uniqueId: str = None
     ):
+        def getPartName(well: plateo.Well) -> str:
+            if "Part" in well.data.keys():
+                cd = well.data["Part"]
+                name = cd.displayId
+            else:
+                name = ""
+            return name
+
         # TODO: Determine plate class?
         # Obtain all constructs from plate
-        allConstructs = self.getAllContentFromPlateoPlate(constructPlate, 'Construct')
+        allConstructs = \
+            self.getAllContentFromPlateoPlate(constructPlate, 'Construct')
         # Obtain parts and linkers from all constructs
         listOfParts = self.getListOfParts(allConstructs)
         # Change linker to linker-s and linker-p
@@ -1077,13 +1160,28 @@ class ParserSBOL:
             96,
             dictOfParts
         )
+        if uniqueId:
+            prefix = "./" + uniqueId + "/"
+        else:
+            prefix = ""
         for plate in partPlates:
-            # Create df
-            partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
-            partLinkerDf.to_csv(
-                "./" + uniqueId + "/part_linker_" + str(partPlates.index(plate) + 1) + ".csv",
-                index=False
-            )
+            if assembly == "BASIC":
+                # Create df
+                partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
+                partLinkerDf.to_csv(
+                    prefix + "part_linker_" + str(partPlates.index(plate) + 1) + ".csv",
+                    index=False
+                )
+            elif assembly == "MoClo":
+                filepath = \
+                    prefix + "part_linker_" + str(partPlates.index(plate) + 1) + ".csv"
+                # Generate platemap
+                plate_to_platemap_spreadsheet(
+                    plate,
+                    getPartName,
+                    filepath,
+                    headers=False
+                )
 
     def is_linkers_order_correct(
         self,

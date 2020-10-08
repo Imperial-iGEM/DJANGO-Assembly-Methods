@@ -26,7 +26,7 @@ class LinkerInType(graphene.InputObjectType):
     well = graphene.String()
 
 
-class Specifications(graphene.Mutation):
+class LinkerList(graphene.Mutation):
     class Arguments:
         sbol_file_string = graphene.String()
         # specifications = graphene.Argument(SpecificationsType)
@@ -37,7 +37,7 @@ class Specifications(graphene.Mutation):
         sbol_document = get_sbol_document(sbol_file_string)
         parser = ParserSBOL(sbolDocument=sbol_document)
         list_of_parts = parser.displayListOfParts()
-        return Specifications(linker_list=list_of_parts)
+        return LinkerList(linker_list=list_of_parts)
 
 
 class FinalSpec(graphene.Mutation):
@@ -61,7 +61,7 @@ class FinalSpec(graphene.Mutation):
 
 
 class Mutation(graphene.ObjectType):
-    run_specifications = Specifications.Field()
+    linker_list = LinkerList.Field()
     final_spec = FinalSpec.Field()
 
 

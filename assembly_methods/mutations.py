@@ -28,12 +28,13 @@ class LinkerInType(graphene.InputObjectType):
 
 class Specifications(graphene.Mutation):
     class Arguments:
-        specifications = graphene.Argument(SpecificationsType)
+        sbol_file_string = graphene.String()
+        # specifications = graphene.Argument(SpecificationsType)
 
     linker_list = graphene.List(graphene.String)
 
-    def mutate(self, info, specifications):
-        sbol_document = get_sbol_document(specifications.sbol_string)
+    def mutate(self, info, sbol_file_string):
+        sbol_document = get_sbol_document(sbol_file_string)
         parser = ParserSBOL(sbolDocument=sbol_document)
         list_of_parts = parser.displayListOfParts()
         return Specifications(linker_list=list_of_parts)

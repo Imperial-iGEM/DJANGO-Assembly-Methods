@@ -16,6 +16,7 @@ class SpecificationsType(graphene.InputObjectType):
     output_part_sequences = graphene.Boolean()
     output_logs = graphene.Boolean()
     output_meta_information = graphene.Boolean()
+    assembly_type = graphene.String()
 
 
 class LinkerInType(graphene.InputObjectType):
@@ -46,6 +47,14 @@ class FinalSpec(graphene.Mutation):
     output_links = graphene.List(graphene.String)
 
     def mutate(self, info, linker_types, specifications):
+        sbol_document = get_sbol_document(specifications.sbol_string)
+        parser = ParserSBOL(sbolDocument=sbol_document)
+        if specifications.assembly_type == "basic":
+            parser.generateCsv_for_DNABot()
+        elif specifications.assembly_type == "golden_gate":
+            parser.generateCsv_for_()
+        elif specifications.assembly_type == "moclo":
+            parser.generateCsv_for_MoClo()
 
         return FinalSpec(output_links=[str(linker_types), str(specifications)])
 

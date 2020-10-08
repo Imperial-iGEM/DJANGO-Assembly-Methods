@@ -19,7 +19,7 @@ class ParserSBOL:
     def __init__(
         self,
         sbolDocument: Document,
-        linkerFile: Document = None
+        linkerFile: Document = Document("./examples/sbol/basic_linkers_standard.xml")
     ):
         self.doc = sbolDocument
         self.linkerFile = linkerFile

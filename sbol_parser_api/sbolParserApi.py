@@ -22,7 +22,11 @@ class ParserSBOL:
         linkerFile: Document = None
     ):
         self.doc = sbolDocument
-        self.linkerFile = linkerFile
+        if linkerFile is None:
+            filepath = "../examples/sbol/basic_linkers_standard.xml"
+            self.linkerFile = Document(filepath)
+        else:
+            self.linkerFile = linkerFile
 
     def generateCsv_for_DNABot(
             self,
@@ -684,10 +688,7 @@ class ParserSBOL:
                     )
         listOfParts = list(dict.fromkeys(listOfParts))
         # Get list of linkers from linkerfile
-        # FIXME: linker sbol document not read properly by pysbol2
         linkers = self.getRootComponentDefinitions(self.linkerFile)
-        # Temp workaround: Remove suffixes and prefixes manually
-        linkers = [linker for linker in linkers if "_" not in linker.displayId]
         # Convert linkers into linker suffix and prefix and add to new list
         newListOfParts = []
         for part in listOfParts:
@@ -1195,13 +1196,8 @@ class ParserSBOL:
         def _get_linker_names():
             """ Open standard linker document and extract all displayIds """
             # Get list of linkers from linkerfile
-            # FIXME: linker sbol document not read properly by pysbol2
             linkers = self.getRootComponentDefinitions(self.linkerFile)
-            # Temp workaround: Remove suffixes and prefixes manually
-            linkers = [
-                linker.displayId
-                for linker in linkers if "_" not in linker.displayId
-            ]
+            linkers = [linker.displayId for linker in linkers]
             return linkers
 
         # Compare each part displayId in 'construct' to available linkers

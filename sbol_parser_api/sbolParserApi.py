@@ -1332,7 +1332,7 @@ class ParserSBOL:
     ) -> bool:
         primary_structure = construct.getPrimaryStructure()
         # Check that there are only 3 parts in the construct
-        if len(primaryStructure) != 3:
+        if len(primary_structure) != 3:
             raise ValueError(
                 "There can only be 3 components in each construct"
             )

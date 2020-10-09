@@ -1038,7 +1038,7 @@ class ParserSBOL:
                     if self.validateBioBricksConstruct(value):
                         # Check if first component is a plasmid vector:
                         plasmidVector = "http://identifiers.org/so/SO:0000755"
-                        if plasmidVector in primaryStructure[1].roles:
+                        if plasmidVector in primaryStructure[0].roles:
                             # Shift backbone to last component
                             primaryStructure.insert(2, primaryStructure.pop(0))
                         dictWellComponent[wellname] = {

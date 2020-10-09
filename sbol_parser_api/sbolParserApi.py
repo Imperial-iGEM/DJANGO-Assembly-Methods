@@ -34,7 +34,7 @@ class ParserSBOL:
             repeat: bool = None,
             maxWellsFilled: int = None,
             numRuns: int = None
-    ):
+    ) -> List[str]:
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
         """
@@ -69,10 +69,12 @@ class ParserSBOL:
             plateo.containers.Plate96,
             maxWellsFilled
         )
+        uniqueIds = []
         # Create construct and parts/linkers CSVs from plateo plates
         for plate in constructPlates:
             # Create UUID
             uniqueId = uuid.uuid4().hex
+            uniqueIds.append(uniqueId)
             # Create new directory
             outdir = "./" + uniqueId
             if not os.path.exists(outdir):
@@ -86,6 +88,7 @@ class ParserSBOL:
                 dictOfParts,
                 uniqueId
             )
+        return uniqueIds
 
     def generateCsv_for_MoClo(
         self,
@@ -93,7 +96,7 @@ class ParserSBOL:
         repeat: bool = None,
         maxWellsFilled: int = None,
         numRuns: int = None
-    ):
+    ) -> List[str]:
         maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
         numRuns = 1 if numRuns is None else numRuns
         numSamples = maxWellsFilled * numRuns
@@ -125,10 +128,11 @@ class ParserSBOL:
             plateo.containers.Plate96,
             maxWellsFilled
         )
-        # TODO: Custom csv generation for moclo
+        uniqueIds = []
         for plate in constructPlates:
             # Create UUID
             uniqueId = uuid.uuid4().hex
+            uniqueIds.append(uniqueId)
             # Create new directory
             outdir = "./" + uniqueId
             if not os.path.exists(outdir):
@@ -142,6 +146,7 @@ class ParserSBOL:
                 dictOfParts,
                 uniqueId
             )
+        return uniqueIds
 
     def generateCsv_for_BioBricks(
         self,
@@ -149,7 +154,7 @@ class ParserSBOL:
         repeat: bool = None,
         maxWellsFilled: int = None,
         numRuns: int = None
-    ):
+    ) -> List[str]:
         # TODO: Can be improved for hierarchical assembly (multiple runs)
         maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
         numRuns = 1 if numRuns is None else numRuns
@@ -182,10 +187,11 @@ class ParserSBOL:
             plateo.containers.Plate96,
             maxWellsFilled
         )
-        # TODO: Custom csv generation for moclo
+        uniqueIds = []
         for plate in constructPlates:
             # Create UUID
             uniqueId = uuid.uuid4().hex
+            uniqueIds.append(uniqueId)
             # Create new directory
             outdir = "./" + uniqueId
             if not os.path.exists(outdir):
@@ -199,6 +205,7 @@ class ParserSBOL:
                 dictOfParts,
                 uniqueId
             )
+        return uniqueIds
 
     def getRootComponentDefinitions(
             self,

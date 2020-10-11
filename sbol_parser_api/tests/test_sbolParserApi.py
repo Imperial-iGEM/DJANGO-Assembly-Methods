@@ -33,7 +33,7 @@ class TestSbolParserApi(TestCase):
         return
 
     def test_getRootComponentDefinitions(self):
-        for cd in self.parser.getRootComponenentDefinitions():
+        for cd in self.parser.getRootComponentDefinitions():
             self.assertEquals(cd.displayId, 'Dummy')
 
     def test_getListOfParts(self):

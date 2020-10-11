@@ -28,19 +28,24 @@ CELL_TRANS_VOL = 50
 COMPETENT_WELL_MAX_VOL = 200
 
 
-def main():
+def biobricks(output_folder, construct_path, part_path, p10_mount='right',
+              p300_mount='left', p10_type='p10_single',
+              p300_type='p300_single',
+              well_plate='biorad_96_wellplate_200ul_pcr',
+              tube_rack='opentrons_24_tuberack_nest_1.5ml_snapcap',
+              soc_plate='usascientific_96_wellplate_2.4ml_deep',
+              transformation_plate='corning_96_wellplate_360ul_flat'):
+
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
     assembly_template_path = os.path.join(template_dir_path,
                                           'bbassembly10template.py')
     transformation_template_path = os.path.join(template_dir_path,
                                                 'bbtransformationtemplate.py')
-    output_path = os.path.join(generator_dir, OUTPUT_DIR_NAME)
+    output_path = os.path.join(generator_dir, output_folder)
     thermocycle = False
-    constructs, dest_well_list = get_constructs(
-        os.path.join(generator_dir, 'examples/constructs.csv'))
-    parts = get_parts(os.path.join(generator_dir, 'examples/parts.csv'),
-                      constructs)
+    constructs, dest_well_list = get_constructs(construct_path)
+    parts = get_parts(part_path, constructs)
     reagents, reagents_well_list, mm_df = get_reagents_wells(constructs, parts)
     digest_loc, parts_df = get_digests(constructs, parts, reagents_well_list,
                                        dest_well_list, reagents)
@@ -48,34 +53,25 @@ def main():
     source_to_digest, reagent_to_digest, digest_to_storage, \
         digest_to_construct, reagent_to_construct = create_assembly_dicts(
                                     constructs, parts, digest_loc, reagents)
-    create_assembly_protocol(assembly_template_path, output_path,
-                             source_to_digest, reagent_to_digest,
-                             digest_to_storage, digest_to_construct,
-                             reagent_to_construct,
-                             p10_mount=labware_dict['p10_mount'],
-                             p10_type=labware_dict['p10_type'],
-                             well_plate_type=labware_dict['well_plate'],
-                             tube_rack_type=labware_dict['tube_rack'],
-                             thermocycle=thermocycle)
+    create_assembly_protocol(
+        assembly_template_path, output_path, source_to_digest,
+        reagent_to_digest, digest_to_storage, digest_to_construct,
+        reagent_to_construct, p10_mount=p10_type, p10_type=p10_type,
+        well_plate_type=well_plate, tube_rack_type=tube_rack,
+        thermocycle=thermocycle)
 
     competent_source_to_dest, control_source_to_dest, \
         assembly_source_to_dest, water_source_to_dest, transform_df \
         = create_tranformation_dicts(constructs, water_well='A1',
                                      controls_per_cons=False)
 
-    create_transformation_protocol(transformation_template_path, output_path,
-                                   competent_source_to_dest,
-                                   control_source_to_dest,
-                                   assembly_source_to_dest,
-                                   water_source_to_dest,
-                                   p10_mount=labware_dict['p10_mount'],
-                                   p300_mount=labware_dict['p300_mount'],
-                                   p10_type=labware_dict['p10_type'],
-                                   p300_type=labware_dict['p300_type'],
-                                   well_plate_type=labware_dict['well_plate'],
-                                   transformation_plate_type=labware_dict['transformation_plate'],
-                                   tube_rack_type=labware_dict['tube_rack'],
-                                   soc_plate_type=labware_dict['soc_plate'])
+    create_transformation_protocol(
+        transformation_template_path, output_path, competent_source_to_dest,
+        control_source_to_dest, assembly_source_to_dest, water_source_to_dest,
+        p10_mount=p10_mount, p300_mount=p300_mount, p10_type=p10_type,
+        p300_type=p300_type, well_plate_type=well_plate,
+        transformation_plate_type=transformation_plate,
+        tube_rack_type=tube_rack, soc_plate_type=soc_plate)
 
     labwareDf = pd.DataFrame(
         data={'name': list(labware_dict.keys()),
@@ -588,7 +584,8 @@ def create_transformation_protocol(template_path, output_path,
         protocol_file.write('p10_type = "' + p10_type + '"\n\n')
         protocol_file.write('p300_type = "' + p300_type + '"\n\n')
         protocol_file.write('well_plate_type = "' + well_plate_type + '"\n\n')
-        protocol_file.write('transformation_plate_type = "' + transformation_plate_type + '"\n\n')
+        protocol_file.write('transformation_plate_type = "' +
+                            transformation_plate_type + '"\n\n')
         protocol_file.write('tube_rack_type = "' + tube_rack_type + '"\n\n')
         protocol_file.write('soc_plate_type = "' + soc_plate_type + '"\n\n')
 
@@ -597,7 +594,7 @@ def create_transformation_protocol(template_path, output_path,
 
 
 def dfs_to_csv(path, index=True, **kw_dfs):
-    """Generates a csv file defined by path, where kw_dfs are 
+    """Generates a csv file defined by path, where kw_dfs are
     written one after another with each key acting as a title. If index=True,
     df indexes are written to the csv file.
 
@@ -610,5 +607,9 @@ def dfs_to_csv(path, index=True, **kw_dfs):
             csvwriter.writerow('')
 
 
-if __name__ == '__main__':
-    main()
+'''
+generator_dir = os.getcwd()
+construct_path = os.path.join(generator_dir, 'examples/constructs.csv')
+part_path = os.path.join(generator_dir, 'examples/parts.csv')
+biobricks(construct_path, part_path, **labware_dict)
+'''

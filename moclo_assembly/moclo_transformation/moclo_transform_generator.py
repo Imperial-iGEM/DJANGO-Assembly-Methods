@@ -16,57 +16,32 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
 
-def moclo_function(output_folder, single_or_triplicate, dna_plate_map,
-                   combinations_file, labware_dict):
+def moclo_function(output_folder, construct_path, part_path,
+                   thermocycle=True, p10_mount='right', p300_mount='left',
+                   p10_type='p10_single', p300_type='p300_multi',
+                   well_plate='biorad_96_wellplate_200ul_pcr',
+                   trough='usascientific_12_reservoir_22ml',
+                   reagent_plate='biorad_96_wellplate_200ul_pcr',
+                   agar_plate='thermofisher_96_wellplate_180ul'):
 
-    # GETTING USER INPUT
+    config = {
+        'output_folder_path': output_folder,
+        'assembly_template_path':
+        'moclo_assembly/moclo_transformation/data/moclo_assembly_template.py',
+        'transform_template_path':
+        'moclo_assembly/moclo_transformation/data/transform_moclo_template.py'}
 
-    # config = get_config(CONFIG_PATH)
-    # ^ returns config just a read of setting.yaml hopefull try to set to
-    # string and still work
-    config = {'output_folder_path': output_folder,
-              'assembly_template_path':
-              'moclo_assembly/moclo_transformation/data/moclo_assembly_template.py',
-              'transform_template_path':
-              'moclo_assembly/moclo_transformation/data/transform_moclo_template.py'}
+    # for now only do single (other option = triplicate)
+    combinations_limit = 'single'
 
-    # combinations_limit = ask_single_or_triplicate()
-    # ^ return the string either 'single' or triplet
-    combinations_limit = single_or_triplicate
-
-    # whether user wants to use thermocycler module
-    # thermocycle = get_thermocycle() in offline vers
-    thermocycle = True
-
-    # whether to use left or right mount for p10 pipette
-    # p10Mount = get_pipette_mount('p10') in offline vers
-    p10Mount = 'left'
-    labware_dict['p10_mount'] = p10Mount
-
-    # whether to use left or right mount for p300 pipette
-    # p300Mount = get_pipette_mount('p300') in offline vers
-    p300Mount = 'right'
-    labware_dict['p300_mount'] = p300Mount
-
-    p10Type = 'p10_single'
-    labware_dict['p10_type'] = p10Type
-
-    p300Type = 'p300_single'
-    labware_dict['p300_type'] = p300Type
-
-    if 'multi' in labware_dict['p300_type'].lower():
+    if 'multi' in p300_type.lower():
         multi = True
     else:
         multi = False
 
-    # dna_plate_map_filename = ask_dna_plate_map_filename()
-    # ^ return string of full disk file path of dna plate map
-    dna_plate_map_filename = ask_dna_plate_map_filename()
-    combinations_filename = ask_combinations_filename()
-
     # Load in CSV files as a dict containing lists of lists.
-    dna_plate_map_dict = generate_plate_maps(dna_plate_map_filename)
-    combinations_to_make = generate_combinations(combinations_filename)
+    dna_plate_map_dict = generate_plate_maps(part_path)
+    combinations_to_make = generate_combinations(construct_path)
     check_number_of_combinations(combinations_limit, combinations_to_make)
 
     # Generate and save output plate maps.
@@ -87,19 +62,14 @@ def moclo_function(output_folder, single_or_triplicate, dna_plate_map,
         labware_dict, triplicate, multi)
 
     # Create a protocol file and hard code the plate maps into it.
-    create_protocol(dna_plate_map_dict, combinations_to_make, 
-                    reagent_to_mm_dict, mm_dict,
-                    config['assembly_template_path'],
-                    config['transform_template_path'],
-                    config['output_folder_path'], thermocycle,
-                    triplicate, multi, p10Mount=labware_dict['p10_mount'],
-                    p300Mount=labware_dict['p300_mount'],
-                    p10_type=labware_dict['p10_type'],
-                    p300_type=labware_dict['p300_type'],
-                    reaction_plate_type=labware_dict['well_plate'],
-                    reagent_plate_type=labware_dict['reagent_plate'],
-                    trough_type=labware_dict['trough'],
-                    agar_plate_type=labware_dict['agar_plate'])
+    create_protocol(
+        dna_plate_map_dict, combinations_to_make, reagent_to_mm_dict, mm_dict,
+        config['assembly_template_path'], config['transform_template_path'],
+        config['output_folder_path'], thermocycle, triplicate, multi,
+        p10Mount=p10_mount, p300Mount=p300_mount, p10_type=p10_type,
+        p300_type=p300_type, reaction_plate_type=well_plate,
+        reagent_plate_type=reagent_plate, trough_type=trough,
+        agar_plate_type=agar_plate)
 
 ###############################################################################
 # Functions for getting user input

@@ -43,7 +43,7 @@ class TestSbolParserApi(TestCase):
         component = construct.components
         print('component', component)
         print('type(component)', type(component))
-        defin = component.definition
+        defin = component[0].definition
         # print('\n\nallConstructs[0].components.definition', allConstructs[0].components.definition)
 
         list_of_parts = self.parser.getListOfParts(allConstructs)

@@ -118,24 +118,27 @@ class BioBricksInputTestCase(unittest.TestCase):
 
         self.reagent_dfs = [pd.DataFrame(data={'name': ['water'], 'well':
                                                ['A1'], 'total_vol': [285]}),
-                            pd.DataFrame(data={'name': ['NEBBuffer10X'],
+                            pd.DataFrame(data={'name': ['mm_upstream'],
                                                'well': ['A2'], 'total_vol':
-                                               [30]}),
+                                               [28]}),
+                            pd.DataFrame(data={'name': ['mm_downstream'],
+                                               'well': ['A3'], 'total_vol':
+                                               [35]}),
+                            pd.DataFrame(data={'name': ['mm_plasmid'],
+                                               'well': ['A4'], 'total_vol':
+                                               [21]}),
                             pd.DataFrame(data={'name': ['T4Ligase10X'], 'well':
-                                               ['A3'], 'total_vol': [6]}),
+                                               ['A5'], 'total_vol': [6]}),
                             pd.DataFrame(data={'name': ['T4Ligase'], 'well':
-                                               ['A4'], 'total_vol': [3]}),
-                            pd.DataFrame(data={'name': ['EcoRI-HF'], 'well':
-                                               ['A5'], 'total_vol': [3]}),
-                            pd.DataFrame(data={'name': ['SpeI'], 'well':
-                                               ['A6'], 'total_vol': [2]}),
-                            pd.DataFrame(data={'name': ['XbaI'], 'well':
-                                               ['B1'], 'total_vol': [3]}),
-                            pd.DataFrame(data={'name': ['PstI'], 'well':
-                                               ['B2'], 'total_vol': [4]})]
-
+                                               ['A6'], 'total_vol': [3]})]
         self.reagents_df = pd.concat(self.reagent_dfs, ignore_index=True)
-        self.reagents_wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'B1', 'B2']
+        self.reagents_wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6']
+        self.mm_df = pd.DataFrame(
+            data={'reagent': ['NEB Buffer 10X', 'EcoRI-HF', 'SpeI', 'XbaI',
+                              'PstI'],
+                  'volume in upstream mm': [20, 4, 4, 0, 0],
+                  'volume in downstream mm': [25, 0, 0, 5, 5],
+                  'volume in plasmid mm': [15, 3, 0, 0, 3]})
         self.constructs_wells = ['A1', 'A2', 'A3']
 
         self.parts_digest_wells = [['A4'], ['A5'], ['A6'], ['A7', 'A8'], ['A9']
@@ -148,39 +151,39 @@ class BioBricksInputTestCase(unittest.TestCase):
                                               'role': ['upstream'], 'part':
                                               ['BBa_B0034'], 'source_well':
                                               ['A1'], 'dest_well': ['A4'],
-                                              'reagent_well': ['B3'],
+                                              'reagent_well': ['B1'],
                                               'construct_wells':
                                               [['A1', 'A2']]}),
                            pd.DataFrame(data={'name': ['BBa_C0040-downstream'],
                                               'role': ['downstream'], 'part':
                                               ['BBa_C0040'], 'source_well':
                                               ['A2'], 'dest_well': ['A5'],
-                                              'reagent_well': ['B4'],
+                                              'reagent_well': ['B2'],
                                               'construct_wells': [['A1']]}),
                            pd.DataFrame(data={'name': ['BBa_pSB1AK3-plasmid'],
                                               'role': ['plasmid'], 'part':
                                               ['BBa_pSB1AK3'], 'source_well':
                                               ['A3'], 'dest_well': ['A6'],
-                                              'reagent_well': ['B5'],
+                                              'reagent_well': ['B3'],
                                               'construct_wells':
                                               [['A1', 'A2', 'A3']]}),
                            pd.DataFrame(data={'name': ['BBa_C0012-upstream'],
                                               'role': ['upstream'], 'part':
                                               ['BBa_C0012'], 'source_well':
                                               ['A4'], 'dest_well': ['A7'],
-                                              'reagent_well': ['B6'],
+                                              'reagent_well': ['B4'],
                                               'construct_wells': [['A3']]}),
                            pd.DataFrame(data={'name': ['BBa_C0012-downstream'],
                                               'role': ['downstream'], 'part':
                                               ['BBa_C0012'], 'source_well':
                                               ['A4'], 'dest_well': ['A8'],
-                                              'reagent_well': ['C1'],
+                                              'reagent_well': ['B5'],
                                               'construct_wells': [['A2']]}),
                            pd.DataFrame(data={'name': ['BBa_B0015-downstream'],
                                               'role': ['downstream'], 'part':
                                               ['BBa_B0015'], 'source_well':
                                               ['A5'], 'dest_well': ['A9'],
-                                              'reagent_well': ['C2'],
+                                              'reagent_well': ['B6'],
                                               'construct_wells': [['A3']]})]
 
         self.digests_df = pd.concat(self.digest_dfs, ignore_index=True)
@@ -189,19 +192,16 @@ class BioBricksInputTestCase(unittest.TestCase):
                                  [('A6', 1)], 'A4': [('A7', 1), ('A8', 1)],
                                  'A5': [('A9', 1)]}
 
-        self.reagent_to_digest = {'A1': [('A4', 42), ('A5', 42), ('A6', 42),
-                                         ('A7', 42), ('A8', 42), ('A9', 42)],
-                                  'A2': [('A4', 5), ('A5', 5), ('A6', 5),
-                                         ('A7', 5), ('A8', 5), ('A9', 5)],
-                                  'A5': [('A4', 1), ('A6', 1), ('A7', 1)],
-                                  'A6': [('A4', 1), ('A7', 1)],
-                                  'B1': [('A5', 1), ('A8', 1), ('A9', 1)],
-                                  'B2': [('A5', 1), ('A6', 1), ('A8', 1),
-                                         ('A9', 1)]}
+        self.reagent_to_digest = {"A1": [("A4", 42), ("A5", 42), ("A6", 42),
+                                         ("A7", 42), ("A8", 42), ("A9", 42)],
+                                  "A2": [("A4", 7), ("A7", 7)],
+                                  "A3": [("A5", 7), ("A8", 7), ("A9", 7)],
+                                  "A4": [("A6", 7)]}
 
-        self.digest_to_storage = {'A4': [('B3', 48)], 'A5': [('B4', 48)],
-                                  'A6': [('B5', 48)], 'A7': [('B6', 48)],
-                                  'A8': [('C1', 48)], 'A9': [('C2', 48)]}
+        self.digest_to_storage = {"A4": [("B1", 48)], "A5": [("B2", 48)],
+                                  "A6": [("B3", 48)], "A7": [("B4", 48)],
+                                  "A8": [("B5", 48)], "A9": [("B6", 48)]}
+
 
         self.digest_to_construct = {'A4': [('A1', 2), ('A2', 2)],
                                     'A5': [('A1', 2)],
@@ -211,8 +211,8 @@ class BioBricksInputTestCase(unittest.TestCase):
 
         self.reagent_to_construct = {'A1': [('A1', 11), ('A2', 11),
                                             ('A3', 11)],
-                                     'A3': [('A1', 2), ('A2', 2), ('A3', 2)],
-                                     'A4': [('A1', 1), ('A2', 1), ('A3', 1)]}
+                                     'A5': [('A1', 2), ('A2', 2), ('A3', 2)],
+                                     'A6': [('A1', 1), ('A2', 1), ('A3', 1)]}
         
         self.competent_source_to_dest = {"A4": [("A1", 50), ("A2", 50),
                                                 ("A3", 50)],
@@ -234,7 +234,6 @@ class BioBricksInputTestCase(unittest.TestCase):
                                                ("A11", 1), ("A12", 1)]}
 
         self.water_to_dest = {"A1": [("B1", 1), ("B2", 1), ("B3", 1)]}
-
         self.entry_dfs = [
             pd.DataFrame(data={'name': ['construct1-0'],
                                'number': [0], 'cell_type': ['competent'],
@@ -324,8 +323,8 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_get_constructs(self, mock_process_construct):
         with patch('csv.reader') as mocked_reader:
             mocked_reader.return_value = self.constructs_list
-            cons_df, dest_wells = bbinput.get_constructs(os.path.join(TEST_DIR,
-                              'testfiles/constructs.csv'))
+            cons_df, dest_wells = bbinput.get_constructs(
+                            os.path.join(TEST_DIR, 'testfiles/constructs.csv'))
             self.assertListEqual(dest_wells, self.construct_wells)
             for col in ['name', 'well', 'upstream', 'downstream', 'plasmid']:
                 self.assertListEqual(cons_df[col].to_list(),
@@ -354,8 +353,8 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_get_parts(self, mock_process_part):
         with patch('csv.reader') as mocked_reader:
             mocked_reader.return_value = self.parts_list
-            df = bbinput.get_parts((os.path.join(TEST_DIR,
-                                                 'testfiles/constructs.csv')),
+            df = bbinput.get_parts(os.path.join(TEST_DIR,
+                                                'testfiles/parts.csv'),
                                    self.constructs_df)
             for col in df.columns:
                 self.assertListEqual(df[col].to_list(),
@@ -399,7 +398,7 @@ class BioBricksInputTestCase(unittest.TestCase):
         self.assertDictEqual(dict3, self.digest_to_storage)
         self.assertDictEqual(dict4, self.digest_to_construct)
         self.assertDictEqual(dict5, self.reagent_to_construct)
-       
+
     def test_create_tranformation_dicts(self):
         dict1, dict2, dict3, dict4, df = bbinput.create_tranformation_dicts(
             self.constructs_df)
@@ -407,10 +406,10 @@ class BioBricksInputTestCase(unittest.TestCase):
         self.assertDictEqual(dict2, self.control_source_to_dest)
         self.assertDictEqual(dict3, self.assembly_source_to_dest)
         self.assertDictEqual(dict4, self.water_to_dest)
+
         for col in df.columns:
             self.assertListEqual(df[col].to_list(),
                                  self.transform_df[col].to_list())
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -56,7 +56,7 @@ class FinalSpec(graphene.Mutation):
         if specifications.assembly_type == "basic":
             links = parser.generateCsv_for_DNABot()
         elif specifications.assembly_type == "golden_gate":
-            parser.generateCsv_for_
+            links = parser.generateCsv_for_BioBricks()
         elif specifications.assembly_type == "moclo":
             link = parser.generateCsv_for_MoClo()
         # return classes with outputs

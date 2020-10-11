@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'graphene_django',
     'basic_assembly',
     'moclo_assembly',
+    'assembly_methods',
     'corsheaders'
 ]
 

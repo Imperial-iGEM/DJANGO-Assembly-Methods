@@ -42,21 +42,24 @@ class LinkerList(graphene.Mutation):
 
 class FinalSpec(graphene.Mutation):
     class Arguments:
+        # Input args
         linker_types = graphene.List(LinkerInType)
         specifications = graphene.Argument(SpecificationsType)
 
+    # output
     output_links = graphene.List(graphene.String)
 
+    # Function that is run: call other functions from here
     def mutate(self, info, linker_types, specifications):
         sbol_document = get_sbol_document(specifications.sbol_string)
         parser = ParserSBOL(sbolDocument=sbol_document)
         if specifications.assembly_type == "basic":
-            parser.generateCsv_for_DNABot()
+            links = parser.generateCsv_for_DNABot()
         elif specifications.assembly_type == "golden_gate":
-            parser.generateCsv_for_()
+            parser.generateCsv_for_
         elif specifications.assembly_type == "moclo":
-            parser.generateCsv_for_MoClo()
-
+            link = parser.generateCsv_for_MoClo()
+        # return classes with outputs
         return FinalSpec(output_links=[str(linker_types), str(specifications)])
 
 

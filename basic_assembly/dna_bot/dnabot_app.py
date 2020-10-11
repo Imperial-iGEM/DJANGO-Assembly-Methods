@@ -2,7 +2,12 @@
 """
 Created on Thu Apr 11 14:26:07 2019
 
-@author: mh2210, Benedict_Carling
+@author: mh2210, Gabrielle Johnston, Benedict_Carling
+
+To run online version, use from .mplates import final_well
+
+To run offline version through command line, use from mplates import final_well
+AND uncomment call of dnabot function at bottom
 """
 import pandas as pd
 import os
@@ -10,27 +15,15 @@ import csv
 import numpy as np
 import json
 import sys
+# Use .mplates for online version and leave line below uncommented:
 from .mplates import final_well
+# Use mplates (no dot) for offline version (to run from command line)
+# For offline version, uncomment line below, and comment .mplates
 # from mplates import final_well
 import random
 import string
 
-# now this in a python function
-# we need to consider having this as a command line tool
-# as when acessing from java.
-# its probably easier to run from command line
-# rather than running command shell but we will see
-
-# e
-
-# MY FUNCTION VARIABLES
-#ethanol_well_for_stage_2 = "A11"
-#deep_well_plate_stage_4 = "A1"
-#input_construct_path = '..../DNA-BOT/my_examples/storch_et_al_cons.csv'
-#output_sources_paths = ('..../DNA-BOT/my_examples/BIOLEGIO_BASIC_STD_SET.csv', '/Users/Benedict/Documents/iGEM/DNA-BOT-EDITING/DNA-BOT/my_examples/part_plate_2_230419.csv')
-    
 # Constant str
-# TEMPLATE_DIR_NAME = 'basic_assembly/dna_bot/template_ot2_scripts'
 TEMPLATE_DIR_NAME = 'template_ot2_scripts'
 CLIP_TEMP_FNAME = 'clip_template.py'
 MAGBEAD_TEMP_FNAME = 'purification_template.py'
@@ -69,7 +62,10 @@ SPOTTING_VOLS_DICT = {2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5}
 # Constant lists
 SOURCE_DECK_POS = ['2', '5', '8', '7', '10', '11']
 
+# labware dictionary - filled in by front end
+
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
+                'p10_type': 'p10_single', 'p300_type': 'p300_multi',
                 'well_plate': 'biorad_96_wellplate_200ul_pcr',
                 'reagent_plate': 'usascientific_12_reservoir_22ml',
                 'mag_plate': 'biorad_96_wellplate_200ul_pcr',
@@ -81,10 +77,10 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
 
-def dnabot(ethanol_well_for_stage_2, deep_well_plate_stage_4,
+def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
            input_construct_path, output_sources_paths,
-           p10_mount='right', p300_mount='left',
-           well_plate='biorad_96_wellplate_200ul_pcr',
+           p10_mount='right', p300_mount='left', p10_type='p10_single',
+           p300_type='p300_multi', well_plate='biorad_96_wellplate_200ul_pcr',
            reagent_plate='usascientific_12_reservoir_22ml',
            mag_plate='biorad_96_wellplate_200ul_pcr',
            tube_rack='opentrons_24_tuberack_nest_1.5ml_snapcap',
@@ -93,64 +89,25 @@ def dnabot(ethanol_well_for_stage_2, deep_well_plate_stage_4,
            soc_plate='usascientific_96_wellplate_2.4ml_deep',
            agar_plate='thermofisher_96_wellplate_180ul'):
 
+    '''
+        Main function, creates scripts and metainformation
+        Can take specific args or just **labware_dict for all labware
+    '''
+
     # Parent directories
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
 
-    # Obtain user input
-    print("Requesting user input, if not visible checked minimized windows.")
-    #root = tk.Tk()
-    #dnabotinst = gui.DnabotApp(root)
-    #root.mainloop()
-    #root.destroy()
-    #if dnabotinst.quit_status:
-    #    sys.exit("User specified 'QUIT' during app.")
-    #root = tk.Tk()
-
-    #First initalialising construct path
-    #construct_path = gui.UserDefinedPaths(root, 'Construct csv file')
-    #root.destroy()
-    #root = tk.Tk()
-    #sources_paths = gui.UserDefinedPaths(root, 'Sources csv files',
-    #                                     multiple_files=True)
-    
-    #if len(output_sources_paths) > len(SOURCE_DECK_POS):
-    #    raise ValueError(
-    #        'Number of source plates exceeds deck positions.')
-
-
-    # HERE YOU CAN SPECIFY THE PATH NAME AND IT WORKS
-    #construct_path.output = input_construct_path
-    #sources_paths.output = output_sources_paths
-
-    #root.destroy()
-    #print('my working directory: {}'.format(generator_dir))
-    #print('my input: {}'.format(input_construct_path))
-    #print('my short input: {}'.format(input_construct_path[1:]))
-    #icp = os.path.join(generator_dir, input_construct_path[1:])
-    #print('my isp: {}'.format(icp))
-    #diricp = os.path.dirname(icp)
-    #print('my dircp: {}'.format(diricp))
-    #os.chdir(diricp)
-    
-    input_construct_path = input_construct_path[1:]
-    #output_sources_paths = output_sources_paths[1:]
-    #os.chdir(os.path.dirname(input_construct_path))
     construct_base = os.path.basename(input_construct_path)
-
     construct_base = os.path.splitext(construct_base)[0]
-    print('User input successfully collected.')
 
-    print('Processing input csv files...')
     constructs_list = generate_constructs_list(input_construct_path)
     clips_df = generate_clips_df(constructs_list)
-    print(output_sources_paths)
     sources_dict, parts_df = generate_sources_dict(output_sources_paths)
     parts_df_temp = fill_parts_df(clips_df, parts_df)
     parts_df = parts_df_temp.copy()
 
     # calculate OT2 script variables
-    print('Calculating OT-2 variables...')
     clips_dict = generate_clips_dict(clips_df, sources_dict, parts_df)
     magbead_sample_number = clips_df['number'].sum()
     final_assembly_dict, clips_df, parts_df = generate_final_assembly_dict(
@@ -160,41 +117,53 @@ def dnabot(ethanol_well_for_stage_2, deep_well_plate_stage_4,
     spotting_tuples = generate_spotting_tuples(constructs_list,
                                                SPOTTING_VOLS_DICT)
 
-    print('Writing files...')
+    if 'multi' in p300_type.lower():
+        multi = True
+    else:
+        multi = False
+
+    full_output_path = os.path.join(generator_dir, output_folder)
+
+    if not os.path.exists(full_output_path):
+        os.makedirs(output_folder)
 
     # Write OT2 scripts
-    out_full_path_1 = generate_ot2_script(CLIP_FNAME, os.path.join(
-        template_dir_path, CLIP_TEMP_FNAME), clips_dict=clips_dict,
-        p10_mount=p10_mount, well_plate_type=well_plate,
+    out_full_path_1 = generate_ot2_script(
+        full_output_path, CLIP_FNAME,
+        os.path.join(template_dir_path, CLIP_TEMP_FNAME),
+        clips_dict=clips_dict,
+        p10_mount=p10_mount, p10_type=p10_type, well_plate_type=well_plate,
         tube_rack_type=tube_rack)
-    out_full_path_2 = generate_ot2_script(MAGBEAD_FNAME, os.path.join(
-        template_dir_path, MAGBEAD_TEMP_FNAME), p300_mount=p300_mount,
-        well_plate_type=well_plate, reagent_plate_type=reagent_plate,
-        bead_container_type=bead_container,
+
+    out_full_path_2 = generate_ot2_script(
+        full_output_path, MAGBEAD_FNAME,
+        os.path.join(template_dir_path, MAGBEAD_TEMP_FNAME),
+        p300_mount=p300_mount,
+        p300_type=p300_type, well_plate_type=well_plate,
+        reagent_plate_type=reagent_plate,
+        multi=multi, bead_container_type=bead_container,
         sample_number=magbead_sample_number,
-        # THIS IS FOR THE ETHANOL TROUGH WELL IN STEP 2
-        #ethanol_well=dnabotinst.etoh_well)
         ethanol_well=ethanol_well_for_stage_2)
 
-    out_full_path_3 = generate_ot2_script(F_ASSEMBLY_FNAME, os.path.join(
-        template_dir_path, F_ASSEMBLY_TEMP_FNAME),
+    out_full_path_3 = generate_ot2_script(
+        full_output_path, F_ASSEMBLY_FNAME,
+        os.path.join(template_dir_path, F_ASSEMBLY_TEMP_FNAME),
         final_assembly_dict=final_assembly_dict,
         tiprack_num=final_assembly_tipracks,
-        p10_mount=p10_mount, mag_plate_type=mag_plate,
+        p10_mount=p10_mount, p10_type=p10_type, mag_plate_type=mag_plate,
         tube_rack_type=tube_rack, aluminum_block_type=aluminum_block)
-    out_full_path_4 = generate_ot2_script(TRANS_SPOT_FNAME, os.path.join(
-        template_dir_path, TRANS_SPOT_TEMP_FNAME),
-        spotting_tuples=spotting_tuples,
-        #Deep well plate for Soc media during
-        #soc_well="A{}".format(dnabotinst.soc_column))
-        #previously the information about the location of the
-        soc_well="A1", p10_mount=p10_mount,
-        p300_mount=p300_mount, well_plate_type=well_plate,
-        tube_rack_type=tube_rack, soc_plate_type=soc_plate,
-        agar_plate_type=agar_plate)
 
-    out_full_path_5 = generate_ot2_script(THERMOCYCLE_FNAME, os.path.join(
-        template_dir_path, THERMOCYCLE_TEMP_NAME),
+    out_full_path_4 = generate_ot2_script(
+        full_output_path, TRANS_SPOT_FNAME,
+        os.path.join(template_dir_path, TRANS_SPOT_TEMP_FNAME),
+        spotting_tuples=spotting_tuples, soc_well="A1", p10_mount=p10_mount,
+        p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
+        well_plate_type=well_plate, tube_rack_type=tube_rack,
+        soc_plate_type=soc_plate, agar_plate_type=agar_plate)
+
+    out_full_path_5 = generate_ot2_script(
+        full_output_path, THERMOCYCLE_FNAME, 
+        os.path.join(template_dir_path, THERMOCYCLE_TEMP_NAME),
         well_plate_type=well_plate)
 
     all_my_output_paths = []
@@ -211,7 +180,7 @@ def dnabot(ethanol_well_for_stage_2, deep_well_plate_stage_4,
         pass
     else:
         random = get_random_string(20)
-        my_meta_dir = os.path.join('basic_files/output', random,
+        my_meta_dir = os.path.join(full_output_path, random,
                                    'metainformation')
         os.makedirs(my_meta_dir)
     os.chdir(my_meta_dir)
@@ -233,7 +202,6 @@ def dnabot(ethanol_well_for_stage_2, deep_well_plate_stage_4,
         f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
         f.write('\n')
         f.write('SOC column: {}'.format(deep_well_plate_stage_4))
-    print('BOT-2 generator successfully completed!')
     os.chdir(generator_dir)
 
     return all_my_output_paths
@@ -279,7 +247,6 @@ def generate_constructs_list(path):
 
     constructs_list = []
     myworkingd = os.getcwd()
-    os
     print('my working directory {}'.format(myworkingd))
     with open(path, 'r') as csvfile:
         csv_reader = csv.reader(csvfile)
@@ -366,8 +333,8 @@ def generate_sources_dict(paths):
     part_dict_list = []
     print('my paths: {}'.format(paths))
     for deck_index, path in enumerate(paths):
-        print('my path: {}'.format(path[1:]))
-        with open(path[1:], 'r') as csvfile:
+        print('my path: {}'.format(path))
+        with open(path, 'r') as csvfile:
             csv_reader = csv.reader(csvfile)
             for index, source in enumerate(csv_reader):
                 if index != 0:
@@ -446,7 +413,7 @@ def fill_parts_df(clips_df, parts_df_temp):
         else:
             parts_df.at[
                 suffix_index, 'mag_well'].extend(list(row['mag_well']))
-        
+
         parts_df.at[prefix_index, 'number'] = int(
             parts_df.at[prefix_index, 'number']) + int(row['number'])
         parts_df.at[part_index, 'number'] = int(
@@ -476,7 +443,7 @@ def fill_parts_df(clips_df, parts_df_temp):
 
 
 def generate_clips_dict(clips_df, sources_dict, parts_df):
-    """Using clips_df and sources_dict, returns a clips_dict which acts as the 
+    """Using clips_df and sources_dict, returns a clips_dict which acts as the
     sole variable for the opentrons script "clip.ot2.py".
 
     """
@@ -494,20 +461,21 @@ def generate_clips_dict(clips_df, sources_dict, parts_df):
             print('my prefix linkers: {}'.format(prefix_linker))
             print('my sources dict: {}'.format(sources_dict))
             print('my clip info {}'.format(clip_info))
-            clips_dict['prefixes_wells'].append([sources_dict[prefix_linker][0]]
-                                                * clip_info['number'])
-            clips_dict['prefixes_plates'].append(
-                [handle_2_columns(sources_dict[prefix_linker])[2]] * clip_info['number'])
+            clips_dict['prefixes_wells'].append(
+                [sources_dict[prefix_linker][0]]*clip_info['number'])
+            clips_dict['prefixes_plates'].append([handle_2_columns(
+                sources_dict[prefix_linker])[2]]*clip_info['number'])
             suffix_linker = clip_info['suffixes']
-            clips_dict['suffixes_wells'].append([sources_dict[suffix_linker][0]]
-                                                * clip_info['number'])
+            clips_dict['suffixes_wells'].append(
+                [sources_dict[suffix_linker][0]]*clip_info['number'])
             clips_dict['suffixes_plates'].append(
-                [handle_2_columns(sources_dict[suffix_linker])[2]] * clip_info['number'])
+                [handle_2_columns(
+                    sources_dict[suffix_linker])[2]]*clip_info['number'])
             part = clip_info['parts']
             clips_dict['parts_wells'].append([sources_dict[part][0]]
                                              * clip_info['number'])
-            clips_dict['parts_plates'].append([handle_2_columns(sources_dict[part])[2]]
-                                              * clip_info['number'])
+            clips_dict['parts_plates'].append([handle_2_columns(
+                sources_dict[part])[2]]*clip_info['number'])
             part_index = parts_df[parts_df['name'] == part].index.values[0]
             part_concentration = parts_df.at[part_index, 'concentration']
             if part_concentration != PART_PER_CLIP:
@@ -525,9 +493,9 @@ def generate_clips_dict(clips_df, sources_dict, parts_df):
             else:
                 clips_dict['parts_vols'].append([DEFAULT_PART_VOL] *
                                                 clip_info['number'])
-                clips_dict['water_vols'].append([max_part_vol - DEFAULT_PART_VOL]
-                                                * clip_info['number'])
-                
+                clips_dict['water_vols'].append(
+                    [max_part_vol - DEFAULT_PART_VOL]*clip_info['number'])
+
     except KeyError:
         sys.exit('likely part/linker not listed in sources.csv')
     for key, value in clips_dict.items():
@@ -648,36 +616,28 @@ def generate_spotting_tuples(constructs_list, spotting_vols_dict):
     return spotting_tuples
 
 
-def generate_ot2_script(ot2_script_path, template_path, **kwargs):
-    """Generates an ot2 script named 'ot2_script_path', where kwargs are 
-    written as global variables at the top of the script. For each kwarg, the 
-    keyword defines the variable name while the value defines the name of the 
-    variable. The remainder of template file is subsequently written below.        
+def generate_ot2_script(parent_dir, ot2_script_path, template_path, **kwargs):
+    """Generates an ot2 script named 'ot2_script_path', where kwargs are
+    written as global variables at the top of the script. For each kwarg, the
+    keyword defines the variable name while the value defines the name of the
+    variable. The remainder of template file is subsequently written below.
 
     """
-    print("output location of ot2_script_path:{}".format(ot2_script_path))
-    random = get_random_string(20)
-    print('random: {}'.format(random))
-    output_str = os.path.join('basic_files/output',random)
+    # print("output location of ot2_script_path:{}".format(ot2_script_path))
+    output_str = get_random_string(20)
 
     working_directory = os.getcwd()
-    
+
+    os.chdir(parent_dir)
+
     os.makedirs(output_str)
-    os.chdir(output_str)
+    full_dir = os.path.join(parent_dir, output_str)
+    os.chdir(full_dir)
 
-    full_file_path = os.path.join(output_str, ot2_script_path)
+    full_file_path = os.path.join(full_dir, ot2_script_path)
 
-
-
-    #print('output string: {}'.format(output_str))
-    #print(os.path.realpath(output_str))
     this_object_output_path = os.path.realpath(full_file_path)
 
-    #current_path = os.getcwd()
-    #remove_example = os.path.split("my_examples")
-    #writing_path = os.path.join(current_path, "output")
-    #output_path = os.path.join(writing_path, ot2_script_path)
-    
     with open(ot2_script_path, 'w') as wf:
         with open(template_path, 'r') as rf:
             for index, line in enumerate(rf):
@@ -706,9 +666,9 @@ def generate_ot2_script(ot2_script_path, template_path, **kwargs):
 
 
 def generate_master_mix_df(clip_number):
-    """Generates a dataframe detailing the components required in the clip 
-    reaction master mix.
-
+    """
+        Generates a dataframe detailing the components required in the clip 
+        reaction master mix.
     """
     COMPONENTS = {'Component': ['Promega T4 DNA Ligase buffer, 10X',
                                 'Water', 'NEB BsaI-HFv2',
@@ -781,12 +741,20 @@ def handle_2_columns(datalist):
 def get_random_string(length):
     letters = string.ascii_lowercase
     result_str = ''.join(random.choice(letters) for i in range(length))
-    #print("Random string of length", length, "is:", result_str)
     return result_str
 
 
-# dnabot('A11', '1', " C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv", [" C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv", " C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/part_plate_2_230419.csv"],
-       # **labware_dict)
+'''
+Uncomment out everything in the comment below this to run command line version.
+Enter your own construct path and enter your part path or paths as a list
+'''
+'''
+output_folder_name = 'test-output'
+ethanol_well = 'A11'
+deep_well = '1'
+construct_path = "C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv"
+part_paths = ["C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv", "C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/part_plate_2_230419.csv"]
 
-# dnabot('A11', '1', " C:/Users/gabri/Documents/Uni/iGEM/opencellrun/basic_constructs.csv", [" C:/Users/gabri/Documents/Uni/iGEM/opencellrun/basic_parts_linkers.csv"],
-# **labware_dict)
+dnabot(output_folder_name, ethanol_well, deep_well, construct_path, part_paths,
+       **labware_dict)
+'''

@@ -21,12 +21,14 @@ metadata = {'apiLevel': '2.2',
 def run(protocol: protocol_api.ProtocolContext):
     def bbassemble(source_to_digest, digest_to_storage, digest_to_construct,
                    reagent_to_digest, reagent_to_construct, p10_mount='right',
+                   p10_type='p10_single',
                    well_plate_type='biorad_96_wellplate_200ul_pcr',
-                   tube_rack_type='opentrons_24_tuberack_nest_1.5ml_snapcap'):
+                   tube_rack_type='opentrons_24_tuberack_nest_1.5ml_snapcap',
+                   thermocycle=True):
         # Define constants
         CANDIDATE_TIPRACK_SLOT = '3'
         TIPRACK_TYPE = 'opentrons_96_tiprack_10ul'
-        PIPETTE_TYPE = 'p10_single'
+        PIPETTE_TYPE = p10_type
         PIPETTE_MOUNT = p10_mount
         SOURCE_PLATE_TYPE = well_plate_type
         SOURCE_PLATE_POSITION = '2'
@@ -41,9 +43,12 @@ def run(protocol: protocol_api.ProtocolContext):
         tip_rack = protocol.load_labware(TIPRACK_TYPE, CANDIDATE_TIPRACK_SLOT)
         pipette = protocol.load_instrument(PIPETTE_TYPE, PIPETTE_MOUNT,
                                            tip_racks=[tip_rack])
-        tc_mod = protocol.load_module('Thermocycler Module')
-        dest_plate = tc_mod.load_labware(DESTINATION_PLATE_TYPE)
-        tc_mod.open_lid()
+        if thermocycle:
+            tc_mod = protocol.load_module('Thermocycler Module')
+            dest_plate = tc_mod.load_labware(DESTINATION_PLATE_TYPE)
+            tc_mod.open_lid()
+        else:
+            dest_plate = protocol.load_labware(DESTINATION_PLATE_TYPE, '7')
 
         '''
             Digestion procedure:
@@ -81,15 +86,28 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.mix(5, 10, digest_well)
             pipette.drop_tip()
 
-        tc_mod.close_lid()
-        profile1 = [{'temperature': 37, 'hold_time_seconds': 600},
-                    {'temperature': 80, 'hold_time_seconds': 1200}]
-        tc_mod.execute_profile(steps=profile1, repetitions=1)
+        if thermocycle:
+            protocol.comment("--------------------------------------------")
+            protocol.comment("Running thermocycler")
+            protocol.comment("--------------------------------------------")
+            tc_mod.close_lid()
+            profile1 = [{'temperature': 37, 'hold_time_seconds': 600},
+                        {'temperature': 80, 'hold_time_seconds': 1200}]
+            tc_mod.execute_profile(steps=profile1, repetitions=1)
+            tc_mod.open_lid()
+        else:
+            protocol.comment(
+                'Seal the reaction plate with adhesive film and remove.')
+            protocol.comment(
+                'Thermocycle the reaction plate on a benchtop thermocycler.')
+            protocol.comment('Use the following thermocycler settings:')
+            protocol.comment(
+                '1 cycle of 37°C for 5 minutes and 80°C for 10 minutes')
+            protocol.comment('Return the reaction plate to position 7.')
 
         '''
             Ligation procedure:
         '''
-        tc_mod.open_lid()
 
         for digest_well in digest_to_construct.keys():
             digest_plate_well = dest_plate.wells_by_name()[digest_well]
@@ -131,12 +149,28 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.mix(5, 10, construct_well)
             pipette.drop_tip()
 
-        tc_mod.close_lid()
-        profile2 = [{'temperature': 25, 'hold_time_seconds': 600},
-                    {'temperature': 80, 'hold_time_seconds': 1200}]
-        tc_mod.execute_profile(steps=profile2, repetitions=1)
-        tc_mod.open_lid()
+        if thermocycle:
+            protocol.comment("--------------------------------------------")
+            protocol.comment("Running thermocycler")
+            protocol.comment("--------------------------------------------")
+            tc_mod.close_lid()
+            profile2 = [{'temperature': 25, 'hold_time_seconds': 600},
+                        {'temperature': 80, 'hold_time_seconds': 1200}]
+            tc_mod.execute_profile(steps=profile2, repetitions=1)
+            tc_mod.open_lid()
+
+        else:
+            protocol.comment(
+                'Seal the reaction plate with adhesive film and remove.')
+            protocol.comment(
+                'Thermocycle the reaction plate on a benchtop thermocycler.')
+            protocol.comment('Use the following thermocycler settings:')
+            protocol.comment(
+                '1 cycle of 25°C for 5 minutes and 80°C for 10 minutes')
+            protocol.comment('Return the reaction plate to position 7.')
 
     bbassemble(source_to_digest, digest_to_storage, digest_to_construct,
                reagent_to_digest, reagent_to_construct, p10_mount=p10_mount,
-               well_plate_type=well_plate_type, tube_rack_type=tube_rack_type)
+               p10_type=p10_type,
+               well_plate_type=well_plate_type, tube_rack_type=tube_rack_type,
+               thermocycle=thermocycle)

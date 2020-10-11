@@ -7,10 +7,10 @@ metadata = {'apiLevel': '2.2',
 
 
 # Labware constants
-PIPETTE_TYPE = 'p10_single'
+PIPETTE_TYPE = p10_type
 # PIPETTE_MOUNT = 'right'
 PIPETTE_MOUNT = p10_mount
-PIPETTE_TYPE2 = 'p300_single'
+PIPETTE_TYPE2 = p300_type
 PIPETTE_MOUNT2 = p300_mount
 # PIPETTE_MOUNT2 = 'left'
 # DESTINATION_PLATE_TYPE = 'corning_96_wellplate_360ul_flat'

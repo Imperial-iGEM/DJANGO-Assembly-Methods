@@ -22,7 +22,11 @@ class ParserSBOL:
         linkerFile: Document = Document("./examples/sbol/basic_linkers_standard.xml")
     ):
         self.doc = sbolDocument
-        self.linkerFile = linkerFile
+        if linkerFile is None:
+            filepath = "../examples/sbol/basic_linkers_standard.xml"
+            self.linkerFile = Document(filepath)
+        else:
+            self.linkerFile = linkerFile
 
     def generateCsv_for_DNABot(
             self,
@@ -30,7 +34,7 @@ class ParserSBOL:
             repeat: bool = None,
             maxWellsFilled: int = None,
             numRuns: int = None
-    ):
+    ) -> List[str]:
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
         """
@@ -39,6 +43,7 @@ class ParserSBOL:
         numSamples = maxWellsFilled * numRuns
         repeat = False if repeat is None else True
         allConstructs = []
+        print("Assembly Method: BASIC")
         # Get list of constructs
         allConstructs = self.getListOfConstructs()
         # Remove constructs with repeated parts using a filter
@@ -64,10 +69,12 @@ class ParserSBOL:
             plateo.containers.Plate96,
             maxWellsFilled
         )
+        uniqueIds = []
         # Create construct and parts/linkers CSVs from plateo plates
         for plate in constructPlates:
             # Create UUID
             uniqueId = uuid.uuid4().hex
+            uniqueIds.append(uniqueId)
             # Create new directory
             outdir = "./" + uniqueId
             if not os.path.exists(outdir):
@@ -81,6 +88,7 @@ class ParserSBOL:
                 dictOfParts,
                 uniqueId
             )
+        return uniqueIds
 
     def generateCsv_for_MoClo(
         self,
@@ -88,12 +96,13 @@ class ParserSBOL:
         repeat: bool = None,
         maxWellsFilled: int = None,
         numRuns: int = None
-    ):
+    ) -> List[str]:
         maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
         numRuns = 1 if numRuns is None else numRuns
         numSamples = maxWellsFilled * numRuns
         repeat = False if repeat is None else True
         allConstructs = []
+        print("Assembly Method: MoClo")
         # Get list of constructs
         allConstructs = self.getListOfConstructs()
         # Remove constructs with repeated parts using a filter
@@ -119,10 +128,11 @@ class ParserSBOL:
             plateo.containers.Plate96,
             maxWellsFilled
         )
-        # TODO: Custom csv generation for moclo
+        uniqueIds = []
         for plate in constructPlates:
             # Create UUID
             uniqueId = uuid.uuid4().hex
+            uniqueIds.append(uniqueId)
             # Create new directory
             outdir = "./" + uniqueId
             if not os.path.exists(outdir):
@@ -136,6 +146,66 @@ class ParserSBOL:
                 dictOfParts,
                 uniqueId
             )
+        return uniqueIds
+
+    def generateCsv_for_BioBricks(
+        self,
+        dictOfParts: Dict[str, float] = None,
+        repeat: bool = None,
+        maxWellsFilled: int = None,
+        numRuns: int = None
+    ) -> List[str]:
+        # TODO: Can be improved for hierarchical assembly (multiple runs)
+        maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
+        numRuns = 1 if numRuns is None else numRuns
+        numSamples = maxWellsFilled * numRuns
+        repeat = False if repeat is None else True
+        allConstructs = []
+        print("Assembly Method: BBF RFC 10")
+        # Get list of constructs
+        allConstructs = self.getListOfConstructs()
+        # Remove constructs with repeated parts using a filter
+        if not repeat:
+            allConstructs = self.filterConstructs(allConstructs)
+        # Sample constructs
+        if len(allConstructs) < numSamples:
+            numSamples = len(allConstructs)
+            print(
+                "Number of constructs specified is greater than number "
+                "of constructs contained within SBOL Document provided."
+            )
+            print("All constructs will be assembled.")
+        sampled = sample(allConstructs, numSamples)
+        # Display number of Component Definitions to be constructed
+        numberOfDesigns = len(sampled)
+        print(numberOfDesigns, "construct(s) will be assembled.")
+        # Create plateo construct plates
+        constructPlates = self.fillPlateoPlates(
+            sampled,
+            "Construct",
+            numRuns,
+            plateo.containers.Plate96,
+            maxWellsFilled
+        )
+        uniqueIds = []
+        for plate in constructPlates:
+            # Create UUID
+            uniqueId = uuid.uuid4().hex
+            uniqueIds.append(uniqueId)
+            # Create new directory
+            outdir = "./" + uniqueId
+            if not os.path.exists(outdir):
+                os.mkdir(outdir)
+            # Create construct CSV
+            self.getConstructCsvFromPlateoPlate(plate, "BioBricks", uniqueId)
+            # Write parts/linkers csv
+            self.getPartLinkerCsvFromPlateoPlate(
+                plate,
+                "BioBricks",
+                dictOfParts,
+                uniqueId
+            )
+        return uniqueIds
 
     def getRootComponentDefinitions(
             self,
@@ -684,10 +754,7 @@ class ParserSBOL:
                     )
         listOfParts = list(dict.fromkeys(listOfParts))
         # Get list of linkers from linkerfile
-        # FIXME: linker sbol document not read properly by pysbol2
         linkers = self.getRootComponentDefinitions(self.linkerFile)
-        # Temp workaround: Remove suffixes and prefixes manually
-        linkers = [linker for linker in linkers if "_" not in linker.displayId]
         # Convert linkers into linker suffix and prefix and add to new list
         newListOfParts = []
         for part in listOfParts:
@@ -949,22 +1016,41 @@ class ParserSBOL:
         Args:
             constructPlate (plateo.Plate): Plateo plate containing constructs
         Returns:
-            dict: Dictionary of wells containing constructs
+            dict: Dictionary of wells containing components
         '''
+        # TODO: Perform checks on all constructs instead of sampled?
         dictWellComponent = {}
         for wellname, well in constructPlate.wells.items():
             for key, value in well.data.items():
                 # Move linker at last position to front of the list
                 primaryStructure = value.getPrimaryStructure()
                 if assembly == "BASIC":
+                    # Check part-linker order
                     if not self.is_linkers_order_correct(value):
+                        # Shift linker to front
                         primaryStructure.insert(0, primaryStructure.pop())
-                dictWellComponent[wellname] = primaryStructure
+                    dictWellComponent[wellname] = primaryStructure
+                elif assembly == "MoClo":
+                    dictWellComponent[wellname] = primaryStructure
+                elif assembly == "BioBricks":
+                    # TODO: Confirm whether construct name is needed
+                    # Check if valid biobrick construct
+                    if self.validateBioBricksConstruct(value):
+                        # Check if first component is a plasmid vector:
+                        plasmidVector = "http://identifiers.org/so/SO:0000755"
+                        if plasmidVector in primaryStructure[0].roles:
+                            # Shift backbone to last component
+                            primaryStructure.insert(2, primaryStructure.pop(0))
+                        dictWellComponent[wellname] = {
+                            'Construct': value,
+                            'Parts': primaryStructure
+                        }
         return dictWellComponent
 
     def getListFromWellComponentDict(
         self,
-        dictWellComponent: Dict[str, ComponentDefinition]
+        dictWellComponent: Dict[str, ComponentDefinition],
+        assembly: str
     ) -> List[str]:
         '''Get a concatenated list of wellname and components (as display ID)
         comprising the construct from the dictionary of wells containing
@@ -976,7 +1062,14 @@ class ParserSBOL:
         '''
         listWellComponent = []
         for k, v in dictWellComponent.items():
-            listWellComponent.append([k, *(x.displayId for x in v)])
+            if assembly == "BioBricks":
+                listWellComponent.append([
+                    v['Construct'].displayId,
+                    k,
+                    *(x.displayId for x in v['Parts'])
+                ])
+            else:
+                listWellComponent.append([k, *(x.displayId for x in v)])
         return listWellComponent
 
     def getConstructDfFromPlateoPlate(
@@ -995,7 +1088,7 @@ class ParserSBOL:
         dictWellComponent = \
             self.getWellComponentDictFromPlateoPlate(constructPlate, assembly)
         listWellComponent = \
-            self.getListFromWellComponentDict(dictWellComponent)
+            self.getListFromWellComponentDict(dictWellComponent, assembly)
         # Create sparse array from list
         sparr = pd.arrays.SparseArray(listWellComponent)
         if assembly == "BASIC":
@@ -1008,7 +1101,9 @@ class ParserSBOL:
             df = pd.DataFrame(data=sparr)
             df = df.iloc[:, 1:]
         elif assembly == "BioBricks":
-            raise NotImplementedError
+            header = ["Construct", "Well", "upstream", "downstream", "plasmid"]
+            # Create df from sparr
+            df = pd.DataFrame(data=sparr, columns=header)
         return df
 
     def getConstructCsvFromPlateoPlate(
@@ -1029,7 +1124,7 @@ class ParserSBOL:
             prefix = "./" + uniqueId + "/"
         else:
             prefix = ""
-        if assembly == "BASIC":
+        if assembly == "BASIC" or "BioBricks":
             constructDf.to_csv(
                 prefix + "construct.csv",
                 index=False,
@@ -1040,8 +1135,6 @@ class ParserSBOL:
                 index=False,
                 header=False
             )
-        elif assembly == "BioBricks":
-            raise NotImplementedError
 
     def isLinker(
         self,
@@ -1182,6 +1275,13 @@ class ParserSBOL:
                     filepath,
                     headers=False
                 )
+            elif assembly == "BioBricks":
+                # Create df
+                partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
+                partLinkerDf.to_csv(
+                    prefix + "parts_" + str(partPlates.index(plate) + 1) + ".csv",
+                    index=False
+                )
 
     def is_linkers_order_correct(
         self,
@@ -1195,13 +1295,8 @@ class ParserSBOL:
         def _get_linker_names():
             """ Open standard linker document and extract all displayIds """
             # Get list of linkers from linkerfile
-            # FIXME: linker sbol document not read properly by pysbol2
             linkers = self.getRootComponentDefinitions(self.linkerFile)
-            # Temp workaround: Remove suffixes and prefixes manually
-            linkers = [
-                linker.displayId
-                for linker in linkers if "_" not in linker.displayId
-            ]
+            linkers = [linker.displayId for linker in linkers]
             return linkers
 
         # Compare each part displayId in 'construct' to available linkers
@@ -1237,3 +1332,31 @@ class ParserSBOL:
             return True
         else:
             return False
+
+    def validateBioBricksConstruct(
+        self,
+        construct: ComponentDefinition
+    ) -> bool:
+        primary_structure = construct.getPrimaryStructure()
+        # Check that there are only 3 parts in the construct
+        if len(primary_structure) != 3:
+            raise ValueError(
+                "There can only be 3 components in each construct"
+            )
+        # Check that construct contains a backbone
+        containsPlasmid = False
+        plasmidVector = "http://identifiers.org/so/SO:0000755"
+        for cd in primary_structure:
+            if plasmidVector in cd.roles:
+                containsPlasmid = True
+        if not containsPlasmid:
+            raise ValueError(
+                "Construct must contain plasmid vector"
+            )
+        # Check that backbone is not between parts
+        midComponent = primary_structure[1]
+        if plasmidVector in midComponent.roles:
+            raise ValueError(
+                "Backbone should not be between parts"
+            )
+        return True

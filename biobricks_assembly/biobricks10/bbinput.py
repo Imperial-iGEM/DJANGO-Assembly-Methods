@@ -5,6 +5,7 @@ import math
 import pandas as pd
 
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
+                'p10_type': 'p10_single', 'p300_type': 'p300_single',
                 'well_plate': 'biorad_96_wellplate_200ul_pcr',
                 'tube_rack': 'opentrons_24_tuberack_nest_1.5ml_snapcap',
                 'soc_plate': 'usascientific_96_wellplate_2.4ml_deep',
@@ -35,19 +36,14 @@ def main():
     transformation_template_path = os.path.join(template_dir_path,
                                                 'bbtransformationtemplate.py')
     output_path = os.path.join(generator_dir, OUTPUT_DIR_NAME)
+    thermocycle = False
     constructs, dest_well_list = get_constructs(
         os.path.join(generator_dir, 'examples/constructs.csv'))
     parts = get_parts(os.path.join(generator_dir, 'examples/parts.csv'),
                       constructs)
-    reagents, reagents_well_list = get_reagents_wells(constructs, parts)
+    reagents, reagents_well_list, mm_df = get_reagents_wells(constructs, parts)
     digest_loc, parts_df = get_digests(constructs, parts, reagents_well_list,
                                        dest_well_list, reagents)
-    parts_df.to_csv(path_or_buf=os.path.join(output_path,
-                                             'parts_df.csv'), index=False)
-    reagents.to_csv(path_or_buf=os.path.join(output_path,
-                                             'reagents_df.csv'), index=False)
-    digest_loc.to_csv(path_or_buf=os.path.join(output_path,
-                                               'digests_df.csv'), index=False)
 
     source_to_digest, reagent_to_digest, digest_to_storage, \
         digest_to_construct, reagent_to_construct = create_assembly_dicts(
@@ -57,17 +53,15 @@ def main():
                              digest_to_storage, digest_to_construct,
                              reagent_to_construct,
                              p10_mount=labware_dict['p10_mount'],
+                             p10_type=labware_dict['p10_type'],
                              well_plate_type=labware_dict['well_plate'],
-                             tube_rack_type=labware_dict['tube_rack'])
+                             tube_rack_type=labware_dict['tube_rack'],
+                             thermocycle=thermocycle)
 
     competent_source_to_dest, control_source_to_dest, \
         assembly_source_to_dest, water_source_to_dest, transform_df \
         = create_tranformation_dicts(constructs, water_well='A1',
                                      controls_per_cons=False)
-
-    transform_df.to_csv(path_or_buf=os.path.join(output_path,
-                                                 'transform_df.csv'),
-                        index=False)
 
     create_transformation_protocol(transformation_template_path, output_path,
                                    competent_source_to_dest,
@@ -76,10 +70,21 @@ def main():
                                    water_source_to_dest,
                                    p10_mount=labware_dict['p10_mount'],
                                    p300_mount=labware_dict['p300_mount'],
+                                   p10_type=labware_dict['p10_type'],
+                                   p300_type=labware_dict['p300_type'],
                                    well_plate_type=labware_dict['well_plate'],
                                    transformation_plate_type=labware_dict['transformation_plate'],
                                    tube_rack_type=labware_dict['tube_rack'],
                                    soc_plate_type=labware_dict['soc_plate'])
+
+    labwareDf = pd.DataFrame(
+        data={'name': list(labware_dict.keys()),
+              'definition': list(labware_dict.values())})
+
+    dfs_to_csv(os.path.join(output_path, 'bb_metainformation.csv'),
+               index=False, PARTS_INFO=parts_df, REAGENTS=reagents,
+               MASTER_MIX=mm_df, DIGESTS=digest_loc, CONSTRUCTS=constructs,
+               LABWARE=labwareDf)
 
 
 def get_constructs(path):
@@ -188,15 +193,28 @@ def get_reagents_wells(constructs_list, parts):
         as the reagent well and the volume of the reagent required.
     '''
     reagents_well_list = []
-    reagents = ['water', 'NEBBuffer10X', 'T4Ligase10X', 'T4Ligase',
-                'EcoRI-HF', 'SpeI', 'XbaI', 'PstI']
+    ''' mm_upstream = digest master mix for upstream dna digests
+        * 1 uL EcoRI-HF
+        * 1 uL SpeI
+        * 5 uL NEB Buffer 10X
+        mm_downstream = digest master mix for downstream dna digests
+        * 1 uL XbaI
+        * 1 uL PstI
+        * 5 uL NEB Buffer 10X
+        mm_plasmid = digest master mix for plasmid digests
+        * 1 uL EcoRI-HF
+        * 1 uL PstI
+        * 5 uL NEB Buffer 10X
+    '''
+    reagents = ['water', 'mm_upstream', 'mm_downstream', 'mm_plasmid',
+                'T4Ligase10X', 'T4Ligase']
     reagents_list = []
     no_cons = len(constructs_list)
     no_plasmids = 0
     no_upstream = 0
     no_downstream = 0
     total_water_vol = parts['water_vol_tot'].sum()
-    total_digests = parts['digests'].sum()
+    mm_vol_per_digest = 2*ENZ_VOL + NEB_BUFFER_10X_VOL
     for _, roles in parts['roles'].iteritems():
         if 'plasmid' in roles:
             no_plasmids += 1
@@ -205,12 +223,11 @@ def get_reagents_wells(constructs_list, parts):
         if 'downstream' in roles:
             no_downstream += 1
     total_water_vol = total_water_vol + no_cons*WATER_VOL_LIG
-    total_volumes = [total_water_vol, NEB_BUFFER_10X_VOL*total_digests,
+    total_volumes = [total_water_vol, mm_vol_per_digest*(no_upstream + 2),
+                     mm_vol_per_digest*(no_downstream + 2),
+                     mm_vol_per_digest*(no_plasmids + 2),
                      T4_LIGASE_VOL_10X*no_cons,
                      T4_LIGASE_VOL*no_cons,
-                     ENZ_VOL*(no_upstream + no_plasmids),
-                     ENZ_VOL*no_upstream, ENZ_VOL*no_downstream,
-                     ENZ_VOL*(no_downstream + no_plasmids),
                      ]
     for i in range(len(reagents)):
         reagents_dict = {}
@@ -220,7 +237,32 @@ def get_reagents_wells(constructs_list, parts):
         reagents_dict['well'] = [new_well]
         reagents_dict['total_vol'] = [total_volumes[i]]
         reagents_list.append(pd.DataFrame.from_dict(reagents_dict))
-    return pd.concat(reagents_list, ignore_index=True), reagents_well_list
+
+    neb_upstream_vol = NEB_BUFFER_10X_VOL*(no_upstream + 2)
+    neb_downstream_vol = NEB_BUFFER_10X_VOL*(no_downstream + 2)
+    neb_plasmid_vol = NEB_BUFFER_10X_VOL*(no_plasmids + 2)
+
+    EcoRI_upstream_vol = ENZ_VOL*(no_upstream + 2)
+    SpeI_upstream_vol = EcoRI_upstream_vol
+
+    XbaI_downstream_vol = ENZ_VOL*(no_downstream + 2)
+    PstI_downstream_vol = XbaI_downstream_vol
+
+    EcoRI_plasmid_vol = ENZ_VOL*(no_plasmids + 2)
+    PstI_plasmid_vol = EcoRI_plasmid_vol
+
+    mm_df = pd.DataFrame(
+        data={'reagent': ['NEB Buffer 10X', 'EcoRI-HF', 'SpeI', 'XbaI',
+                          'PstI'],
+              'volume in upstream mm': [neb_upstream_vol, EcoRI_upstream_vol,
+                                        SpeI_upstream_vol, 0, 0],
+              'volume in downstream mm': [neb_downstream_vol, 0, 0,
+                                          XbaI_downstream_vol,
+                                          PstI_downstream_vol],
+              'volume in plasmid mm': [neb_plasmid_vol, EcoRI_plasmid_vol,
+                                       0, 0, PstI_plasmid_vol]})
+    return pd.concat(reagents_list, ignore_index=True), reagents_well_list, \
+        mm_df
 
 
 def get_digests(constructs_list, parts, reagents_wells_used, dest_wells_used,
@@ -328,16 +370,24 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
     digest_to_storage = {}
 
     # water well
-    reagent_to_digest['A1'] = []  # water
+    water_index = reagents[reagents['name'] == 'water'].index.values[0]
+    water_well = reagents.at[water_index, 'well']
+    reagent_to_digest[water_well] = []
 
-    digest_wells = tuple(digests['dest_well'].to_list())
-    NEBVols = tuple([int(NEB_BUFFER_10X_VOL)]*len(digests))
-    reagent_to_digest['A2'] = [*zip(digest_wells, NEBVols)]
+    mm_upstream_index = reagents[reagents[
+        'name'] == 'mm_upstream'].index.values[0]
+    mm_upstream_well = reagents.at[mm_upstream_index, 'well']
+    reagent_to_digest[mm_upstream_well] = []
 
-    reagent_to_digest['A5'] = []
-    reagent_to_digest['A6'] = []
-    reagent_to_digest['B1'] = []
-    reagent_to_digest['B2'] = []
+    mm_downstream_index = reagents[
+        reagents['name'] == 'mm_downstream'].index.values[0]
+    mm_downstream_well = reagents.at[mm_downstream_index, 'well']
+    reagent_to_digest[mm_downstream_well] = []
+
+    mm_plasmid_index = reagents[
+        reagents['name'] == 'mm_plasmid'].index.values[0]
+    mm_plasmid_well = reagents.at[mm_plasmid_index, 'well']
+    reagent_to_digest[mm_plasmid_well] = []
 
     for i, digest in digests.iterrows():
         part_idx = parts[parts['name'] == digest['part']].index.values
@@ -350,18 +400,18 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
                 source_to_digest[str(digest['source_well'])].append((
                         digest['dest_well'], int(parts['part_vol'][idx])))
 
-            reagent_to_digest['A1'].append((digest['dest_well'],
-                                            int(parts['water_vol'][idx])))
+            reagent_to_digest[water_well].append(
+                (digest['dest_well'], int(parts['water_vol'][idx])))
 
         if digest['role'] == 'upstream':
-            reagent_to_digest['A5'].append((digest['dest_well'], int(ENZ_VOL)))
-            reagent_to_digest['A6'].append((digest['dest_well'], int(ENZ_VOL)))
+            reagent_to_digest[mm_upstream_well].append(
+                (digest['dest_well'], int(2*ENZ_VOL + NEB_BUFFER_10X_VOL)))
         elif digest['role'] == 'downstream':
-            reagent_to_digest['B1'].append((digest['dest_well'], int(ENZ_VOL)))
-            reagent_to_digest['B2'].append((digest['dest_well'], int(ENZ_VOL)))
+            reagent_to_digest[mm_downstream_well].append(
+                (digest['dest_well'], int(2*ENZ_VOL + NEB_BUFFER_10X_VOL)))
         elif digest['role'] == 'plasmid':
-            reagent_to_digest['A5'].append((digest['dest_well'], int(ENZ_VOL)))
-            reagent_to_digest['B2'].append((digest['dest_well'], int(ENZ_VOL)))
+            reagent_to_digest[mm_plasmid_well].append(
+                (digest['dest_well'], int(2*ENZ_VOL + NEB_BUFFER_10X_VOL)))
 
         storage_vol = FILL_VOL - DIGEST_TO_CONS_VOL
         digest_to_storage[str(digest['dest_well'])] = [(
@@ -377,11 +427,16 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
                             digest['construct_wells'][0], DIGEST_TO_CONS_VOL)]
 
     construct_wells = tuple(constructs['well'].to_list())
-    reagent_to_construct['A1'] = [*zip(construct_wells, tuple(
+    reagent_to_construct[water_well] = [*zip(construct_wells, tuple(
                                     [WATER_VOL_LIG]*len(constructs)))]
-    reagent_to_construct['A3'] = [*zip(construct_wells, tuple(
+    T4_ligase_10X_index = reagents[
+        reagents['name'] == 'T4Ligase10X'].index.values[0]
+    T4_ligase_10X_well = reagents.at[T4_ligase_10X_index, 'well']
+    T4_ligase_index = reagents[reagents['name'] == 'T4Ligase'].index.values[0]
+    T4_ligase_well = reagents.at[T4_ligase_index, 'well']
+    reagent_to_construct[T4_ligase_10X_well] = [*zip(construct_wells, tuple(
                                     [T4_LIGASE_VOL_10X]*len(constructs)))]
-    reagent_to_construct['A4'] = [*zip(construct_wells, tuple(
+    reagent_to_construct[T4_ligase_well] = [*zip(construct_wells, tuple(
                                     [T4_LIGASE_VOL]*len(constructs)))]
     return source_to_digest, reagent_to_digest, digest_to_storage, \
         digest_to_construct, reagent_to_construct
@@ -477,7 +532,8 @@ def create_tranformation_dicts(constructs, water_well='A1',
 def create_assembly_protocol(template_path, output_path, source_to_digest,
                              reagent_to_digest, digest_to_storage,
                              digest_to_construct, reagent_to_construct,
-                             p10_mount, well_plate_type, tube_rack_type):
+                             p10_mount, p10_type, well_plate_type,
+                             tube_rack_type, thermocycle):
     with open(template_path) as template_file:
         template_string = template_file.read()
     with open(os.path.join(output_path, 'bb_assembly_protocol.py'),
@@ -494,8 +550,10 @@ def create_assembly_protocol(template_path, output_path, source_to_digest,
         protocol_file.write('reagent_to_construct = '
                             + json.dumps(reagent_to_construct) + '\n\n')
         protocol_file.write('p10_mount = "' + p10_mount + '"\n\n')
+        protocol_file.write('p10_type = "' + p10_type + '"\n\n')
         protocol_file.write('well_plate_type = "' + well_plate_type + '"\n\n')
         protocol_file.write('tube_rack_type = "' + tube_rack_type + '"\n\n')
+        protocol_file.write('thermocycle = ' + str(thermocycle) + '\n\n')
 
         # Paste the rest of the protocol.
         protocol_file.write(template_string)
@@ -506,7 +564,8 @@ def create_transformation_protocol(template_path, output_path,
                                    control_source_to_dest,
                                    assembly_source_to_dest,
                                    water_source_to_dest, p10_mount,
-                                   p300_mount, well_plate_type,
+                                   p300_mount, p10_type, p300_type,
+                                   well_plate_type,
                                    transformation_plate_type,
                                    tube_rack_type,
                                    soc_plate_type):
@@ -526,6 +585,8 @@ def create_transformation_protocol(template_path, output_path,
                             + json.dumps(water_source_to_dest) + '\n\n')
         protocol_file.write('p10_mount = "' + p10_mount + '"\n\n')
         protocol_file.write('p300_mount = "' + p300_mount + '"\n\n')
+        protocol_file.write('p10_type = "' + p10_type + '"\n\n')
+        protocol_file.write('p300_type = "' + p300_type + '"\n\n')
         protocol_file.write('well_plate_type = "' + well_plate_type + '"\n\n')
         protocol_file.write('transformation_plate_type = "' + transformation_plate_type + '"\n\n')
         protocol_file.write('tube_rack_type = "' + tube_rack_type + '"\n\n')
@@ -533,6 +594,20 @@ def create_transformation_protocol(template_path, output_path,
 
         # Paste the rest of the protocol.
         protocol_file.write(template_string)
+
+
+def dfs_to_csv(path, index=True, **kw_dfs):
+    """Generates a csv file defined by path, where kw_dfs are 
+    written one after another with each key acting as a title. If index=True,
+    df indexes are written to the csv file.
+
+    """
+    with open(path, 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        for key, value in kw_dfs.items():
+            csvwriter.writerow([str(key)])
+            value.to_csv(csvfile, index=index)
+            csvwriter.writerow('')
 
 
 if __name__ == '__main__':

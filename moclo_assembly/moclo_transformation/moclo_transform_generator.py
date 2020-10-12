@@ -4,7 +4,6 @@ import os
 import csv
 import json
 import pandas as pd
-from datetime import datetime
 
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'p10_type': 'p10_single', 'p300_type': 'p300_multi',
@@ -34,15 +33,10 @@ def moclo_function(output_folder, construct_path, part_path,
                    agar_plate='thermofisher_96_wellplate_180ul'):
 
     current_dir = os.getcwd()
-    output_str = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
-    if len(output_folder) > 0:
-        output_path = os.path.join(output_folder, output_str)
-    else:
-        output_path = output_str
-    full_output_path = os.path.join(OUTPUT_DIR, output_path)
+    full_output_path = os.path.join(OUTPUT_DIR, output_folder)
     if not os.path.exists(full_output_path):
         os.chdir(OUTPUT_DIR)
-        os.makedirs(output_path)
+        os.makedirs(output_folder)
         os.chdir(current_dir)
 
     # Online

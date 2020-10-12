@@ -22,7 +22,6 @@ from .mplates import final_well
 # from mplates import final_well
 import random
 import string
-from datetime import datetime
 
 # Constant str
 TEMPLATE_DIR_NAME = 'template_ot2_scripts'
@@ -133,17 +132,7 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     else:
         multi = False
 
-    if len(output_folder) > 0:
-
-        full_output_path = os.path.join(OUTPUT_DIR, output_folder)
-
-        if not os.path.exists(full_output_path):
-            os.chdir(OUTPUT_DIR)
-            os.makedirs(output_folder)
-            os.chdir(generator_dir)
-
-    else:
-        full_output_path = OUTPUT_DIR
+    full_output_path = os.path.join(OUTPUT_DIR, output_folder)
 
     # Write OT2 scripts
     out_full_path_1 = generate_ot2_script(
@@ -197,10 +186,9 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     if 'metainformation' in os.listdir():
         pass
     else:
-        output_path = os.path.split(out_full_path_5)[0]
-        my_meta_dir = os.path.join(output_path, 'metainformation')
+        my_meta_dir = os.path.join(full_output_path, 'metainformation')
         os.makedirs(my_meta_dir)
-    os.chdir(my_meta_dir)
+        os.chdir(my_meta_dir)
     master_mix_df = generate_master_mix_df(clips_df['number'].sum())
     sources_paths_df = generate_sources_paths_df(
         output_sources_paths, SOURCE_DECK_POS)
@@ -640,22 +628,11 @@ def generate_ot2_script(parent_dir, ot2_script_path, template_path, **kwargs):
     variable. The remainder of template file is subsequently written below.
 
     """
-    # print("output location of ot2_script_path:{}".format(ot2_script_path))
-    # output_str = get_random_string(20)
-    output_str = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
-
     working_directory = os.getcwd()
 
     os.chdir(parent_dir)
 
-    full_dir = os.path.join(parent_dir, output_str)
-
-    if not os.path.exists(full_dir):
-        os.makedirs(output_str)
-
-    os.chdir(full_dir)
-
-    full_file_path = os.path.join(full_dir, ot2_script_path)
+    full_file_path = os.path.join(parent_dir, ot2_script_path)
 
     this_object_output_path = os.path.realpath(full_file_path)
 

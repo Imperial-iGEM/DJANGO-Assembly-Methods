@@ -133,12 +133,17 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     else:
         multi = False
 
-    full_output_path = os.path.join(OUTPUT_DIR, output_folder)
+    if len(output_folder) > 0:
 
-    if not os.path.exists(full_output_path):
-        os.chdir(OUTPUT_DIR)
-        os.makedirs(output_folder)
-        os.chdir(generator_dir)
+        full_output_path = os.path.join(OUTPUT_DIR, output_folder)
+
+        if not os.path.exists(full_output_path):
+            os.chdir(OUTPUT_DIR)
+            os.makedirs(output_folder)
+            os.chdir(generator_dir)
+
+    else:
+        full_output_path = OUTPUT_DIR
 
     # Write OT2 scripts
     out_full_path_1 = generate_ot2_script(

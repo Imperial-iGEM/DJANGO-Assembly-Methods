@@ -28,13 +28,15 @@ CELL_TRANS_VOL = 50
 COMPETENT_WELL_MAX_VOL = 200
 
 
-def biobricks(full_output_path, construct_path, part_path, thermocycle=True,
+def biobricks(output_folder, construct_path, part_path, thermocycle=True,
               p10_mount='right', p300_mount='left', p10_type='p10_single',
               p300_type='p300_single',
               well_plate='biorad_96_wellplate_200ul_pcr',
               tube_rack='opentrons_24_tuberack_nest_1.5ml_snapcap',
               soc_plate='usascientific_96_wellplate_2.4ml_deep',
               transformation_plate='corning_96_wellplate_360ul_flat'):
+
+    full_output_path = output_folder
 
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
@@ -52,19 +54,21 @@ def biobricks(full_output_path, construct_path, part_path, thermocycle=True,
     source_to_digest, reagent_to_digest, digest_to_storage, \
         digest_to_construct, reagent_to_construct = create_assembly_dicts(
                                     constructs, parts, digest_loc, reagents)
-    create_assembly_protocol(
+    assembly_path = create_assembly_protocol(
         assembly_template_path, full_output_path, source_to_digest,
         reagent_to_digest, digest_to_storage, digest_to_construct,
         reagent_to_construct, p10_mount=p10_type, p10_type=p10_type,
         well_plate_type=well_plate, tube_rack_type=tube_rack,
         thermocycle=thermocycle)
+    output_paths = []
+    output_paths.append(assembly_path)
 
     competent_source_to_dest, control_source_to_dest, \
         assembly_source_to_dest, water_source_to_dest, transform_df \
         = create_tranformation_dicts(constructs, water_well='A1',
                                      controls_per_cons=False)
 
-    create_transformation_protocol(
+    transform_path = create_transformation_protocol(
         transformation_template_path, full_output_path,
         competent_source_to_dest,
         control_source_to_dest, assembly_source_to_dest, water_source_to_dest,
@@ -72,7 +76,7 @@ def biobricks(full_output_path, construct_path, part_path, thermocycle=True,
         p300_type=p300_type, well_plate_type=well_plate,
         transformation_plate_type=transformation_plate,
         tube_rack_type=tube_rack, soc_plate_type=soc_plate)
-
+    output_paths.append(transform_path)
     labwareDf = pd.DataFrame(
         data={'name': list(labware_dict.keys()),
               'definition': list(labware_dict.values())})
@@ -81,6 +85,10 @@ def biobricks(full_output_path, construct_path, part_path, thermocycle=True,
                index=False, PARTS_INFO=parts_df, REAGENTS=reagents,
                MASTER_MIX=mm_df, DIGESTS=digest_loc, CONSTRUCTS=constructs,
                LABWARE=labwareDf)
+    output_paths.append(
+        os.path.join(full_output_path, 'bb_metainformation.csv'))
+
+    return output_paths
 
 
 def get_constructs(path):
@@ -532,8 +540,8 @@ def create_assembly_protocol(template_path, output_path, source_to_digest,
                              tube_rack_type, thermocycle):
     with open(template_path) as template_file:
         template_string = template_file.read()
-    with open(os.path.join(output_path, 'bb_assembly_protocol.py'),
-              "w+") as protocol_file:
+    assembly_path = os.path.join(output_path, 'bb_assembly_protocol.py')
+    with open(assembly_path, "w+") as protocol_file:
         # Paste in plate maps at top of file.
         protocol_file.write('source_to_digest = ' +
                             json.dumps(source_to_digest) + '\n\n')
@@ -554,6 +562,8 @@ def create_assembly_protocol(template_path, output_path, source_to_digest,
         # Paste the rest of the protocol.
         protocol_file.write(template_string)
 
+    return assembly_path
+
 
 def create_transformation_protocol(template_path, output_path,
                                    competent_source_to_dest,
@@ -568,8 +578,8 @@ def create_transformation_protocol(template_path, output_path,
 
     with open(template_path) as template_file:
         template_string = template_file.read()
-    with open(os.path.join(output_path, 'bb_transformation_protocol.py'),
-              "w+") as protocol_file:
+    transform_path = os.path.join(output_path, 'bb_transformation_protocol.py')
+    with open(transform_path, "w+") as protocol_file:
         # Paste in plate maps at top of file.
         protocol_file.write('competent_source_to_dest = ' +
                             json.dumps(competent_source_to_dest) + '\n\n')
@@ -591,6 +601,8 @@ def create_transformation_protocol(template_path, output_path,
 
         # Paste the rest of the protocol.
         protocol_file.write(template_string)
+
+    return transform_path
 
 
 def dfs_to_csv(path, index=True, **kw_dfs):

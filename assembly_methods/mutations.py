@@ -7,13 +7,14 @@ from sbol_parser_api.sbolParserApi import ParserSBOL
 import base64
 from sbol2 import Document
 from basic_assembly.dna_bot import dnabot_app
-
+from biobricks_assembly.biobricks10 import bbinput
 
 class CommonLabware(graphene.InputObjectType):
     p10_mount = graphene.String()
     p300_mount = graphene.String()
     p10_type = graphene.String()
     p300_type = graphene.String()
+    well_plate = graphene.String()
 
 
 class SpecificationsType(graphene.InputObjectType):
@@ -43,7 +44,6 @@ class InputSpecsBASIC(graphene.InputObjectType):
 
 class LabwareDictMoClo(graphene.InputObjectType):
     common_labware = graphene.Argument(CommonLabware)
-    well_plate = graphene.String()
     trough = graphene.String()
     reagent_plate = graphene.String()
     agar_plate = graphene.String()
@@ -112,7 +112,7 @@ class FinalSpec(graphene.Mutation):
             csv_links = parser.generateCsv_for_DNABot()
             labware_dict = specifications_basic.labware_dict
             common_labware = labware_dict.common_labware
-            links = dnabot_app.dnabot(full_output_path=output_folder,
+            links = dnabot_app.dnabot(output_folder=output_folder,
                                       ethanol_well_for_stage_2=specifications_basic.ethanol_well_for_stage_2,
                                       deep_well_plate_stage_4=specifications_basic.deep_well_plate_stage_4,
                                       input_construct_path=csv_links['input_construct_path'],
@@ -121,7 +121,7 @@ class FinalSpec(graphene.Mutation):
                                       p300_mount=common_labware.p300_mount,
                                       p10_type=common_labware.p10_type,
                                       p300_type=common_labware.p300_type,
-                                      well_plate=labware_dict.well_plate,
+                                      well_plate=common_labware.well_plate,
                                       reagent_plate=labware_dict.reagent_plate,
                                       mag_plate=labware_dict.mag_plate,
                                       tube_rack=labware_dict.tube_rack,
@@ -130,9 +130,23 @@ class FinalSpec(graphene.Mutation):
                                       soc_plate=labware_dict.soc_plate,
                                       agar_plate=labware_dict.agar_plate
                                       )
-        elif assembly_type == "golden_gate":
+        elif assembly_type == "bio_bricks":
+            labware_dict = specifications_bio_bricks.labware_dict
+            common_labware = labware_dict.common_labware
             csv_links = parser.generateCsv_for_BioBricks()
-            links = []
+            links = bbinput.biobricks(output_folder=output_folder,
+                                      construct_path=csv_links["construct_path"],
+                                      part_path=csv_links["part_path"],
+                                      thermocycle=specifications_bio_bricks.thermocycle,
+                                      p10_mount=common_labware.p10_mount,
+                                      p300_mount=common_labware.p300_mount,
+                                      p10_type=common_labware.p10_type,
+                                      p300_type=common_labware.p300_type,
+                                      well_plate=common_labware.well_plate,
+                                      tube_rack=labware_dict.tube_rack,
+                                      soc_plate=labware_dict.soc_plate,
+                                      transformation_plate=labware_dict.transformation_plate
+                                      )
         elif assembly_type == "moclo":
             csv_links = parser.generateCsv_for_MoClo()
             links = []

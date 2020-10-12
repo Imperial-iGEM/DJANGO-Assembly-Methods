@@ -46,47 +46,54 @@ def moclo_function(output_folder, construct_path, part_path,
         multi = True
     else:
         multi = False
+    try:
+        # Load in CSV files as a dict containing lists of lists.
+        dna_plate_map_dict = generate_plate_maps(part_path)
+        combinations_to_make = generate_combinations(construct_path)
+        check_number_of_combinations(combinations_limit, combinations_to_make)
 
-    # Load in CSV files as a dict containing lists of lists.
-    dna_plate_map_dict = generate_plate_maps(part_path)
-    combinations_to_make = generate_combinations(construct_path)
-    check_number_of_combinations(combinations_limit, combinations_to_make)
+        # Generate and save output plate maps.
+        triplicate, agar_path = generate_and_save_output_plate_maps(
+            combinations_to_make, combinations_limit, config['output_folder_path'])
 
-    # Generate and save output plate maps.
-    triplicate, agar_path = generate_and_save_output_plate_maps(
-        combinations_to_make, combinations_limit, config['output_folder_path'])
+        assembly_metainformation_path = os.path.join(
+            config['output_folder_path'], 'assembly_metainformation.csv')
+        parts, comb, mm, reagents = create_metainformation(
+            assembly_metainformation_path,
+            dna_plate_map_dict, combinations_to_make, labware_dict, thermocycle,
+            triplicate)
 
-    assembly_metainformation_path = os.path.join(
-        config['output_folder_path'], 'assembly_metainformation.csv')
-    parts, comb, mm, reagents = create_metainformation(
-        assembly_metainformation_path,
-        dna_plate_map_dict, combinations_to_make, labware_dict, thermocycle,
-        triplicate)
+        reagent_to_mm_dict, mm_dict = get_mm_dicts(mm, reagents)
 
-    reagent_to_mm_dict, mm_dict = get_mm_dicts(mm, reagents)
+        transform_metainformation_path = os.path.join(
+            config['output_folder_path'], 'transform_metainformation.csv')
+        create_transform_metainformation(
+            transform_metainformation_path,
+            labware_dict, triplicate, multi)
 
-    transform_metainformation_path = os.path.join(
-        config['output_folder_path'], 'transform_metainformation.csv')
-    create_transform_metainformation(
-        transform_metainformation_path,
-        labware_dict, triplicate, multi)
+        # Create a protocol file and hard code the plate maps into it.
+        assembly_path, transform_path = create_protocol(
+            dna_plate_map_dict, combinations_to_make, reagent_to_mm_dict, mm_dict,
+            config['assembly_template_path'], config['transform_template_path'],
+            config['output_folder_path'], thermocycle, triplicate, multi,
+            p10Mount=p10_mount, p300Mount=p300_mount, p10_type=p10_type,
+            p300_type=p300_type, reaction_plate_type=well_plate,
+            reagent_plate_type=reagent_plate, trough_type=trough,
+            agar_plate_type=agar_plate)
 
-    # Create a protocol file and hard code the plate maps into it.
-    assembly_path, transform_path = create_protocol(
-        dna_plate_map_dict, combinations_to_make, reagent_to_mm_dict, mm_dict,
-        config['assembly_template_path'], config['transform_template_path'],
-        config['output_folder_path'], thermocycle, triplicate, multi,
-        p10Mount=p10_mount, p300Mount=p300_mount, p10_type=p10_type,
-        p300_type=p300_type, reaction_plate_type=well_plate,
-        reagent_plate_type=reagent_plate, trough_type=trough,
-        agar_plate_type=agar_plate)
+        output_paths.append(assembly_path)
+        output_paths.append(transform_path)
+        output_paths.append(assembly_metainformation_path)
+        output_paths.append(transform_metainformation_path)
+        output_paths.append(agar_path)
 
-    output_paths.append(assembly_path)
-    output_paths.append(transform_path)
-    output_paths.append(assembly_metainformation_path)
-    output_paths.append(transform_metainformation_path)
-    output_paths.append(agar_path)
-    return output_paths
+    except Exception as e:
+        error_path = os.path.join(full_output_path, 'MoClo_error.txt')
+        with open(error_path) as f:
+            f.write("Failed to generate MoClo scripts: {}\n".format(str(e)))
+        output_paths.append(error_path)
+    finally:
+        return output_paths
 
 ###############################################################################
 # Functions for getting user input

@@ -180,9 +180,8 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     if 'metainformation' in os.listdir():
         pass
     else:
-        random = get_random_string(20)
-        my_meta_dir = os.path.join(full_output_path, random,
-                                   'metainformation')
+        output_path = os.path.split(out_full_path_5)[0]
+        my_meta_dir = os.path.join(output_path, 'metainformation')
         os.makedirs(my_meta_dir)
     os.chdir(my_meta_dir)
     master_mix_df = generate_master_mix_df(clips_df['number'].sum())

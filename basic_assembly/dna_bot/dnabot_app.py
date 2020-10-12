@@ -22,6 +22,7 @@ from .mplates import final_well
 # from mplates import final_well
 import random
 import string
+from datetime import datetime
 
 # Constant str
 TEMPLATE_DIR_NAME = 'template_ot2_scripts'
@@ -624,14 +625,18 @@ def generate_ot2_script(parent_dir, ot2_script_path, template_path, **kwargs):
 
     """
     # print("output location of ot2_script_path:{}".format(ot2_script_path))
-    output_str = get_random_string(20)
+    # output_str = get_random_string(20)
+    output_str = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
 
     working_directory = os.getcwd()
 
     os.chdir(parent_dir)
 
-    os.makedirs(output_str)
     full_dir = os.path.join(parent_dir, output_str)
+
+    if not os.path.exists(full_dir):
+        os.makedirs(output_str)
+
     os.chdir(full_dir)
 
     full_file_path = os.path.join(full_dir, ot2_script_path)

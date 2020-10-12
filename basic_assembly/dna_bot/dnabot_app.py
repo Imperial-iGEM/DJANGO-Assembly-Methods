@@ -39,16 +39,6 @@ CLIPS_INFO_FNAME = 'clip_run_info.csv'
 FINAL_ASSEMBLIES_INFO_FNAME = 'final_assembly_run_info.csv'
 WELL_OUTPUT_FNAME = 'wells.txt'
 
-'''
-# Offline:
-OUTPUT_DIR = os.path.join(os.path.split(os.path.split(os.cwd())[0])[0],
-                          'output')
-# e.g. OUTPUT_DIR = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods-master/output'
-'''
-
-# Online:
-OUTPUT_DIR = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/output'
-
 # Constant floats/ints
 CLIP_DEAD_VOL = 60
 CLIP_VOL = 30
@@ -87,7 +77,7 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
 
-def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
+def dnabot(full_output_path, ethanol_well_for_stage_2, deep_well_plate_stage_4,
            input_construct_path, output_sources_paths,
            p10_mount='right', p300_mount='left', p10_type='p10_single',
            p300_type='p300_multi', well_plate='biorad_96_wellplate_200ul_pcr',
@@ -131,8 +121,6 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         multi = True
     else:
         multi = False
-
-    full_output_path = os.path.join(OUTPUT_DIR, output_folder)
 
     # Write OT2 scripts
     out_full_path_1 = generate_ot2_script(

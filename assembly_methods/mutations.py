@@ -9,14 +9,76 @@ class SpecificationsType(graphene.InputObjectType):
     sbol_string = graphene.String()
     liquid_handler = graphene.String()
     remove_repeated = graphene.Boolean()
-    number_of_wells = graphene.Int()
-    number_of_runs = graphene.Int()
-    output_plate_positions = graphene.Boolean()
-    output_reagents_list = graphene.Boolean()
-    output_part_sequences = graphene.Boolean()
-    output_logs = graphene.Boolean()
-    output_meta_information = graphene.Boolean()
+    # number_of_wells = graphene.Int()
+    # number_of_runs = graphene.Int()
+    # output_plate_positions = graphene.Boolean()
+    # output_reagents_list = graphene.Boolean()
+    # output_part_sequences = graphene.Boolean()
+    # output_logs = graphene.Boolean()
+    # output_meta_information = graphene.Boolean()
     assembly_type = graphene.String()
+
+
+class LabwareDictBASIC(graphene.InputObjectType):
+    p10_mount = graphene.String()
+    p300_mount = graphene.String()
+    p10_type = graphene.String()
+    p300_type = graphene.String()
+    well_plate = graphene.String()
+    reagent_plate = graphene.String()
+    mag_plate = graphene.String()
+    tube_rack = graphene.String()
+    aluminum_block = graphene.String()
+    bead_container = graphene.String()
+    soc_plate = graphene.String()
+    agar_plate = graphene.String()
+
+
+class InputSpecsBASIC(graphene.InputObjectType):
+    output_folder = graphene.String()
+    ethanol_well_for_stage_2 = graphene.String()
+    deep_well_plate_stage_4 = graphene.String()
+    input_construct_path = graphene.String()
+    output_sources_path = graphene.List(graphene.String())
+    labware_dict = graphene.Argument(LabwareDictBASIC)
+
+
+class LabwareDictMoClo(graphene.InputObjectType):
+    p10_mount = graphene.String()
+    p300_mount = graphene.String()
+    p10_type = graphene.String()
+    p300_type = graphene.String()
+    well_plate = graphene.String()
+    trough = graphene.String()
+    reagent_plate = graphene.String()
+    agar_plate = graphene.String()
+
+
+class InputSpecsMoClo(graphene.InputObjectType):
+    output_folder = graphene.String()
+    construct_path = graphene.String()
+    part_path = graphene.String()
+    thermocycle = graphene.Boolean()
+    labware_dict = graphene.Argument(LabwareDictMoClo)
+
+
+class LabwareDictBioBricks(graphene.InputObjectType):
+    p10_mount = graphene.String()
+    p300_mount = graphene.String()
+    p10_type = graphene.String()
+    p300_type = graphene.String()
+    well_plate = graphene.String()
+    tube_rack = graphene.String()
+    soc_plate = graphene.String()
+    transformation_plate = graphene.String()
+
+
+class InputSpecsBioBricks(graphene.InputObjectType):
+    output_folder = graphene.String()
+    construct_path = graphene.String()
+    part_path = graphene.String()
+    thermocycle = graphene.Boolean()
+    labware_dict = graphene.Argument(LabwareDictBioBricks)
 
 
 class LinkerInType(graphene.InputObjectType):
@@ -58,7 +120,7 @@ class FinalSpec(graphene.Mutation):
         elif specifications.assembly_type == "golden_gate":
             links = parser.generateCsv_for_BioBricks()
         elif specifications.assembly_type == "moclo":
-            link = parser.generateCsv_for_MoClo()
+            links = parser.generateCsv_for_MoClo()
         # return classes with outputs
         return FinalSpec(output_links=[str(linker_types), str(specifications)])
 

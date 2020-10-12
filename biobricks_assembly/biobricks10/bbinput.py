@@ -3,6 +3,7 @@ import csv
 import json
 import math
 import pandas as pd
+from datetime import datetime
 
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'p10_type': 'p10_single', 'p300_type': 'p300_single',
@@ -42,7 +43,12 @@ def biobricks(output_folder, construct_path, part_path, p10_mount='right',
                                           'bbassembly10template.py')
     transformation_template_path = os.path.join(template_dir_path,
                                                 'bbtransformationtemplate.py')
-    output_path = os.path.join(generator_dir, output_folder)
+    output_str = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
+    output_path = os.path.join(output_folder, output_str)
+    full_output_path = os.path.join(generator_dir, output_path)
+    if not os.path.exits(full_output_path):
+        os.makedirs(output_path)
+
     thermocycle = False
     constructs, dest_well_list = get_constructs(construct_path)
     parts = get_parts(part_path, constructs)
@@ -54,7 +60,7 @@ def biobricks(output_folder, construct_path, part_path, p10_mount='right',
         digest_to_construct, reagent_to_construct = create_assembly_dicts(
                                     constructs, parts, digest_loc, reagents)
     create_assembly_protocol(
-        assembly_template_path, output_path, source_to_digest,
+        assembly_template_path, full_output_path, source_to_digest,
         reagent_to_digest, digest_to_storage, digest_to_construct,
         reagent_to_construct, p10_mount=p10_type, p10_type=p10_type,
         well_plate_type=well_plate, tube_rack_type=tube_rack,
@@ -66,7 +72,8 @@ def biobricks(output_folder, construct_path, part_path, p10_mount='right',
                                      controls_per_cons=False)
 
     create_transformation_protocol(
-        transformation_template_path, output_path, competent_source_to_dest,
+        transformation_template_path, full_output_path,
+        competent_source_to_dest,
         control_source_to_dest, assembly_source_to_dest, water_source_to_dest,
         p10_mount=p10_mount, p300_mount=p300_mount, p10_type=p10_type,
         p300_type=p300_type, well_plate_type=well_plate,
@@ -77,7 +84,7 @@ def biobricks(output_folder, construct_path, part_path, p10_mount='right',
         data={'name': list(labware_dict.keys()),
               'definition': list(labware_dict.values())})
 
-    dfs_to_csv(os.path.join(output_path, 'bb_metainformation.csv'),
+    dfs_to_csv(os.path.join(full_output_path, 'bb_metainformation.csv'),
                index=False, PARTS_INFO=parts_df, REAGENTS=reagents,
                MASTER_MIX=mm_df, DIGESTS=digest_loc, CONSTRUCTS=constructs,
                LABWARE=labwareDf)

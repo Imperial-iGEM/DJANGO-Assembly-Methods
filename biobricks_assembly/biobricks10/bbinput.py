@@ -38,7 +38,7 @@ OUTPUT_DIR = os.path.join(os.path.split(os.path.split(os.cwd())[0])[0],
 OUTPUT_DIR = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/output'
 
 
-def biobricks(output_folder, construct_path, part_path, thermocycle='True',
+def biobricks(output_folder, construct_path, part_path, thermocycle=True,
               p10_mount='right', p300_mount='left', p10_type='p10_single',
               p300_type='p300_single',
               well_plate='biorad_96_wellplate_200ul_pcr',

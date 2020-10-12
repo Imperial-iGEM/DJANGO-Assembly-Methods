@@ -700,3 +700,12 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
 
         # Paste the rest of the protocol.
         transform_file.write(transform_template_string)
+
+
+'''
+construct_path = "C:/Users/gabri/Documents/Uni/iGEM/OT2-MoClo-Transformation-Ecoli-master/examples/combination_to_make_csv/combination-to-make-72.csv"
+part_path = "C:/Users/gabri/Documents/Uni/iGEM/OT2-MoClo-Transformation-Ecoli-master/examples/input_DNA_plate_csv/input-plate-map.csv"
+
+moclo_function('output/test1', construct_path, part_path, thermocycle=True,
+               **labware_dict)
+'''

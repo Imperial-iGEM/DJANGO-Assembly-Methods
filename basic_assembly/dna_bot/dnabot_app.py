@@ -20,8 +20,6 @@ from .mplates import final_well
 # Use mplates (no dot) for offline version (to run from command line)
 # For offline version, uncomment line below, and comment .mplates
 # from mplates import final_well
-import random
-import string
 
 # Constant str
 TEMPLATE_DIR_NAME = 'template_ot2_scripts'
@@ -722,12 +720,6 @@ def handle_2_columns(datalist):
         mylist[0] = datalist
         return mylist
     return datalist
-
-
-def get_random_string(length):
-    letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
 
 
 '''

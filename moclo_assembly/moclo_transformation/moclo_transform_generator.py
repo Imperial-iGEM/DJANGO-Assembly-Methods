@@ -17,6 +17,17 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
 
+'''
+# Offline:
+OUTPUT_DIR = os.path.join(os.path.split(os.path.split(os.cwd())[0])[0],
+                          'output')
+# e.g. OUTPUT_DIR = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods-master/output'
+'''
+
+# Online:
+OUTPUT_DIR = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/output'
+
+
 def moclo_function(output_folder, construct_path, part_path,
                    thermocycle=True, p10_mount='right', p300_mount='left',
                    p10_type='p10_single', p300_type='p300_multi',
@@ -28,17 +39,28 @@ def moclo_function(output_folder, construct_path, part_path,
     current_dir = os.getcwd()
     output_str = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
     output_path = os.path.join(output_folder, output_str)
-    full_output_path = os.path.join(current_dir, output_path)
-    if not os.path.exits(full_output_path):
+    full_output_path = os.path.join(OUTPUT_DIR, output_path)
+    if not os.path.exists(full_output_path):
+        os.chdir(OUTPUT_DIR)
         os.makedirs(output_path)
+        os.chdir(current_dir)
 
+    # Online
     config = {
         'output_folder_path': full_output_path,
         'assembly_template_path':
-        'moclo_assembly/moclo_transformation/data/moclo_assembly_template.py',
+        '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/moclo_assembly/moclo_transformation/data/moclo_assembly_template.py',
         'transform_template_path':
-        'moclo_assembly/moclo_transformation/data/transform_moclo_template.py'}
-
+        '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/moclo_assembly/moclo_transformation/data/moclo_assembly_template.py'}
+    '''
+    # Offline (should also work online)
+    config = {
+        'output_folder_path': full_output_path,
+        'assembly_template_path':
+        os.path.join(current_dir, 'data/moclo_assembly_template.py')
+        'transform_template_path':
+        os.path.join(current_dir, 'data/moclo_assembly_template.py')}
+    '''
     # for now only do single (other option = triplicate)
     combinations_limit = 'single'
 
@@ -82,111 +104,6 @@ def moclo_function(output_folder, construct_path, part_path,
 ###############################################################################
 # Functions for getting user input
 ###############################################################################
-
-
-def get_config(config_path):
-
-    # Load settings from file.
-    config = yaml.safe_load(open(config_path))
-
-    # Create a tkiner window and hide it (this will allow us to create dialog
-    # boxes)
-    window = tkinter.Tk()
-    window.withdraw()
-
-    # Ask user to set output folder if not set.
-    if not config['output_folder_path']:
-        messagebox.showinfo("Choose output folder",
-                            "You will now select the folder to save the "
-                            "protocol and plate maps to. This can be changed "
-                            "later by editing settings.yaml in the "
-                            "OT2_MoClo_JoVE/moclo_transform/data folder.")
-        config['output_folder_path'] = filedialog.askdirectory(
-            title="Choose output folder")
-        with open(config_path, "w+") as yaml_file:
-            yaml_file.write(yaml.dump(config))
-
-    return config
-
-# Ask user in command line whether they want single combinations or triplicates
-# Max number of combinations if single is 88 (11 unique columns), and if
-# triplicate is 24 (3 unique columns, each repeated 3 times)
-
-
-def ask_single_or_triplicate():
-    return str(input("Enter 'single' if you want to run at most 88 single "
-                     "combinations or 'triplicate' if you want to run at most "
-                     "24 triplicate combinations: "))
-
-
-def ask_multi():
-    return str(input("Enter 'yes' if you want to use a p300 multi-channel "
-                     "pipette in transformation, and 'no' if you want to use "
-                     "a p300 single channel pipette: "))
-
-
-def get_multi():
-    multi_res = ask_multi()
-    if 'yes' in multi_res.lower():
-        multi = True
-    else:
-        multi = False
-    return multi
-
-
-def ask_thermocycle():
-    return str(input("Enter 'yes' if you want to use the Opentrons  "
-                     "thermocycler module, and 'no' if you want to use "
-                     "a benchtop thermocycler: "))
-
-
-def get_thermocycle():
-    thermocycle_res = ask_thermocycle()
-    if 'yes' in thermocycle_res.lower():
-        thermocycle = True
-    else:
-        thermocycle = False
-    return thermocycle
-
-
-def ask_pipette_mount(pipetteType):
-    return str(input("Enter 'left' or 'right' to select the mount of the "
-                     + pipetteType + " pipette: "))
-
-
-def get_pipette_mount(pipetteType):
-    pipetteMount = ask_pipette_mount(pipetteType)
-    if 'l' in pipetteMount.lower():
-        return 'left'
-    else:
-        return 'right'
-
-
-def ask_dna_plate_map_filename():
-
-    # Create tkinter window in background to allow us to make dialog boxes.
-    window = tkinter.Tk()
-    window.withdraw()
-
-    # Open dialog boxes asking user for dna plate map.
-    dna_plate_map_filename = filedialog.askopenfilename(
-        title="Select DNA plate map",
-        filetypes=(("CSV files", "*.CSV"), ("all files", "*.*")))
-
-    return dna_plate_map_filename
-
-
-def ask_combinations_filename():
-    # Create tkinter window in background to allow us to make dialog boxes.
-    window = tkinter.Tk()
-    window.withdraw()
-
-    # Open dialog boxes asking user for combinations file.
-    combinations_filename = filedialog.askopenfilename(
-        title="Select file containing combinations to make.",
-        filetypes=(("CSV files", "*.CSV"), ("all files", "*.*")))
-
-    return combinations_filename
 
 
 def generate_plate_maps(filename):
@@ -703,6 +620,7 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
 
 
 '''
+Example of offline:
 construct_path = "C:/Users/gabri/Documents/Uni/iGEM/OT2-MoClo-Transformation-Ecoli-master/examples/combination_to_make_csv/combination-to-make-72.csv"
 part_path = "C:/Users/gabri/Documents/Uni/iGEM/OT2-MoClo-Transformation-Ecoli-master/examples/input_DNA_plate_csv/input-plate-map.csv"
 

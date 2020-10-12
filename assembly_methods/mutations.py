@@ -2,7 +2,7 @@ import os
 
 import graphene
 from django.conf.global_settings import MEDIA_ROOT
-import datetime
+from datetime import datetime
 from sbol_parser_api.sbolParserApi import ParserSBOL
 import base64
 from sbol2 import Document
@@ -109,9 +109,10 @@ class FinalSpec(graphene.Mutation):
         date_time = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
         output_folder = os.path.join(MEDIA_ROOT, date_time)
         os.mkdir(output_folder)
-        parser = ParserSBOL(sbolDocument=sbol_document, out_dir=output_folder)
+        part_types_dictionary = self.convert_part_info(linker_types)
+        parser = ParserSBOL(sbolDocument=sbol_document, outdir=output_folder)
         if assembly_type == "basic":
-            csv_links = parser.generateCsv_for_DNABot()
+            csv_links = parser.generateCsv_for_DNABot(dictOfParts=part_types_dictionary)
             labware_dict = specifications_basic.labware_dict
             common_labware = labware_dict.common_labware
             links = dnabot_app.dnabot(output_folder=output_folder,
@@ -135,7 +136,7 @@ class FinalSpec(graphene.Mutation):
         elif assembly_type == "bio_bricks":
             labware_dict = specifications_bio_bricks.labware_dict
             common_labware = labware_dict.common_labware
-            csv_links = parser.generateCsv_for_BioBricks()
+            csv_links = parser.generateCsv_for_BioBricks(dictOfParts=part_types_dictionary)
             links = bbinput.biobricks(output_folder=output_folder,
                                       construct_path=csv_links["construct_path"],
                                       part_path=csv_links["part_path"],
@@ -152,7 +153,7 @@ class FinalSpec(graphene.Mutation):
         elif assembly_type == "moclo":
             labware_dict = specifications_bio_bricks.labware_dict
             common_labware = labware_dict.common_labware
-            csv_links = parser.generateCsv_for_MoClo()
+            csv_links = parser.generateCsv_for_MoClo(dictOfParts=part_types_dictionary)
             links = moclo_transform_generator.moclo_function(
                                         output_folder=output_folder,
                                         construct_path=csv_links["construct_path"],
@@ -171,6 +172,13 @@ class FinalSpec(graphene.Mutation):
             links = []
         # return classes with outputs
         return FinalSpec(output_links=links)
+
+    def convert_part_info(self, part_types_list):
+        return {part_type.linker_id: {
+                "concentration": part_type.concentration,
+                "plate": part_type.plate_number,
+                "well": part_type.well
+            } for part_type in part_types_list}
 
 
 class Mutation(graphene.ObjectType):

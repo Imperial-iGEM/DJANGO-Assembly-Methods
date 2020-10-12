@@ -18,7 +18,7 @@ class ParserSBOL:
     def __init__(
         self,
         sbolDocument: Document,
-        out_dir: str = os.getcwd(),
+        outdir: str = os.getcwd(),
         linkerFile: Document = Document("./examples/sbol/basic_linkers_standard.xml")
     ):
         self.doc = sbolDocument

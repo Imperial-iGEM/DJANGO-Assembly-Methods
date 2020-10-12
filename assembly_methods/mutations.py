@@ -105,11 +105,19 @@ class FinalSpec(graphene.Mutation):
     # Function that is run: call other functions from here
     def mutate(self, info, linker_types, assembly_type, sbol_file_string, specifications_basic,
                specifications_bio_bricks, specifications_mo_clo):
+
+        def convert_part_info(part_types_list):
+            return {part_type.linker_id: {
+                    "concentration": part_type.concentration,
+                    "plate": part_type.plate_number,
+                    "well": part_type.well
+                } for part_type in part_types_list}
+        
         sbol_document = get_sbol_document(sbol_file_string)
         date_time = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
         output_folder = os.path.join(MEDIA_ROOT, date_time)
         os.mkdir(output_folder)
-        part_types_dictionary = self.convert_part_info(linker_types)
+        part_types_dictionary = convert_part_info(linker_types)
         parser = ParserSBOL(sbolDocument=sbol_document, outdir=output_folder)
         if assembly_type == "basic":
             csv_links = parser.generateCsv_for_DNABot(dictOfParts=part_types_dictionary)
@@ -172,13 +180,6 @@ class FinalSpec(graphene.Mutation):
             links = []
         # return classes with outputs
         return FinalSpec(output_links=links)
-
-    def convert_part_info(self, part_types_list):
-        return {part_type.linker_id: {
-                "concentration": part_type.concentration,
-                "plate": part_type.plate_number,
-                "well": part_type.well
-            } for part_type in part_types_list}
 
 
 class Mutation(graphene.ObjectType):

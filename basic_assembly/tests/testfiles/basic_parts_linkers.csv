@@ -1,0 +1,16 @@
+Part/linker,Well,Part concentration (ng/uL)
+CDS,A1
+L1-P,A2
+L1-S,A3
+L2-P,A4
+L2-S,A5
+L3-P,A6
+L3-S,A7
+LMP-P,A8
+LMP-S,A9
+LMS-P,A10
+LMS-S,A11
+Pro,A12
+RBS,B1
+Ter,B2
+dummyBackbone,B3

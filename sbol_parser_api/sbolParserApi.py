@@ -3,7 +3,6 @@ import plateo.containers
 import plateo.tools
 import warnings
 import pandas as pd
-import uuid
 import numpy as np
 import os
 from typing import List, Dict, Tuple
@@ -19,14 +18,18 @@ class ParserSBOL:
     def __init__(
         self,
         sbolDocument: Document,
-        linkerFile: Document = Document("./examples/sbol/basic_linkers_standard.xml")
+        outdir: str = os.getcwd(),
+        linkerFile: Document = Document("../examples/sbol/basic_linkers_standard.xml")
     ):
         self.doc = sbolDocument
+        self.outdir = outdir
         if linkerFile is None:
             filepath = "../examples/sbol/basic_linkers_standard.xml"
             self.linkerFile = Document(filepath)
         else:
             self.linkerFile = linkerFile
+        self.construct_csv_paths = []
+        self.part_csv_paths = []
 
     def generateCsv_for_DNABot(
             self,
@@ -34,7 +37,7 @@ class ParserSBOL:
             repeat: bool = None,
             maxWellsFilled: int = None,
             numRuns: int = None
-    ) -> List[str]:
+    ) -> Dict[str, List[str]]:
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
         """
@@ -69,26 +72,19 @@ class ParserSBOL:
             plateo.containers.Plate96,
             maxWellsFilled
         )
-        uniqueIds = []
-        # Create construct and parts/linkers CSVs from plateo plates
         for plate in constructPlates:
-            # Create UUID
-            uniqueId = uuid.uuid4().hex
-            uniqueIds.append(uniqueId)
-            # Create new directory
-            outdir = "./" + uniqueId
-            if not os.path.exists(outdir):
-                os.mkdir(outdir)
             # Create construct CSV
-            self.getConstructCsvFromPlateoPlate(plate, "BASIC", uniqueId)
+            self.getConstructCsvFromPlateoPlate(plate, "BASIC")
             # Write parts/linkers csv
             self.getPartLinkerCsvFromPlateoPlate(
                 plate,
                 "BASIC",
-                dictOfParts,
-                uniqueId
+                dictOfParts
             )
-        return uniqueIds
+        filepaths = {}
+        filepaths['construct_path'] = self.construct_csv_paths
+        filepaths['part_path'] = self.part_csv_paths
+        return filepaths
 
     def generateCsv_for_MoClo(
         self,
@@ -96,7 +92,7 @@ class ParserSBOL:
         repeat: bool = None,
         maxWellsFilled: int = None,
         numRuns: int = None
-    ) -> List[str]:
+    ) -> Dict[str, List[str]]:
         maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
         numRuns = 1 if numRuns is None else numRuns
         numSamples = maxWellsFilled * numRuns
@@ -128,25 +124,19 @@ class ParserSBOL:
             plateo.containers.Plate96,
             maxWellsFilled
         )
-        uniqueIds = []
         for plate in constructPlates:
-            # Create UUID
-            uniqueId = uuid.uuid4().hex
-            uniqueIds.append(uniqueId)
-            # Create new directory
-            outdir = "./" + uniqueId
-            if not os.path.exists(outdir):
-                os.mkdir(outdir)
             # Create construct CSV
-            self.getConstructCsvFromPlateoPlate(plate, "MoClo", uniqueId)
+            self.getConstructCsvFromPlateoPlate(plate, "MoClo")
             # Write parts/linkers csv
             self.getPartLinkerCsvFromPlateoPlate(
                 plate,
                 "MoClo",
-                dictOfParts,
-                uniqueId
+                dictOfParts
             )
-        return uniqueIds
+        filepaths = {}
+        filepaths['construct_path'] = self.construct_csv_paths
+        filepaths['part_path'] = self.part_csv_paths
+        return filepaths
 
     def generateCsv_for_BioBricks(
         self,
@@ -154,7 +144,7 @@ class ParserSBOL:
         repeat: bool = None,
         maxWellsFilled: int = None,
         numRuns: int = None
-    ) -> List[str]:
+    ) -> Dict[str, List[str]]:
         # TODO: Can be improved for hierarchical assembly (multiple runs)
         maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
         numRuns = 1 if numRuns is None else numRuns
@@ -187,25 +177,19 @@ class ParserSBOL:
             plateo.containers.Plate96,
             maxWellsFilled
         )
-        uniqueIds = []
         for plate in constructPlates:
-            # Create UUID
-            uniqueId = uuid.uuid4().hex
-            uniqueIds.append(uniqueId)
-            # Create new directory
-            outdir = "./" + uniqueId
-            if not os.path.exists(outdir):
-                os.mkdir(outdir)
             # Create construct CSV
-            self.getConstructCsvFromPlateoPlate(plate, "BioBricks", uniqueId)
+            self.getConstructCsvFromPlateoPlate(plate, "BioBricks")
             # Write parts/linkers csv
             self.getPartLinkerCsvFromPlateoPlate(
                 plate,
                 "BioBricks",
-                dictOfParts,
-                uniqueId
+                dictOfParts
             )
-        return uniqueIds
+        filepaths = {}
+        filepaths['construct_path'] = self.construct_csv_paths
+        filepaths['part_path'] = self.part_csv_paths
+        return filepaths
 
     def getRootComponentDefinitions(
             self,
@@ -1109,8 +1093,7 @@ class ParserSBOL:
     def getConstructCsvFromPlateoPlate(
         self,
         constructPlate: plateo.Plate,
-        assembly: str,
-        uniqueId: str = None
+        assembly: str
     ):
         '''Convert construct dataframe into CSV and creates CSV file in the same
         directory.
@@ -1120,21 +1103,21 @@ class ParserSBOL:
         '''
         constructDf = \
             self.getConstructDfFromPlateoPlate(constructPlate, assembly)
-        if uniqueId:
-            prefix = "./" + uniqueId + "/"
-        else:
-            prefix = ""
         if assembly == "BASIC" or "BioBricks":
+            filepath = os.path.join(self.outdir, "construct.csv")
             constructDf.to_csv(
-                prefix + "construct.csv",
+                filepath,
                 index=False,
             )
+            self.construct_csv_paths.append(filepath)
         elif assembly == "MoClo":
+            filepath = os.path.join(self.outdir, "construct.csv")
             constructDf.to_csv(
-                prefix + "construct.csv",
+                filepath,
                 index=False,
                 header=False
             )
+            self.construct_csv_paths.append(filepath)
 
     def isLinker(
         self,
@@ -1215,8 +1198,7 @@ class ParserSBOL:
         self,
         constructPlate: plateo.Plate,
         assembly,
-        dictOfParts: Dict[str, float] = None,
-        uniqueId: str = None
+        dictOfParts: Dict[str, float] = None
     ):
         def getPartName(well: plateo.Well) -> str:
             if "Part" in well.data.keys():
@@ -1253,21 +1235,26 @@ class ParserSBOL:
             96,
             dictOfParts
         )
-        if uniqueId:
-            prefix = "./" + uniqueId + "/"
-        else:
-            prefix = ""
         for plate in partPlates:
             if assembly == "BASIC":
                 # Create df
                 partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
+                filepath = \
+                    os.path.join(
+                        self.outdir,
+                        "part_linker_" + str(partPlates.index(plate) + 1) + ".csv"
+                    )
                 partLinkerDf.to_csv(
-                    prefix + "part_linker_" + str(partPlates.index(plate) + 1) + ".csv",
+                    filepath,
                     index=False
                 )
+                self.part_csv_paths.append(filepath)
             elif assembly == "MoClo":
                 filepath = \
-                    prefix + "part_linker_" + str(partPlates.index(plate) + 1) + ".csv"
+                    os.path.join(
+                        self.outdir,
+                        "parts_" + str(partPlates.index(plate) + 1) + ".csv"
+                    )
                 # Generate platemap
                 plate_to_platemap_spreadsheet(
                     plate,
@@ -1275,13 +1262,20 @@ class ParserSBOL:
                     filepath,
                     headers=False
                 )
+                self.part_csv_paths.append(filepath)
             elif assembly == "BioBricks":
                 # Create df
                 partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
+                filepath = \
+                    os.path.join(
+                        self.outdir,
+                        "parts_" + str(partPlates.index(plate) + 1) + ".csv"
+                    )
                 partLinkerDf.to_csv(
-                    prefix + "parts_" + str(partPlates.index(plate) + 1) + ".csv",
+                    filepath,
                     index=False
                 )
+                self.part_csv_paths(filepath)
 
     def is_linkers_order_correct(
         self,

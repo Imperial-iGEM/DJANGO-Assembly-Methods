@@ -91,7 +91,6 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         Main function, creates scripts and metainformation
         Can take specific args or just **labware_dict for all labware
     '''
-
     # Parent directories
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
@@ -101,108 +100,117 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     construct_base = os.path.basename(input_construct_path)
     construct_base = os.path.splitext(construct_base)[0]
 
-    constructs_list = generate_constructs_list(input_construct_path)
-    clips_df = generate_clips_df(constructs_list)
-    sources_dict, parts_df = generate_sources_dict(output_sources_paths)
-    parts_df_temp = fill_parts_df(clips_df, parts_df)
-    parts_df = parts_df_temp.copy()
+    try:
+        constructs_list = generate_constructs_list(input_construct_path)
+        clips_df = generate_clips_df(constructs_list)
+        sources_dict, parts_df = generate_sources_dict(output_sources_paths)
+        parts_df_temp = fill_parts_df(clips_df, parts_df)
+        parts_df = parts_df_temp.copy()
 
-    # calculate OT2 script variables
-    clips_dict = generate_clips_dict(clips_df, sources_dict, parts_df)
-    magbead_sample_number = clips_df['number'].sum()
-    final_assembly_dict, clips_df, parts_df = generate_final_assembly_dict(
-        constructs_list, clips_df, parts_df)
-    final_assembly_tipracks = calculate_final_assembly_tipracks(
-        final_assembly_dict)
-    spotting_tuples = generate_spotting_tuples(constructs_list,
-                                               SPOTTING_VOLS_DICT)
+        # calculate OT2 script variables
+        clips_dict = generate_clips_dict(clips_df, sources_dict, parts_df)
+        magbead_sample_number = clips_df['number'].sum()
+        final_assembly_dict, clips_df, parts_df = generate_final_assembly_dict(
+            constructs_list, clips_df, parts_df)
+        final_assembly_tipracks = calculate_final_assembly_tipracks(
+            final_assembly_dict)
+        spotting_tuples = generate_spotting_tuples(constructs_list,
+                                                   SPOTTING_VOLS_DICT)
 
-    if 'multi' in p300_type.lower():
-        multi = True
-    else:
-        multi = False
+        if 'multi' in p300_type.lower():
+            multi = True
+        else:
+            multi = False
 
-    # Write OT2 scripts
-    out_full_path_1 = generate_ot2_script(
-        full_output_path, CLIP_FNAME,
-        os.path.join(template_dir_path, CLIP_TEMP_FNAME),
-        clips_dict=clips_dict,
-        p10_mount=p10_mount, p10_type=p10_type, well_plate_type=well_plate,
-        tube_rack_type=tube_rack)
+        # Write OT2 scripts
+        out_full_path_1 = generate_ot2_script(
+            full_output_path, CLIP_FNAME,
+            os.path.join(template_dir_path, CLIP_TEMP_FNAME),
+            clips_dict=clips_dict,
+            p10_mount=p10_mount, p10_type=p10_type, well_plate_type=well_plate,
+            tube_rack_type=tube_rack)
 
-    out_full_path_2 = generate_ot2_script(
-        full_output_path, MAGBEAD_FNAME,
-        os.path.join(template_dir_path, MAGBEAD_TEMP_FNAME),
-        p300_mount=p300_mount,
-        p300_type=p300_type, well_plate_type=well_plate,
-        reagent_plate_type=reagent_plate,
-        multi=multi, bead_container_type=bead_container,
-        sample_number=magbead_sample_number,
-        ethanol_well=ethanol_well_for_stage_2)
+        out_full_path_2 = generate_ot2_script(
+            full_output_path, MAGBEAD_FNAME,
+            os.path.join(template_dir_path, MAGBEAD_TEMP_FNAME),
+            p300_mount=p300_mount,
+            p300_type=p300_type, well_plate_type=well_plate,
+            reagent_plate_type=reagent_plate,
+            multi=multi, bead_container_type=bead_container,
+            sample_number=magbead_sample_number,
+            ethanol_well=ethanol_well_for_stage_2)
 
-    out_full_path_3 = generate_ot2_script(
-        full_output_path, F_ASSEMBLY_FNAME,
-        os.path.join(template_dir_path, F_ASSEMBLY_TEMP_FNAME),
-        final_assembly_dict=final_assembly_dict,
-        tiprack_num=final_assembly_tipracks,
-        p10_mount=p10_mount, p10_type=p10_type, mag_plate_type=mag_plate,
-        tube_rack_type=tube_rack, aluminum_block_type=aluminum_block)
+        out_full_path_3 = generate_ot2_script(
+            full_output_path, F_ASSEMBLY_FNAME,
+            os.path.join(template_dir_path, F_ASSEMBLY_TEMP_FNAME),
+            final_assembly_dict=final_assembly_dict,
+            tiprack_num=final_assembly_tipracks,
+            p10_mount=p10_mount, p10_type=p10_type, mag_plate_type=mag_plate,
+            tube_rack_type=tube_rack, aluminum_block_type=aluminum_block)
 
-    out_full_path_4 = generate_ot2_script(
-        full_output_path, TRANS_SPOT_FNAME,
-        os.path.join(template_dir_path, TRANS_SPOT_TEMP_FNAME),
-        spotting_tuples=spotting_tuples, soc_well="A1", p10_mount=p10_mount,
-        p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
-        well_plate_type=well_plate, tube_rack_type=tube_rack,
-        soc_plate_type=soc_plate, agar_plate_type=agar_plate)
+        out_full_path_4 = generate_ot2_script(
+            full_output_path, TRANS_SPOT_FNAME,
+            os.path.join(template_dir_path, TRANS_SPOT_TEMP_FNAME),
+            spotting_tuples=spotting_tuples, soc_well="A1", p10_mount=p10_mount,
+            p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
+            well_plate_type=well_plate, tube_rack_type=tube_rack,
+            soc_plate_type=soc_plate, agar_plate_type=agar_plate)
 
-    out_full_path_5 = generate_ot2_script(
-        full_output_path, THERMOCYCLE_FNAME, 
-        os.path.join(template_dir_path, THERMOCYCLE_TEMP_NAME),
-        well_plate_type=well_plate)
+        out_full_path_5 = generate_ot2_script(
+            full_output_path, THERMOCYCLE_FNAME, 
+            os.path.join(template_dir_path, THERMOCYCLE_TEMP_NAME),
+            well_plate_type=well_plate)
 
-    all_my_output_paths = []
-    all_my_output_paths.append(out_full_path_1)
-    all_my_output_paths.append(out_full_path_2)
-    all_my_output_paths.append(out_full_path_3)
-    all_my_output_paths.append(out_full_path_4)
-    all_my_output_paths.append(out_full_path_5)
+        all_my_output_paths = []
+        all_my_output_paths.append(out_full_path_1)
+        all_my_output_paths.append(out_full_path_2)
+        all_my_output_paths.append(out_full_path_3)
+        all_my_output_paths.append(out_full_path_4)
+        all_my_output_paths.append(out_full_path_5)
 
-    # Write non-OT2 scripts
-    os.chdir(generator_dir)
+        # Write non-OT2 scripts
+        os.chdir(generator_dir)
 
-    my_meta_dir = os.path.join(full_output_path, 'metainformation')
-    if not os.path.exists(my_meta_dir):
-        os.chdir(full_output_path)
-        os.makedirs(my_meta_dir)
-    os.chdir(my_meta_dir)
-    master_mix_df = generate_master_mix_df(clips_df['number'].sum())
-    sources_paths_df = generate_sources_paths_df(
-        output_sources_paths, SOURCE_DECK_POS)
-    labwareDf = pd.DataFrame(
-        data={'name': list(labware_dict.keys()),
-              'definition': list(labware_dict.values())})
-    dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
-               MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
-               CLIP_REACTIONS=clips_df, PART_INFO=parts_df, LABWARE=labwareDf)
-    output_sources_paths.append(os.path.join(
-        my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
-    with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
-              'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        for final_assembly_well, construct_clips in final_assembly_dict.items():
-            csvwriter.writerow([final_assembly_well, construct_clips])
-    output_sources_paths.append(os.path.join(
-        my_meta_dir, construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME))
-    with open(construct_base + '_' + WELL_OUTPUT_FNAME, 'w') as f:
-        f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
-        f.write('\n')
-        f.write('SOC column: {}'.format(deep_well_plate_stage_4))
-    output_sources_paths.append(os.path.join(
-        my_meta_dir, construct_base + '_' + WELL_OUTPUT_FNAME))
-    os.chdir(generator_dir)
+        my_meta_dir = os.path.join(full_output_path, 'metainformation')
+        if not os.path.exists(my_meta_dir):
+            os.chdir(full_output_path)
+            os.makedirs(my_meta_dir)
+        os.chdir(my_meta_dir)
+        master_mix_df = generate_master_mix_df(clips_df['number'].sum())
+        sources_paths_df = generate_sources_paths_df(
+            output_sources_paths, SOURCE_DECK_POS)
+        labwareDf = pd.DataFrame(
+            data={'name': list(labware_dict.keys()),
+                'definition': list(labware_dict.values())})
+        dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
+                MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
+                CLIP_REACTIONS=clips_df, PART_INFO=parts_df, LABWARE=labwareDf)
+        output_sources_paths.append(os.path.join(
+            my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
+        with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
+                'w', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            for final_assembly_well, construct_clips in final_assembly_dict.items():
+                csvwriter.writerow([final_assembly_well, construct_clips])
+        output_sources_paths.append(os.path.join(
+            my_meta_dir, construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME))
+        with open(construct_base + '_' + WELL_OUTPUT_FNAME, 'w') as f:
+            f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
+            f.write('\n')
+            f.write('SOC column: {}'.format(deep_well_plate_stage_4))
+        output_sources_paths.append(os.path.join(
+            my_meta_dir, construct_base + '_' + WELL_OUTPUT_FNAME))
+        os.chdir(generator_dir)
 
-    return all_my_output_paths
+    except Exception as e:
+        all_my_output_paths = []
+        error_path = os.path.join(full_output_path, 'BASIC_error.txt')
+        with open(error_path) as f:
+            f.write("Failed to generate BASIC scripts: {}\n".format(str(e)))
+        all_my_output_paths.append(error_path)
+
+    finally:
+        return all_my_output_paths
 
 
 def generate_constructs_list(path):

@@ -310,9 +310,9 @@ def run(protocol: protocol_api.ProtocolContext):
                     for slot in p10_slots]
     p300_tipracks = [protocol.load_labware(P300_TIPRACK_TYPE, slot)
                      for slot in p300_slots]
-    p10_pipette = protocol.load_instrument('p10_single', P10_MOUNT,
+    p10_pipette = protocol.load_instrument(p10_type, P10_MOUNT,
                                            tip_racks=p10_tipracks)
-    p300_pipette = protocol.load_instrument('p300_multi', P300_MOUNT,
+    p300_pipette = protocol.load_instrument(p300_type, P300_MOUNT,
                                             tip_racks=p300_tipracks)
 
     assembly_plate = protocol.load_labware(ASSEMBLY_PLATE_TYPE,

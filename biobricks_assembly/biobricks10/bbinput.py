@@ -26,18 +26,9 @@ DIGEST_TO_CONS_VOL = 2
 DNA_TRANS_VOL = 1
 CELL_TRANS_VOL = 50
 COMPETENT_WELL_MAX_VOL = 200
-'''
-# Offline:
-OUTPUT_DIR = os.path.join(os.path.split(os.path.split(os.cwd())[0])[0],
-                          'output')
-# e.g. OUTPUT_DIR = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods-master/output'
-'''
-
-# Online:
-OUTPUT_DIR = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/output'
 
 
-def biobricks(output_folder, construct_path, part_path, thermocycle=True,
+def biobricks(full_output_path, construct_path, part_path, thermocycle=True,
               p10_mount='right', p300_mount='left', p10_type='p10_single',
               p300_type='p300_single',
               well_plate='biorad_96_wellplate_200ul_pcr',
@@ -51,13 +42,6 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
                                           'bbassembly10template.py')
     transformation_template_path = os.path.join(template_dir_path,
                                                 'bbtransformationtemplate.py')
-
-    # full_output_path = os.path.join(generator_dir, output_path)
-    full_output_path = os.path.join(OUTPUT_DIR, output_folder)
-    if not os.path.exists(full_output_path):
-        os.chdir(OUTPUT_DIR)
-        os.makedirs(output_folder)
-        os.chdir(generator_dir)
 
     constructs, dest_well_list = get_constructs(construct_path)
     parts = get_parts(part_path, constructs)
@@ -625,7 +609,11 @@ def dfs_to_csv(path, index=True, **kw_dfs):
 
 '''
 generator_dir = os.getcwd()
-construct_path = os.path.join(generator_dir, 'examples/constructs.csv')
-part_path = os.path.join(generator_dir, 'examples/parts.csv')
+construct_path = os.path.join(
+    os.path.split(os.path.split(generator_dir)[0])[0],
+    'examples/biobricks-constructs.csv')
+part_path = os.path.join(
+    os.path.split(os.path.split(generator_dir)[0])[0],
+    'examples/biobricks-parts.csv')
 biobricks(construct_path, part_path, thermocycle=True, **labware_dict)
 '''

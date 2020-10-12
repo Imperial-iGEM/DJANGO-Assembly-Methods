@@ -3,7 +3,6 @@ import csv
 import json
 import math
 import pandas as pd
-from datetime import datetime
 
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'p10_type': 'p10_single', 'p300_type': 'p300_single',
@@ -52,16 +51,12 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
                                           'bbassembly10template.py')
     transformation_template_path = os.path.join(template_dir_path,
                                                 'bbtransformationtemplate.py')
-    output_str = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
-    if len(output_folder) > 0:
-        output_path = os.path.join(output_folder, output_str)
-    else:
-        output_path = output_str
+
     # full_output_path = os.path.join(generator_dir, output_path)
-    full_output_path = os.path.join(OUTPUT_DIR, output_path)
+    full_output_path = os.path.join(OUTPUT_DIR, output_folder)
     if not os.path.exists(full_output_path):
         os.chdir(OUTPUT_DIR)
-        os.makedirs(output_path)
+        os.makedirs(output_folder)
         os.chdir(generator_dir)
 
     constructs, dest_well_list = get_constructs(construct_path)

@@ -730,14 +730,14 @@ def handle_2_columns(datalist):
     return datalist
 
     def final_well(sample_number):
-    """Determines well containing the final sample from sample number.
-    
-    """
-    letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    final_well_column = sample_number // 8 + \
-        (1 if sample_number % 8 > 0 else 0)
-    final_well_row = letter[sample_number - (final_well_column - 1) * 8 - 1]
-    return final_well_row + str(final_well_column)
+        """Determines well containing the final sample from sample number.
+        
+        """
+        letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        final_well_column = sample_number // 8 + \
+            (1 if sample_number % 8 > 0 else 0)
+        final_well_row = letter[sample_number - (final_well_column - 1) * 8 - 1]
+        return final_well_row + str(final_well_column)
 
 
 '''

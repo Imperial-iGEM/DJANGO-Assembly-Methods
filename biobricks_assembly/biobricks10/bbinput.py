@@ -29,8 +29,8 @@ CELL_TRANS_VOL = 50
 COMPETENT_WELL_MAX_VOL = 200
 
 
-def biobricks(output_folder, construct_path, part_path, p10_mount='right',
-              p300_mount='left', p10_type='p10_single',
+def biobricks(output_folder, construct_path, part_path, thermocycle='True',
+              p10_mount='right', p300_mount='left', p10_type='p10_single',
               p300_type='p300_single',
               well_plate='biorad_96_wellplate_200ul_pcr',
               tube_rack='opentrons_24_tuberack_nest_1.5ml_snapcap',
@@ -49,7 +49,6 @@ def biobricks(output_folder, construct_path, part_path, p10_mount='right',
     if not os.path.exits(full_output_path):
         os.makedirs(output_path)
 
-    thermocycle = False
     constructs, dest_well_list = get_constructs(construct_path)
     parts = get_parts(part_path, constructs)
     reagents, reagents_well_list, mm_df = get_reagents_wells(constructs, parts)
@@ -618,5 +617,5 @@ def dfs_to_csv(path, index=True, **kw_dfs):
 generator_dir = os.getcwd()
 construct_path = os.path.join(generator_dir, 'examples/constructs.csv')
 part_path = os.path.join(generator_dir, 'examples/parts.csv')
-biobricks(construct_path, part_path, **labware_dict)
+biobricks(construct_path, part_path, thermocycle=True, **labware_dict)
 '''

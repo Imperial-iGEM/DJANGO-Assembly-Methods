@@ -13,7 +13,7 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
 
-def moclo_function(full_output_path, construct_path, part_path,
+def moclo_function(output_folder, construct_path, part_path,
                    thermocycle=True, p10_mount='right', p300_mount='left',
                    p10_type='p10_single', p300_type='p300_multi',
                    well_plate='biorad_96_wellplate_200ul_pcr',
@@ -21,6 +21,8 @@ def moclo_function(full_output_path, construct_path, part_path,
                    reagent_plate='biorad_96_wellplate_200ul_pcr',
                    agar_plate='thermofisher_96_wellplate_180ul'):
 
+    output_paths = []
+    full_output_path = output_folder
     # Online
     config = {
         'output_folder_path': full_output_path,
@@ -51,24 +53,26 @@ def moclo_function(full_output_path, construct_path, part_path,
     check_number_of_combinations(combinations_limit, combinations_to_make)
 
     # Generate and save output plate maps.
-    triplicate = generate_and_save_output_plate_maps(combinations_to_make,
-                                                     combinations_limit,
-                                                     config[
-                                                         'output_folder_path'])
+    triplicate, agar_path = generate_and_save_output_plate_maps(
+        combinations_to_make, combinations_limit, config['output_folder_path'])
 
+    assembly_metainformation_path = os.path.join(
+        config['output_folder_path'], 'assembly_metainformation.csv')
     parts, comb, mm, reagents = create_metainformation(
-        config['output_folder_path'] + '/' + 'assembly_metainformation.csv',
+        assembly_metainformation_path,
         dna_plate_map_dict, combinations_to_make, labware_dict, thermocycle,
         triplicate)
 
     reagent_to_mm_dict, mm_dict = get_mm_dicts(mm, reagents)
 
+    transform_metainformation_path = os.path.join(
+        config['output_folder_path'], 'transform_metainformation.csv')
     create_transform_metainformation(
-        config['output_folder_path'] + '/' + 'transform_metainformation.csv',
+        transform_metainformation_path,
         labware_dict, triplicate, multi)
 
     # Create a protocol file and hard code the plate maps into it.
-    create_protocol(
+    assembly_path, transform_path = create_protocol(
         dna_plate_map_dict, combinations_to_make, reagent_to_mm_dict, mm_dict,
         config['assembly_template_path'], config['transform_template_path'],
         config['output_folder_path'], thermocycle, triplicate, multi,
@@ -76,6 +80,13 @@ def moclo_function(full_output_path, construct_path, part_path,
         p300_type=p300_type, reaction_plate_type=well_plate,
         reagent_plate_type=reagent_plate, trough_type=trough,
         agar_plate_type=agar_plate)
+
+    output_paths.append(assembly_path)
+    output_paths.append(transform_path)
+    output_paths.append(assembly_metainformation_path)
+    output_paths.append(transform_metainformation_path)
+    output_paths.append(agar_path)
+    return output_paths
 
 ###############################################################################
 # Functions for getting user input
@@ -194,7 +205,7 @@ def generate_and_save_output_plate_maps(combinations_to_make,
         writer = csv.writer(f)
         for row in output_plate_map:
             writer.writerow(row)
-    return triplicate
+    return triplicate, output_filename
 
 
 def create_metainformation(output_path, dna_plate_map_dict,
@@ -547,8 +558,8 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
     # the protocol.
     with open(assembly_template_path) as assembly_template_file:
         assembly_template_string = assembly_template_file.read()
-    with open(output_folder_path + '/' + 'moclo_assembly_protocol.py',
-              "w+") as assembly_file:
+    assembly_path = output_folder_path + '/' + 'moclo_assembly_protocol.py'
+    with open(assembly_path, "w+") as assembly_file:
         # Paste in plate maps at top of file.
         assembly_file.write('dna_plate_map_dict = ' +
                             json.dumps(dna_plate_map_dict) + '\n\n')
@@ -573,8 +584,8 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
 
     with open(transform_template_path) as transform_template_file:
         transform_template_string = transform_template_file.read()
-    with open(output_folder_path + '/' + 'transform_moclo_protocol.py',
-              "w+") as transform_file:
+    transform_path = output_folder_path + '/' + 'transform_moclo_protocol.py'
+    with open(transform_path, "w+") as transform_file:
         # Paste in plate maps at top of file.
         transform_file.write('combinations_to_make = '
                              + json.dumps(combinations_to_make) + '\n\n')
@@ -593,6 +604,8 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
 
         # Paste the rest of the protocol.
         transform_file.write(transform_template_string)
+
+    return assembly_path, transform_path
 
 
 '''

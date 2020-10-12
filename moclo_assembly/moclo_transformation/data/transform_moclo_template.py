@@ -131,7 +131,7 @@ def run(protocol: protocol_api.ProtocolContext):
         #   tr_300.append(labware.load('tipone_96_tiprack_200ul', '9'))
 
         # Load in pipettes
-        p10_single = protocol.load_instrument('p10_single',
+        p10_single = protocol.load_instrument(p10_type,
                                               mount=pipetteMount10,
                                               tip_racks=tr_10)
         
@@ -192,21 +192,11 @@ def run(protocol: protocol_api.ProtocolContext):
         else:
             rep = False  # p10 pipette is not being replaced
 
-        if multi:
-            p300_multi = protocol.load_instrument('p300_multi',
-                                                  mount=pipetteMount300,
-                                                  tip_racks=tr_300,
-                                                  replace=rep)
-        else:
-            p300_single = protocol.load_instrument('p300_single',
-                                                   mount=pipetteMount300,
-                                                   tip_racks=tr_300,
-                                                   replace=rep)
-        # add soc
-        if multi:
-            pipette300 = p300_multi
-        else:
-            pipette300 = p300_single
+        pipette300 = protocol.load_instrument(p300_type,
+                                              mount=pipetteMount300,
+                                              tip_racks=tr_300,
+                                              replace=rep)
+
         add_soc(reaction_plate, pipette300, soc, multi, [wash_0, wash_1])
 
         # Grow for 1 hr, seal the plate with adhesive film to avoid evaporation

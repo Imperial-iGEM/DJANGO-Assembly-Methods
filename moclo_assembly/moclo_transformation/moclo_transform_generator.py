@@ -7,7 +7,7 @@ import csv
 import json
 import yaml
 import pandas as pd
-from datatime import datetime
+from datetime import datetime
 
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'p10_type': 'p10_single', 'p300_type': 'p300_multi',

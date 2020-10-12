@@ -8,6 +8,8 @@ import base64
 from sbol2 import Document
 from basic_assembly.dna_bot import dnabot_app
 from biobricks_assembly.biobricks10 import bbinput
+from moclo_assembly.moclo_transformation import moclo_transform_generator
+
 
 class CommonLabware(graphene.InputObjectType):
     p10_mount = graphene.String()
@@ -148,7 +150,24 @@ class FinalSpec(graphene.Mutation):
                                       transformation_plate=labware_dict.transformation_plate
                                       )
         elif assembly_type == "moclo":
+            labware_dict = specifications_bio_bricks.labware_dict
+            common_labware = labware_dict.common_labware
             csv_links = parser.generateCsv_for_MoClo()
+            links = moclo_transform_generator.moclo_function(
+                                        output_folder=output_folder,
+                                        construct_path=csv_links["construct_path"],
+                                        part_path=csv_links["part_path"],
+                                        thermocycle=specifications_bio_bricks.thermocycle,
+                                        p10_mount=common_labware.p10_mount,
+                                        p300_mount=common_labware.p300_mount,
+                                        p10_type=common_labware.p10_type,
+                                        p300_type=common_labware.p300_type,
+                                        well_plate=common_labware.well_plate,
+                                        trough=labware_dict.trough,
+                                        reagent_plate=labware_dict.reagent_plate,
+                                        agar_plate=labware_dict.agar_plate
+                                    )
+        else:
             links = []
         # return classes with outputs
         return FinalSpec(output_links=links)

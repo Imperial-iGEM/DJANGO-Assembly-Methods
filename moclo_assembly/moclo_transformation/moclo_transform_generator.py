@@ -7,6 +7,7 @@ import csv
 import json
 import yaml
 import pandas as pd
+from datatime import datetime
 
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'p10_type': 'p10_single', 'p300_type': 'p300_multi',
@@ -24,8 +25,15 @@ def moclo_function(output_folder, construct_path, part_path,
                    reagent_plate='biorad_96_wellplate_200ul_pcr',
                    agar_plate='thermofisher_96_wellplate_180ul'):
 
+    current_dir = os.getcwd()
+    output_str = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
+    output_path = os.path.join(output_folder, output_str)
+    full_output_path = os.path.join(current_dir, output_path)
+    if not os.path.exits(full_output_path):
+        os.makedirs(output_path)
+
     config = {
-        'output_folder_path': output_folder,
+        'output_folder_path': full_output_path,
         'assembly_template_path':
         'moclo_assembly/moclo_transformation/data/moclo_assembly_template.py',
         'transform_template_path':

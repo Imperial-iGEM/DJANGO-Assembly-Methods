@@ -21,7 +21,7 @@ class ParserSBOL:
         outdir: str = os.getcwd(),
         linkerFile: Document = Document(os.path.join(os.getcwd(), "sbol_parser_api/basic_linkers_standard.xml"))
     ):
-        self.doc = sbolDocument(os.path.join(os.getcwd(), "sbol_parser_api/basic_linkers_standard.xml"))
+        self.doc = sbolDocument
         self.outdir = os.getcwd()
         if linkerFile is None:
             filepath = os.path.join(os.getcwd(), "sbol_parser_api/basic_linkers_standard.xml")

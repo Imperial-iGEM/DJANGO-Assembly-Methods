@@ -13,31 +13,13 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
 
-'''
-# Offline:
-OUTPUT_DIR = os.path.join(os.path.split(os.path.split(os.cwd())[0])[0],
-                          'output')
-# e.g. OUTPUT_DIR = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods-master/output'
-'''
-
-# Online:
-OUTPUT_DIR = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/output'
-
-
-def moclo_function(output_folder, construct_path, part_path,
+def moclo_function(full_output_path, construct_path, part_path,
                    thermocycle=True, p10_mount='right', p300_mount='left',
                    p10_type='p10_single', p300_type='p300_multi',
                    well_plate='biorad_96_wellplate_200ul_pcr',
                    trough='usascientific_12_reservoir_22ml',
                    reagent_plate='biorad_96_wellplate_200ul_pcr',
                    agar_plate='thermofisher_96_wellplate_180ul'):
-
-    current_dir = os.getcwd()
-    full_output_path = os.path.join(OUTPUT_DIR, output_folder)
-    if not os.path.exists(full_output_path):
-        os.chdir(OUTPUT_DIR)
-        os.makedirs(output_folder)
-        os.chdir(current_dir)
 
     # Online
     config = {

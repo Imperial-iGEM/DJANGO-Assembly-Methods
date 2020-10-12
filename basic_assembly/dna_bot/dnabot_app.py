@@ -4,10 +4,6 @@ Created on Thu Apr 11 14:26:07 2019
 
 @author: mh2210, Gabrielle Johnston, Benedict_Carling
 
-To run online version, use from .mplates import final_well
-
-To run offline version through command line, use from mplates import final_well
-AND uncomment call of dnabot function at bottom
 """
 import pandas as pd
 import os
@@ -15,11 +11,6 @@ import csv
 import numpy as np
 import json
 import sys
-# Use .mplates for online version and leave line below uncommented:
-from .mplates import final_well
-# Use mplates (no dot) for offline version (to run from command line)
-# For offline version, uncomment line below, and comment .mplates
-# from mplates import final_well
 
 # Constant str
 TEMPLATE_DIR_NAME = 'template_ot2_scripts'
@@ -151,7 +142,8 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         out_full_path_4 = generate_ot2_script(
             full_output_path, TRANS_SPOT_FNAME,
             os.path.join(template_dir_path, TRANS_SPOT_TEMP_FNAME),
-            spotting_tuples=spotting_tuples, soc_well="A1", p10_mount=p10_mount,
+            spotting_tuples=spotting_tuples, soc_well="A1",
+            p10_mount=p10_mount,
             p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
             well_plate_type=well_plate, tube_rack_type=tube_rack,
             soc_plate_type=soc_plate, agar_plate_type=agar_plate)
@@ -181,14 +173,15 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
             output_sources_paths, SOURCE_DECK_POS)
         labwareDf = pd.DataFrame(
             data={'name': list(labware_dict.keys()),
-                'definition': list(labware_dict.values())})
+                  'definition': list(labware_dict.values())})
         dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
-                MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
-                CLIP_REACTIONS=clips_df, PART_INFO=parts_df, LABWARE=labwareDf)
+                   MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
+                   CLIP_REACTIONS=clips_df, PART_INFO=parts_df,
+                   LABWARE=labwareDf)
         output_sources_paths.append(os.path.join(
             my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
         with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
-                'w', newline='') as csvfile:
+                  'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             for final_assembly_well, construct_clips in final_assembly_dict.items():
                 csvwriter.writerow([final_assembly_well, construct_clips])
@@ -252,8 +245,8 @@ def generate_constructs_list(path):
         return pd.DataFrame.from_dict(clips_info)
 
     constructs_list = []
-    myworkingd = os.getcwd()
-    print('my working directory {}'.format(myworkingd))
+    # myworkingd = os.getcwd()
+    # print('my working directory {}'.format(myworkingd))
     with open(path, 'r') as csvfile:
         csv_reader = csv.reader(csvfile)
         for index, construct in enumerate(csv_reader):
@@ -337,9 +330,9 @@ def generate_sources_dict(paths):
     sources_dict = {}
     part_dict = {}
     part_dict_list = []
-    print('my paths: {}'.format(paths))
+    # print('my paths: {}'.format(paths))
     for deck_index, path in enumerate(paths):
-        print('my path: {}'.format(path))
+        # print('my path: {}'.format(path))
         with open(path, 'r') as csvfile:
             csv_reader = csv.reader(csvfile)
             for index, source in enumerate(csv_reader):
@@ -361,7 +354,7 @@ def generate_sources_dict(paths):
                     part_dict['plate'] = [SOURCE_DECK_POS[deck_index]]
                     part_dict_list.append(pd.DataFrame.from_dict(part_dict))
     parts_df = pd.concat(part_dict_list, ignore_index=True)
-    print('essential: {}'.format(sources_dict))
+    # print('essential: {}'.format(sources_dict))
     return sources_dict, parts_df
 
 
@@ -464,9 +457,9 @@ def generate_clips_dict(clips_df, sources_dict, parts_df):
     try:
         for _, clip_info in clips_df.iterrows():
             prefix_linker = clip_info['prefixes']
-            print('my prefix linkers: {}'.format(prefix_linker))
-            print('my sources dict: {}'.format(sources_dict))
-            print('my clip info {}'.format(clip_info))
+            # print('my prefix linkers: {}'.format(prefix_linker))
+            # print('my sources dict: {}'.format(sources_dict))
+            # print('my clip info {}'.format(clip_info))
             clips_dict['prefixes_wells'].append(
                 [sources_dict[prefix_linker][0]]*clip_info['number'])
             clips_dict['prefixes_plates'].append([handle_2_columns(
@@ -735,6 +728,16 @@ def handle_2_columns(datalist):
         mylist[0] = datalist
         return mylist
     return datalist
+
+    def final_well(sample_number):
+    """Determines well containing the final sample from sample number.
+    
+    """
+    letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    final_well_column = sample_number // 8 + \
+        (1 if sample_number % 8 > 0 else 0)
+    final_well_row = letter[sample_number - (final_well_column - 1) * 8 - 1]
+    return final_well_row + str(final_well_column)
 
 
 '''

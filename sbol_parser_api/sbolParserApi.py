@@ -18,13 +18,13 @@ class ParserSBOL:
     def __init__(
         self,
         sbolDocument: Document,
-        outdir: str = os.getcwd(),
-        linkerFile: Document = Document("../examples/sbol/basic_linkers_standard.xml")
+        out_dir: str = os.getcwd(),
+        linkerFile: Document = Document("./examples/sbol/basic_linkers_standard.xml")
     ):
         self.doc = sbolDocument
         self.outdir = outdir
         if linkerFile is None:
-            filepath = "../examples/sbol/basic_linkers_standard.xml"
+            filepath = "./examples/sbol/basic_linkers_standard.xml"
             self.linkerFile = Document(filepath)
         else:
             self.linkerFile = linkerFile

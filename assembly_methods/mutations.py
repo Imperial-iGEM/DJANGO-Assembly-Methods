@@ -2,7 +2,7 @@ import os
 
 import graphene
 from django.conf.global_settings import MEDIA_ROOT
-import datetime
+from datetime import datetime
 from sbol_parser_api.sbolParserApi import ParserSBOL
 import base64
 from sbol2 import Document

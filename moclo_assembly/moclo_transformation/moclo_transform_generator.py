@@ -38,7 +38,10 @@ def moclo_function(output_folder, construct_path, part_path,
 
     current_dir = os.getcwd()
     output_str = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
-    output_path = os.path.join(output_folder, output_str)
+    if len(output_folder) > 0:
+        output_path = os.path.join(output_folder, output_str)
+    else:
+        output_path = output_str
     full_output_path = os.path.join(OUTPUT_DIR, output_path)
     if not os.path.exists(full_output_path):
         os.chdir(OUTPUT_DIR)

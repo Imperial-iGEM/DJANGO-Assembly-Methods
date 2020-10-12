@@ -1,0 +1,1 @@
+This is where all of the output scripts and metainformation will go. Subfolders are in datetime format. 

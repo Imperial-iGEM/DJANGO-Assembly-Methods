@@ -1,11 +1,8 @@
 # Modified version 09/10/20
 
 import os
-import tkinter
-from tkinter import filedialog, messagebox
 import csv
 import json
-import yaml
 import pandas as pd
 from datetime import datetime
 

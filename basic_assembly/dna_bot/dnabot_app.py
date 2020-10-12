@@ -20,8 +20,6 @@ from .mplates import final_well
 # Use mplates (no dot) for offline version (to run from command line)
 # For offline version, uncomment line below, and comment .mplates
 # from mplates import final_well
-import random
-import string
 
 # Constant str
 TEMPLATE_DIR_NAME = 'template_ot2_scripts'
@@ -38,16 +36,6 @@ THERMOCYCLE_FNAME = '1_5_thermocycle.ot2.py'
 CLIPS_INFO_FNAME = 'clip_run_info.csv'
 FINAL_ASSEMBLIES_INFO_FNAME = 'final_assembly_run_info.csv'
 WELL_OUTPUT_FNAME = 'wells.txt'
-
-'''
-# Offline:
-OUTPUT_DIR = os.path.join(os.path.split(os.path.split(os.cwd())[0])[0],
-                          'output')
-# e.g. OUTPUT_DIR = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods-master/output'
-'''
-
-# Online:
-OUTPUT_DIR = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/output'
 
 # Constant floats/ints
 CLIP_DEAD_VOL = 60
@@ -108,6 +96,8 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
 
+    full_output_path = output_folder
+
     construct_base = os.path.basename(input_construct_path)
     construct_base = os.path.splitext(construct_base)[0]
 
@@ -131,8 +121,6 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         multi = True
     else:
         multi = False
-
-    full_output_path = os.path.join(OUTPUT_DIR, output_folder)
 
     # Write OT2 scripts
     out_full_path_1 = generate_ot2_script(
@@ -183,12 +171,11 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     # Write non-OT2 scripts
     os.chdir(generator_dir)
 
-    if 'metainformation' in os.listdir():
-        pass
-    else:
-        my_meta_dir = os.path.join(full_output_path, 'metainformation')
+    my_meta_dir = os.path.join(full_output_path, 'metainformation')
+    if not os.path.exists(my_meta_dir):
+        os.chdir(full_output_path)
         os.makedirs(my_meta_dir)
-        os.chdir(my_meta_dir)
+    os.chdir(my_meta_dir)
     master_mix_df = generate_master_mix_df(clips_df['number'].sum())
     sources_paths_df = generate_sources_paths_df(
         output_sources_paths, SOURCE_DECK_POS)
@@ -198,15 +185,21 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
                MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
                CLIP_REACTIONS=clips_df, PART_INFO=parts_df, LABWARE=labwareDf)
+    output_sources_paths.append(os.path.join(
+        my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
     with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
               'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         for final_assembly_well, construct_clips in final_assembly_dict.items():
             csvwriter.writerow([final_assembly_well, construct_clips])
+    output_sources_paths.append(os.path.join(
+        my_meta_dir, construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME))
     with open(construct_base + '_' + WELL_OUTPUT_FNAME, 'w') as f:
         f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
         f.write('\n')
         f.write('SOC column: {}'.format(deep_well_plate_stage_4))
+    output_sources_paths.append(os.path.join(
+        my_meta_dir, construct_base + '_' + WELL_OUTPUT_FNAME))
     os.chdir(generator_dir)
 
     return all_my_output_paths
@@ -734,12 +727,6 @@ def handle_2_columns(datalist):
         mylist[0] = datalist
         return mylist
     return datalist
-
-
-def get_random_string(length):
-    letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
 
 
 '''

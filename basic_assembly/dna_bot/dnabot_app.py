@@ -75,7 +75,7 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
 
-def dnabot(full_output_path, ethanol_well_for_stage_2, deep_well_plate_stage_4,
+def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
            input_construct_path, output_sources_paths,
            p10_mount='right', p300_mount='left', p10_type='p10_single',
            p300_type='p300_multi', well_plate='biorad_96_wellplate_200ul_pcr',
@@ -95,6 +95,8 @@ def dnabot(full_output_path, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     # Parent directories
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
+
+    full_output_path = output_folder
 
     construct_base = os.path.basename(input_construct_path)
     construct_base = os.path.splitext(construct_base)[0]
@@ -169,12 +171,11 @@ def dnabot(full_output_path, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     # Write non-OT2 scripts
     os.chdir(generator_dir)
 
-    if 'metainformation' in os.listdir():
-        pass
-    else:
-        my_meta_dir = os.path.join(full_output_path, 'metainformation')
+    my_meta_dir = os.path.join(full_output_path, 'metainformation')
+    if not os.path.exists(my_meta_dir):
+        os.chdir(full_output_path)
         os.makedirs(my_meta_dir)
-        os.chdir(my_meta_dir)
+    os.chdir(my_meta_dir)
     master_mix_df = generate_master_mix_df(clips_df['number'].sum())
     sources_paths_df = generate_sources_paths_df(
         output_sources_paths, SOURCE_DECK_POS)
@@ -184,15 +185,21 @@ def dnabot(full_output_path, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
                MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
                CLIP_REACTIONS=clips_df, PART_INFO=parts_df, LABWARE=labwareDf)
+    output_sources_paths.append(os.path.join(
+        my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
     with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
               'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         for final_assembly_well, construct_clips in final_assembly_dict.items():
             csvwriter.writerow([final_assembly_well, construct_clips])
+    output_sources_paths.append(os.path.join(
+        my_meta_dir, construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME))
     with open(construct_base + '_' + WELL_OUTPUT_FNAME, 'w') as f:
         f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
         f.write('\n')
         f.write('SOC column: {}'.format(deep_well_plate_stage_4))
+    output_sources_paths.append(os.path.join(
+        my_meta_dir, construct_base + '_' + WELL_OUTPUT_FNAME))
     os.chdir(generator_dir)
 
     return all_my_output_paths

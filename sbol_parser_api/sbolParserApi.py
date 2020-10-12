@@ -888,19 +888,19 @@ class ParserSBOL:
                 listed = \
                     True if name in dictOfParts.keys() else False
                 plated = \
-                    True if listed and dictOfParts[name]['Plate'] else False
+                    True if listed and dictOfParts[name]['plate'] else False
                 welled = \
-                    True if listed and dictOfParts[name]['Well'] else False
+                    True if listed and dictOfParts[name]['well'] else False
                 if listed and plated and welled:
-                    plateNum = dictOfParts[name]['Plate']
+                    plateNum = dictOfParts[name]['plate']
                     plate = plates[plateNum - 1]
-                    wellname = dictOfParts[name]['Well']
+                    wellname = dictOfParts[name]['well']
                     well = plate.wells[wellname]
-                    conc = dictOfParts[name]['Concentration']
-                    well.data = {contentName: content, "Concentration": conc}
+                    conc = dictOfParts[name]['concentration']
+                    well.data = {contentName: content, "concentration": conc}
                 elif listed and welled and not plated:
                     selectedPlate = None
-                    wellname = dictOfParts[name]['Well']
+                    wellname = dictOfParts[name]['well']
                     # Find suitable plate
                     for plate in plates:
                         well = plate.wells[wellname]
@@ -914,22 +914,22 @@ class ParserSBOL:
                         )
                     else:
                         well = selectedPlate.wells[wellname]
-                        conc = dictOfParts[name]['Concentration']
+                        conc = dictOfParts[name]['concentration']
                         well.data = \
-                            {contentName: content, "Concentration": conc}
+                            {contentName: content, "concentration": conc}
                 elif listed and plated and not welled:
-                    plateNum = dictOfParts[name]['Plate']
+                    plateNum = dictOfParts[name]['plate']
                     plate = plates[plateNum - 1]
                     # Find first empty well in plate
                     selectedWell = firstEmptyWell(plates, plateNum)
-                    conc = dictOfParts[name]['Concentration']
+                    conc = dictOfParts[name]['concentration']
                     selectedWell.data = \
-                        {contentName: content, "Concentration": conc}
+                        {contentName: content, "concentration": conc}
                 else:
                     # Find first empty well in ordered list of plates
                     selectedWell = firstEmptyWell(plates)
                     selectedWell.data = \
-                        {contentName: content, "Concentration": ''}
+                        {contentName: content, "concentration": ''}
         return plates
 
     def getAllContentFromPlateoPlate(
@@ -1162,8 +1162,8 @@ class ParserSBOL:
         for wellname, well in plateoPlate.wells.items():
             if contentName in well.data.keys():
                 cd = well.data[contentName]
-                if "Concentration" in well.data.keys():
-                    conc = well.data['Concentration']
+                if "concentration" in well.data.keys():
+                    conc = well.data['concentration']
                 else:
                     conc = np.nan
                 dictWellContent[wellname] = (cd, conc)

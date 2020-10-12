@@ -27,6 +27,15 @@ DIGEST_TO_CONS_VOL = 2
 DNA_TRANS_VOL = 1
 CELL_TRANS_VOL = 50
 COMPETENT_WELL_MAX_VOL = 200
+'''
+# Offline:
+OUTPUT_DIR = os.path.join(os.path.split(os.path.split(os.cwd())[0])[0],
+                          'output')
+# e.g. OUTPUT_DIR = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods-master/output'
+'''
+
+# Online:
+OUTPUT_DIR = '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/output'
 
 
 def biobricks(output_folder, construct_path, part_path, thermocycle='True',
@@ -45,9 +54,12 @@ def biobricks(output_folder, construct_path, part_path, thermocycle='True',
                                                 'bbtransformationtemplate.py')
     output_str = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
     output_path = os.path.join(output_folder, output_str)
-    full_output_path = os.path.join(generator_dir, output_path)
-    if not os.path.exits(full_output_path):
+    # full_output_path = os.path.join(generator_dir, output_path)
+    full_output_path = os.path.join(OUTPUT_DIR, output_path)
+    if not os.path.exists(full_output_path):
+        os.chdir(OUTPUT_DIR)
         os.makedirs(output_path)
+        os.chdir(generator_dir)
 
     constructs, dest_well_list = get_constructs(construct_path)
     parts = get_parts(part_path, constructs)

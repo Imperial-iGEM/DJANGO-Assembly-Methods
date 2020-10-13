@@ -213,13 +213,14 @@ class ParserSBOL:
                         is not None and childDefinition in componentDefs):
                     componentDefs.remove(childDefinition)
         # Remove child components of combinatorial derivations
-        for obj in document.combinatorialderivations:
-            for variableComponent in obj.variableComponents:
-                for variant in variableComponent.variants:
-                    childDefinition = document.getComponentDefinition(variant)
-                    if(childDefinition
-                            is not None and childDefinition in componentDefs):
-                        componentDefs.remove(childDefinition)
+        if len(document.combinatorialderivations) > 1:
+            for obj in document.combinatorialderivations:
+                for variableComponent in obj.variableComponents:
+                    for variant in variableComponent.variants:
+                        childDefinition = document.getComponentDefinition(variant)
+                        if(childDefinition
+                                is not None and childDefinition in componentDefs):
+                            componentDefs.remove(childDefinition)
         # Remove Templates
         for obj in document.combinatorialderivations:
             template = document.getComponentDefinition(obj.masterTemplate)
@@ -234,14 +235,15 @@ class ParserSBOL:
     ) -> List[CombinatorialDerivation]:
         document = self.doc if sbolDocument is None else sbolDocument
         combDerivs = list(document.combinatorialderivations)
-        for obj in document.combinatorialderivations:
-            for vc in obj.variableComponents:
-                if vc.variantDerivations is not None:
-                    for vd in vc.variantDerivations:
-                        childDeriv = document.combinatorialderivations.get(vd)
-                        if (childDeriv
-                                is not None and childDeriv in combDerivs):
-                            combDerivs.remove(childDeriv)
+        if len(combDerivs) > 1:
+            for obj in document.combinatorialderivations:
+                for vc in obj.variableComponents:
+                    if vc.variantDerivations is not None:
+                        for vd in vc.variantDerivations:
+                            childDeriv = document.combinatorialderivations.get(vd)
+                            if (childDeriv
+                                    is not None and childDeriv in combDerivs):
+                                combDerivs.remove(childDeriv)
         return combDerivs
 
     def getListOfConstructs(

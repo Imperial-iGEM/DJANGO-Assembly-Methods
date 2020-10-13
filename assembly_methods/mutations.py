@@ -94,7 +94,7 @@ class FinalSpec(graphene.Mutation):
         # Input args
         linker_types = graphene.List(LinkerInType)
         assembly_type = graphene.String()
-        sbol_file_string = graphene.String(default="")
+        sbol_file_string = graphene.String()
         specifications_basic = graphene.Argument(InputSpecsBASIC)
         specifications_bio_bricks = graphene.Argument(InputSpecsBioBricks)
         specifications_mo_clo = graphene.Argument(InputSpecsMoClo)

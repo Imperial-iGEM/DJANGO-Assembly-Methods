@@ -47,8 +47,13 @@ def moclo_function(output_folder, construct_path, part_path,
     else:
         multi = False
     try:
+        print("Running Try!")
+        print("part_path: ", part_path)
         # Load in CSV files as a dict containing lists of lists.
+        part_path = part_path[0] if type(part_path)==list else part_path
+        print("part_path CHANGED: ", part_path)
         dna_plate_map_dict = generate_plate_maps(part_path)
+        print("dna_plate_map_dict: ", dna_plate_map_dict)
         combinations_to_make = generate_combinations(construct_path)
         check_number_of_combinations(combinations_limit, combinations_to_make)
 
@@ -88,11 +93,17 @@ def moclo_function(output_folder, construct_path, part_path,
         output_paths.append(agar_path)
 
     except Exception as e:
+        print("Running Exception :((")
         error_path = os.path.join(full_output_path, 'MoClo_error.txt')
-        with open(error_path) as f:
+        print("Exception: error_path", error_path)
+
+        with open(error_path, 'w') as f:
             f.write("Failed to generate MoClo scripts: {}\n".format(str(e)))
         output_paths.append(error_path)
+        print("Exception: output_paths", output_paths)
     finally:
+        print("Running finally :(( (")
+        print("finally: output_paths", output_paths)
         return output_paths
 
 ###############################################################################

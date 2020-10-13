@@ -22,7 +22,7 @@ class ParserSBOL:
         linkerFile: Document = Document(os.path.join(os.getcwd(), "sbol_parser_api/basic_linkers_standard.xml"))
     ):
         self.doc = sbolDocument
-        self.outdir = os.getcwd()
+        self.outdir = outdir
         if linkerFile is None:
             filepath = os.path.join(os.getcwd(), "sbol_parser_api/basic_linkers_standard.xml")
             self.linkerFile = Document(filepath)
@@ -33,7 +33,7 @@ class ParserSBOL:
 
     def generateCsv_for_DNABot(
             self,
-            dictOfParts: Dict[str, float] = None,
+            dictOfParts: Dict[str, float] = None,   # Keys: "concentration", "plate", "well"
             repeat: bool = None,
             maxWellsFilled: int = None,
             numRuns: int = None
@@ -1223,7 +1223,7 @@ class ParserSBOL:
             numPlates = len(listOfParts) // 96 + (len(listOfParts) % 96 > 0)
         else:
             # Determine number of plates from dict of parts
-            plates = [info["Plate"] for part, info in dictOfParts.items()]
+            plates = [info["plate"] for part, info in dictOfParts.items()]
             plates = list(dict.fromkeys(plates))
             numPlates = len(plates)
         # Add parts and linkers to plate

@@ -93,7 +93,7 @@ class FinalSpec(graphene.Mutation):
     class Arguments:
         # Input args
         linker_types = graphene.List(LinkerInType)
-        assembly_type = graphene.String()
+        assembly_type = graphene.String()   # "basic", "bio_bricks", or "moclo"
         sbol_file_string = graphene.String()
         specifications_basic = graphene.Argument(InputSpecsBASIC)
         specifications_bio_bricks = graphene.Argument(InputSpecsBioBricks)
@@ -159,14 +159,14 @@ class FinalSpec(graphene.Mutation):
                                       transformation_plate=labware_dict.transformation_plate
                                       )
         elif assembly_type == "moclo":
-            labware_dict = specifications_bio_bricks.labware_dict
+            labware_dict = specifications_mo_clo.labware_dict
             common_labware = labware_dict.common_labware
             csv_links = parser.generateCsv_for_MoClo(dictOfParts=part_types_dictionary)
             links = moclo_transform_generator.moclo_function(
                 output_folder=output_folder,
                 construct_path=csv_links["construct_path"],
                 part_path=csv_links["part_path"],
-                thermocycle=specifications_bio_bricks.thermocycle,
+                thermocycle=specifications_mo_clo.thermocycle,
                 p10_mount=common_labware.p10_mount,
                 p300_mount=common_labware.p300_mount,
                 p10_type=common_labware.p10_type,

@@ -94,7 +94,7 @@ class FinalSpec(graphene.Mutation):
         # Input args
         linker_types = graphene.List(LinkerInType)
         assembly_type = graphene.String()
-        sbol_file_string = graphene.String()
+        sbol_file_string = graphene.String(default="")
         specifications_basic = graphene.Argument(InputSpecsBASIC)
         specifications_bio_bricks = graphene.Argument(InputSpecsBioBricks)
         specifications_mo_clo = graphene.Argument(InputSpecsMoClo)
@@ -163,19 +163,19 @@ class FinalSpec(graphene.Mutation):
             common_labware = labware_dict.common_labware
             csv_links = parser.generateCsv_for_MoClo(dictOfParts=part_types_dictionary)
             links = moclo_transform_generator.moclo_function(
-                                        output_folder=output_folder,
-                                        construct_path=csv_links["construct_path"],
-                                        part_path=csv_links["part_path"],
-                                        thermocycle=specifications_bio_bricks.thermocycle,
-                                        p10_mount=common_labware.p10_mount,
-                                        p300_mount=common_labware.p300_mount,
-                                        p10_type=common_labware.p10_type,
-                                        p300_type=common_labware.p300_type,
-                                        well_plate=common_labware.well_plate,
-                                        trough=labware_dict.trough,
-                                        reagent_plate=labware_dict.reagent_plate,
-                                        agar_plate=labware_dict.agar_plate
-                                    )
+                output_folder=output_folder,
+                construct_path=csv_links["construct_path"],
+                part_path=csv_links["part_path"],
+                thermocycle=specifications_bio_bricks.thermocycle,
+                p10_mount=common_labware.p10_mount,
+                p300_mount=common_labware.p300_mount,
+                p10_type=common_labware.p10_type,
+                p300_type=common_labware.p300_type,
+                well_plate=common_labware.well_plate,
+                trough=labware_dict.trough,
+                reagent_plate=labware_dict.reagent_plate,
+                agar_plate=labware_dict.agar_plate
+            )
         else:
             links = []
         # return classes with outputs
@@ -192,3 +192,12 @@ def get_sbol_document(sbol_string):
     doc = Document()
     doc.appendString(sbol_str=sbol_string_decoded, overwrite=True)
     return doc
+
+
+def convert_part_info(part_types_list):
+    return {
+        part_type.linker_id: {
+            "concentration": part_type.concentration,
+            "plate": part_type.plate_number,
+            "well": part_type.well
+        } for part_type in part_types_list}

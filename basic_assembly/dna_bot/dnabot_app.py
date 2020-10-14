@@ -84,9 +84,17 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     '''
     # Parent directories
     generator_dir = os.getcwd()
-    template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
-
+    if os.path.split(generator_dir)[1] == 'dna_bot':
+        template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
+    elif os.path.split(generator_dir)[1] == 'basic_assembly':
+        template_dir_path = os.path.join(generator_dir, 'dna_bot', TEMPLATE_DIR_NAME)
+    else:
+        template_dir_path = os.path.join(generator_dir, 'basic_assembly/dna_bot', TEMPLATE_DIR_NAME)
     full_output_path = output_folder
+    
+    # In case construct path is list: can only have one path
+    if type(input_construct_path) == list:
+        input_construct_path = input_construct_path[0]
 
     construct_base = os.path.basename(input_construct_path[0]) if type(input_construct_path) == list else os.path.basename(input_construct_path)
     construct_base = os.path.splitext(construct_base)[0]
@@ -192,15 +200,15 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
             output_sources_paths, SOURCE_DECK_POS)
         labwareDf = pd.DataFrame(
             data={'name': list(labware_dict.keys()),
-                  'definition': list(labware_dict.values())})
+                    'definition': list(labware_dict.values())})
         dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
-                   MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
-                   CLIP_REACTIONS=clips_df, PART_INFO=parts_df,
-                   LABWARE=labwareDf)
+                    MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
+                    CLIP_REACTIONS=clips_df, PART_INFO=parts_df,
+                    LABWARE=labwareDf)
         output_sources_paths.append(os.path.join(
             my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
         with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
-                  'w', newline='') as csvfile:
+                    'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             for final_assembly_well, construct_clips in final_assembly_dict.items():
                 csvwriter.writerow([final_assembly_well, construct_clips])
@@ -221,7 +229,8 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         all_my_output_paths.append(error_path)
 
     finally:
-        return all_my_output_paths
+        output_paths = all_my_output_paths
+        return output_paths
 
 
 def generate_constructs_list(path):
@@ -368,8 +377,25 @@ def generate_sources_dict(paths):
                         csv_values = [source[1]]
                         part_dict['concentration'] = [PART_PER_CLIP]
                     csv_values.append(SOURCE_DECK_POS[deck_index])
-                    sources_dict[str(source[0])] = tuple(csv_values)
-                    part_dict['name'] = [str(source[0])]
+                    name = str(source[0])
+                    if name.find('_Prefix') > 0:
+                        index = name.index('Prefix')
+                        if name[index-1] == '-':
+                            name = name.replace('Prefix', 'P')
+                        elif name[index-1] == '_':
+                            name = name.replace('_Prefix', '-P')
+                        else:
+                            name = name.replace('Prefix', '-P')
+                    elif 'Suffix' in name:
+                        index = name.index('Suffix')
+                        if name[index-1] == '-':
+                            name = name.replace('Suffix', 'S')
+                        elif name[index-1] == '_':
+                            name = name.replace('_Suffix', '-S')
+                        else:
+                            name = name.replace('Suffix', '-S')
+                    sources_dict[name] = tuple(csv_values)
+                    part_dict['name'] = [name]
                     part_dict['well'] = [str(source[1])]
                     part_dict['plate'] = [SOURCE_DECK_POS[deck_index]]
                     part_dict_list.append(pd.DataFrame.from_dict(part_dict))
@@ -480,7 +506,6 @@ def generate_clips_dict(clips_df, sources_dict, parts_df):
                   'suffixes_wells': [], 'suffixes_plates': [],
                   'parts_wells': [], 'parts_plates': [], 'parts_vols': [],
                   'water_vols': []}
-
     # Generate clips_dict from args
     try:
         for _, clip_info in clips_df.iterrows():
@@ -500,7 +525,7 @@ def generate_clips_dict(clips_df, sources_dict, parts_df):
                     sources_dict[suffix_linker])[2]]*clip_info['number'])
             part = clip_info['parts']
             clips_dict['parts_wells'].append([sources_dict[part][0]]
-                                             * clip_info['number'])
+                                                * clip_info['number'])
             clips_dict['parts_plates'].append([handle_2_columns(
                 sources_dict[part])[2]]*clip_info['number'])
             part_index = parts_df[parts_df['name'] == part].index.values[0]
@@ -653,7 +678,6 @@ def generate_ot2_script(parent_dir, ot2_script_path, template_path, **kwargs):
     working_directory = os.getcwd()
 
     os.chdir(parent_dir)
-
     full_file_path = os.path.join(parent_dir, ot2_script_path)
 
     this_object_output_path = os.path.realpath(full_file_path)
@@ -757,6 +781,7 @@ def handle_2_columns(datalist):
         return mylist
     return datalist
 
+
 def final_well(sample_number):
     """Determines well containing the final sample from sample number.
     
@@ -773,12 +798,13 @@ Uncomment out everything in the comment below this to run command line version.
 Enter your own construct path and enter your part path or paths as a list
 '''
 '''
-output_folder_name = 'test-output'
+output_folder_name = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/output'
 ethanol_well = 'A11'
 deep_well = '1'
-construct_path = "C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/construct_csvs/storch_et_al_cons/storch_et_al_cons.csv"
-part_paths = ["C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/BIOLEGIO_BASIC_STD_SET.csv", "C:/Users/gabri/Documents/Uni/iGEM/DNABot/DNA-BOT-master/examples/part_linker_csvs/part_plate_2_230419.csv"]
+construct_path = ["C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/20201014_14_57_16/construct.csv"]
+part_paths = ["C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/20201014_14_57_16/part_linker_1.csv"]
 
 dnabot(output_folder_name, ethanol_well, deep_well, construct_path, part_paths,
        **labware_dict)
+
 '''

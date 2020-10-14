@@ -94,7 +94,7 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
         assembly_path = create_assembly_protocol(
             assembly_template_path, full_output_path, source_to_digest,
             reagent_to_digest, digest_to_storage, digest_to_construct,
-            reagent_to_construct, p10_mount=p10_type, p10_type=p10_type,
+            reagent_to_construct, p10_mount=p10_mount, p10_type=p10_type,
             well_plate_type=well_plate, tube_rack_type=tube_rack,
             thermocycle=thermocycle)
         output_paths = []
@@ -716,9 +716,10 @@ Below is an example of how this would be run through the command line:
 To use this, replace the output_folder name, construct_path, and part_path.
 '''
 '''
+output_folder = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/output'
 construct_path = [
     'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/biobricks-constructs.csv']
 part_path = [
     'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/biobricks-parts.csv']
-biobricks(construct_path, part_path, thermocycle=True, **labware_dict)
+biobricks(output_folder, construct_path, part_path, thermocycle=True, **labware_dict)
 '''

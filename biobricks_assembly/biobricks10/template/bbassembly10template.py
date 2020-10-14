@@ -43,6 +43,7 @@ def run(protocol: protocol_api.ProtocolContext):
         tip_rack = protocol.load_labware(TIPRACK_TYPE, CANDIDATE_TIPRACK_SLOT)
         pipette = protocol.load_instrument(PIPETTE_TYPE, PIPETTE_MOUNT,
                                            tip_racks=[tip_rack])
+        pipette.flow_rate.aspirate = 20
         if thermocycle:
             tc_mod = protocol.load_module('Thermocycler Module')
             dest_plate = tc_mod.load_labware(DESTINATION_PLATE_TYPE)
@@ -63,8 +64,19 @@ def run(protocol: protocol_api.ProtocolContext):
                 digest_wells.append(dest_plate.wells_by_name()[val[i][0]])
                 # vols.append(val[i][1])
             vol = val[0][1]
-            pipette.transfer(vol, source_plate_well, digest_wells, 
-                             blow_out=True)
+            # pipette.transfer(vol, source_plate_well, digest_wells,
+                             # blow_out=True)
+            pipette.pick_up_tip()
+            for digest_well in digest_wells:
+                pipette.move_to(source_plate_well.bottom())
+                protocol.max_speeds['Z'] = 10
+                pipette.aspirate(vol, source_plate_well.bottom())
+                pipette.move_to(digest_well.top())
+                protocol.max_speeds['Z'] = None
+                pipette.dispense(vol, digest_well)
+                pipette.touch_tip(digest_well)
+                pipette.blow_out()
+            pipette.drop_tip()
 
         # transferring reagents
         for reagent_well in reagent_to_digest.keys():
@@ -118,9 +130,22 @@ def run(protocol: protocol_api.ProtocolContext):
                 construct_wells.append(dest_plate.wells_by_name()[val[i][0]])
                 # vols.append(val[i][1])
             vol = val[0][1]
-            pipette.transfer(vol, digest_plate_well, construct_wells,
-                             blow_out=True)
-   
+            # pipette.transfer(vol, digest_plate_well, construct_wells,
+                             # blow_out=True)
+            
+            # transfer from digest to construct
+            pipette.pick_up_tip()
+            for construct_well in construct_wells:
+                pipette.move_to(digest_plate_well.bottom())
+                protocol.max_speeds['Z'] = 10
+                pipette.aspirate(vol, digest_plate_well.bottom())
+                pipette.move_to(construct_well.top())
+                protocol.max_speeds['Z'] = None
+                pipette.dispense(vol, construct_well)
+                pipette.touch_tip(construct_well)
+                pipette.blow_out()
+            pipette.drop_tip()
+
         for digest_well in digest_to_storage.keys():
             digest_plate_well = dest_plate.wells_by_name()[digest_well]
             val = digest_to_storage[digest_well]
@@ -130,8 +155,34 @@ def run(protocol: protocol_api.ProtocolContext):
                 storage_wells.append(tube_rack.wells_by_name()[val[i][0]])
                 # vols.append(val[i][1])
             vol = val[0][1]
-            pipette.transfer(vol, digest_plate_well, storage_wells,
-                             blow_out=True)
+            # pipette.transfer(vol, digest_plate_well, storage_wells,
+                             # blow_out=True)
+            pipette.pick_up_tip()
+            for storage_well in storage_wells:
+                if vol > 10:
+                    full_vol_no = vol // 10
+                    vols = [10]*full_vol_no
+                    if vol % 10 > 0:
+                        vols.append(vol % 10)
+                    for v in vols:
+                        pipette.move_to(digest_plate_well.bottom())
+                        protocol.max_speeds['Z'] = 10
+                        pipette.aspirate(v, digest_plate_well.bottom())
+                        pipette.move_to(storage_well.top())
+                        protocol.max_speeds['Z'] = None
+                        pipette.dispense(v, storage_well)
+                        pipette.touch_tip(storage_well)
+                        pipette.blow_out()
+                else:
+                    pipette.move_to(digest_plate_well.bottom())
+                    protocol.max_speeds['Z'] = 10
+                    pipette.aspirate(vol, digest_plate_well.bottom())
+                    pipette.move_to(storage_well.top())
+                    protocol.max_speeds['Z'] = None
+                    pipette.dispense(vol, storage_well)
+                    pipette.touch_tip(storage_well)
+                    pipette.blow_out()
+            pipette.drop_tip()
 
         for reagent_well in reagent_to_construct.keys():
             reagent_plate_well = tube_rack.wells_by_name()[reagent_well]

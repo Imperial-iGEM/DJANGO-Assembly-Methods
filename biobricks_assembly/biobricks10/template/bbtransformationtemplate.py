@@ -5,6 +5,12 @@ metadata = {'apiLevel': '2.2',
             'author': 'iGEM',
             'description': 'Opentrons BioBricks transformation template'}
 
+'''
+    Please note that this is incomplete and does not include agar transfers.
+    We would not recommend using this until we have a chance to validate it,
+    as there was no previous code basis to inform our template.
+'''
+
 
 # Labware constants
 PIPETTE_TYPE = p10_type

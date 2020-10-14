@@ -33,34 +33,34 @@ part_dfs = [pd.DataFrame(data={'name': ['BBa_B0034'], 'well': ['A1'],
                                [['upstream']], 'digests': [1], 'concentration':
                                [500], 'part_vol': [1], 'water_vol': [42],
                                'part_vol_tot': [1], 'water_vol_tot': [42],
-                               'constructs_in': [[[0, 1], [], []]], 'plate' = ['2']}),
+                               'constructs_in': [[[0, 1], [], []]], 'plate': ['2']}),
             pd.DataFrame(data={'name': ['BBa_C0040'], 'well': ['A2'],
                                'occurences': [[0, 1, 0]], 'roles':
                                [['downstream']], 'digests': [1],
                                'concentration': [500], 'part_vol': [1],
                                'water_vol': [42], 'part_vol_tot': [1],
                                'water_vol_tot': [42], 'constructs_in':
-                               [[[], [0], []]], 'plate' = ['2']}),
+                               [[[], [0], []]], 'plate': ['2']}),
             pd.DataFrame(data={'name': ['BBa_pSB1AK3'], 'well': ['A3'],
                                'occurences': [[0, 0, 3]], 'roles':
                                [['plasmid']], 'digests': [1], 'concentration':
                                [500], 'part_vol': [1], 'water_vol': [42],
                                'part_vol_tot': [1], 'water_vol_tot': [42],
-                               'constructs_in': [[[], [], [0, 1, 2]]], 'plate' = ['2']}),
+                               'constructs_in': [[[], [], [0, 1, 2]]], 'plate': ['2']}),
             pd.DataFrame(data={'name': ['BBa_C0012'], 'well': ['A4'],
                                'occurences': [[1, 1, 0]], 'roles':
                                [['upstream', 'downstream']], 'digests': [2],
                                'concentration': [500], 'part_vol': [1],
                                'water_vol': [42], 'part_vol_tot': [2],
                                'water_vol_tot': [84], 'constructs_in':
-                               [[[2], [1], []]], 'plate' = ['2']}),
+                               [[[2], [1], []]], 'plate': ['2']}),
             pd.DataFrame(data={'name': ['BBa_B0015'], 'well': ['A5'],
                                'occurences': [[0, 1, 0]], 'roles':
                                [['downstream']], 'digests': [1],
                                'concentration': [500], 'part_vol': [1],
                                'water_vol': [42], 'part_vol_tot': [1],
                                'water_vol_tot': [42], 'constructs_in':
-                               [[[], [2], []]], 'plate' = ['2']})]
+                               [[[], [2], []]], 'plate': ['2']})]
 
 
 def process_cons(construct):

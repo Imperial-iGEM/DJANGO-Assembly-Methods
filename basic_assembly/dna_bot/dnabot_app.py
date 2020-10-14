@@ -84,8 +84,12 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     '''
     # Parent directories
     generator_dir = os.getcwd()
-    template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
-
+    if os.path.split(generator_dir)[1] == 'dna_bot':
+      template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
+    elif os.path.split(generator_dir)[1] == 'basic_assembly':
+      template_dir_path = os.path.join(generator_dir, 'dna_bot', TEMPLATE_DIR_NAME)
+    else:
+      template_dir_path = os.path.join(generator_dir, 'basic_assembly/dna_bot', TEMPLATE_DIR_NAME)
     full_output_path = output_folder
     
     # In case construct path is list: can only have one path

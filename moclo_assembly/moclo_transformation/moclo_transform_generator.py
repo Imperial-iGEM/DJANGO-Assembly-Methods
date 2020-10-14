@@ -29,13 +29,21 @@ def moclo_function(output_folder, construct_path, part_path,
         construct_path = construct_path[0]
 
     current_dir = os.getcwd()
+    
+    if os.path.split(current_dir)[1] == 'moclo_transformation':
+      assembly_path = os.path.join(current_dir, 'data/moclo_assembly_template.py')
+      transform_path = os.path.join(current_dir, 'data/transform_moclo_template.py')
+    elif os.path.split(current_dir)[1] == 'moclo_assembly':
+      assembly_path = os.path.join(current_dir, 'moclo_transformation/data/moclo_assembly_template.py')
+      transform_path = os.path.join(current_dir, 'moclo_transformation/data/transform_moclo_template.py')
+    else:
+      assembly_path = os.path.join(current_dir, 'moclo_assembly/moclo_transformation/data/moclo_assembly_template.py')
+      transform_path = os.path.join(current_dir, 'moclo_assembly/moclo_transformation/data/transform_moclo_template.py')
 
     config = {
         'output_folder_path': full_output_path,
-        'assembly_template_path':
-        os.path.join(current_dir, 'moclo_assembly/moclo_transformation/data/moclo_assembly_template.py'),
-        'transform_template_path':
-        os.path.join(current_dir, 'moclo_assembly/moclo_transformation/data/transform_moclo_template.py')}
+        'assembly_template_path': assembly_path,
+        'transform_template_path': transform_path}
 
     # for now only do single (other option = triplicate)
     combinations_limit = 'single'

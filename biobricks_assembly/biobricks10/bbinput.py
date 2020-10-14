@@ -141,7 +141,10 @@ def get_parts(paths, constructs_list):
 
     parts_list = []
     source_plate_pos = ['2', '5', '6']
+    if len(paths) > 3:
+      paths = paths[0:2]
     for index, path in enumerate(paths):
+      plate = source_plate_pos[index]
       with open(path, 'r') as csvfile:
           csv_reader = csv.reader(csvfile)
           for index, part in enumerate(csv_reader):

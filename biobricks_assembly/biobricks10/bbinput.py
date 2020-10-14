@@ -4,6 +4,7 @@ import json
 import math
 import pandas as pd
 
+# labware dictionary - filled in by front end
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'p10_type': 'p10_single', 'p300_type': 'p300_single',
                 'well_plate': 'biorad_96_wellplate_200ul_pcr',
@@ -13,6 +14,8 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
 
 TEMPLATE_DIR_NAME = 'template'
 OUTPUT_DIR_NAME = 'output'
+
+# Integer constants
 REAGENTS_TUBE_MAX_VOL = 1500
 DEFAULT_CONCENTRATION = 500  # 500 ng/uL
 PART_AMOUNT = 500
@@ -35,34 +38,59 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
               tube_rack='opentrons_24_tuberack_nest_1.5ml_snapcap',
               soc_plate='usascientific_96_wellplate_2.4ml_deep',
               transformation_plate='corning_96_wellplate_360ul_flat'):
+    '''
+        Main function, creates scripts and metainformation
+        Can take specific args or just **labware_dict for all labware
+        Args:
+            output_folder: the full file path of the intended output folder
+            for files generated
+            construct_path: a one element list with the full path of the
+            construct csv
+            part_path: a list of full paths to part csv(s) (one or more)
+            thermocyle: True or False, indicating whether the user has
+            and would like to use the Opentrons Thermocycler
+            see labware_dict for rest of arguments
+    '''
 
     full_output_path = output_folder
-    
+
     # In case construct path is list: can only have one path
     if type(construct_path) == list:
-      construct_path = construct_path[0]
+        construct_path = construct_path[0]
 
     generator_dir = os.getcwd()
+    '''
+        Ensure that template directories are correct.
+        Important for running this script through the front end.
+    '''
     if os.path.split(generator_dir)[1] == 'biobricks10':
-      template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
+        template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
     elif os.path.split(generator_dir)[1] == 'biobricks_assembly':
-      template_dir_path = os.path.join(generator_dir, 'biobricks10', TEMPLATE_DIR_NAME)
+        template_dir_path = os.path.join(
+            generator_dir, 'biobricks10', TEMPLATE_DIR_NAME)
     else:
-      template_dir_path = os.path.join(generator_dir, 'biobricks_assembly/biobricks10', TEMPLATE_DIR_NAME)
+        template_dir_path = os.path.join(
+            generator_dir, 'biobricks_assembly/biobricks10', TEMPLATE_DIR_NAME)
     assembly_template_path = os.path.join(template_dir_path,
                                           'bbassembly10template.py')
     transformation_template_path = os.path.join(template_dir_path,
                                                 'bbtransformationtemplate.py')
     try:
+        # Creates constructs, parts, reagents, and digest dataframes
         constructs, dest_well_list = get_constructs(construct_path)
         parts = get_parts(part_path, constructs)
-        reagents, reagents_well_list, mm_df = get_reagents_wells(constructs, parts)
-        digest_loc, parts_df = get_digests(constructs, parts, reagents_well_list,
-                                        dest_well_list, reagents)
+        reagents, reagents_well_list, mm_df = get_reagents_wells(
+            constructs, parts)
+        digest_loc, parts_df = get_digests(
+            constructs, parts, reagents_well_list,
+            dest_well_list, reagents)
 
+        # Creates assembly dictionaries to be used in assembly protocol
         source_to_digest, reagent_to_digest, digest_to_storage, \
             digest_to_construct, reagent_to_construct = create_assembly_dicts(
                                         constructs, parts, digest_loc, reagents)
+
+        # Creates and saves assembly protocol
         assembly_path = create_assembly_protocol(
             assembly_template_path, full_output_path, source_to_digest,
             reagent_to_digest, digest_to_storage, digest_to_construct,
@@ -72,15 +100,19 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
         output_paths = []
         output_paths.append(assembly_path)
 
+        # Creates transformation dictionaries to be used in transformation
+        # protocol
         competent_source_to_dest, control_source_to_dest, \
             assembly_source_to_dest, water_source_to_dest, transform_df \
             = create_tranformation_dicts(constructs, water_well='A1',
-                                        controls_per_cons=False)
+                                         controls_per_cons=False)
 
+        # Creates and saves transformation protocol
         transform_path = create_transformation_protocol(
             transformation_template_path, full_output_path,
             competent_source_to_dest,
-            control_source_to_dest, assembly_source_to_dest, water_source_to_dest,
+            control_source_to_dest, assembly_source_to_dest,
+            water_source_to_dest,
             p10_mount=p10_mount, p300_mount=p300_mount, p10_type=p10_type,
             p300_type=p300_type, well_plate_type=well_plate,
             transformation_plate_type=transformation_plate,
@@ -88,18 +120,22 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
         output_paths.append(transform_path)
         labwareDf = pd.DataFrame(
             data={'name': list(labware_dict.keys()),
-                'definition': list(labware_dict.values())})
+                  'definition': list(labware_dict.values())})
 
-        dfs_to_csv(os.path.join(full_output_path, 'bb_metainformation.csv'),
-                index=False, PARTS_INFO=parts_df, REAGENTS=reagents,
-                MASTER_MIX=mm_df, DIGESTS=digest_loc, CONSTRUCTS=constructs,
-                LABWARE=labwareDf)
+        # Saves dataframes in metainformation csv
+        dfs_to_csv(
+            os.path.join(full_output_path, 'bb_metainformation.csv'),
+            index=False, PARTS_INFO=parts_df, REAGENTS=reagents,
+            MASTER_MIX=mm_df, DIGESTS=digest_loc, CONSTRUCTS=constructs,
+            LABWARE=labwareDf)
         output_paths.append(
             os.path.join(full_output_path, 'bb_metainformation.csv'))
- 
+
     except Exception as e:
+        # Handles error and writes to file
         output_paths = []
         error_path = os.path.join(full_output_path, 'BioBricks_error.txt')
+        print("Exception: error_path", error_path)
         with open(error_path) as f:
             f.write("Failed to generate BioBricks scripts: {}\n".format(str(e)))
         output_paths.append(error_path)
@@ -109,7 +145,7 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
 
 def get_constructs(path):
     '''
-        Returns list of construct dictionaries from csv file
+        Returns construct dataframe from constructs csv
     '''
     constructs_list = []
     dest_well_list = []
@@ -132,6 +168,7 @@ def get_constructs(path):
 def process_construct(construct_entry):
     '''
         Returns construct dictionary from row in csv file
+        Used in get_constructs()
     '''
     construct_dict = {'name': [construct_entry[0]],
                       'well': [construct_entry[1]], 'upstream':
@@ -143,7 +180,7 @@ def process_construct(construct_entry):
 
 def get_parts(paths, constructs_list):
     '''
-        Returns list of part dictionaries from part csv file.
+        Returns a dataframe of parts from part csv file.
         Uses constructs_list to record the number of times the part is used
         in the constructs and the roles it plays.
     '''
@@ -151,15 +188,15 @@ def get_parts(paths, constructs_list):
     parts_list = []
     source_plate_pos = ['2', '5', '6']
     if len(paths) > 3:
-      paths = paths[0:2]
+        paths = paths[0:2]
     for index, path in enumerate(paths):
-      plate = source_plate_pos[index]
-      with open(path, 'r') as csvfile:
-          csv_reader = csv.reader(csvfile)
-          for index, part in enumerate(csv_reader):
-              if index != 0:
-                  part = list(filter(None, part))
-                  parts_list.append(process_part(part, constructs_list, plate))
+        plate = source_plate_pos[index]
+        with open(path, 'r') as csvfile:
+            csv_reader = csv.reader(csvfile)
+            for index, part in enumerate(csv_reader):
+                if index != 0:
+                    part = list(filter(None, part))
+                    parts_list.append(process_part(part, constructs_list, plate))
     merged_parts_list = pd.concat(parts_list, ignore_index=True)
     return merged_parts_list
 
@@ -167,6 +204,7 @@ def get_parts(paths, constructs_list):
 def process_part(part, constructs_list, plate):
     '''
         Returns a part dictionary with detailed information.
+        Used in get_parts()
     '''
     part_dict = {'name': [part[0]], 'well': [part[1]]}
     occ, cons_in = count_part_occurences(constructs_list, part)
@@ -293,6 +331,10 @@ def get_reagents_wells(constructs_list, parts):
 
 def get_digests(constructs_list, parts, reagents_wells_used, dest_wells_used,
                 reagents):
+    '''
+        Creates a dataframe of digests, the intermediate step in assembly
+        BioBricks constructs.
+    '''
     digests = []
     parts_df = parts.copy()
     parts_df['digest_wells'] = pd.Series([] * len(parts_df.index))
@@ -332,6 +374,10 @@ def get_digests(constructs_list, parts, reagents_wells_used, dest_wells_used,
 
 
 def next_well(wells_used):
+    '''
+        Finds the next available well from a list of used wells
+        for a 96 well plate
+    '''
     letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     well_avail = None
     for i in range(96):
@@ -350,6 +396,10 @@ def next_well(wells_used):
 
 
 def next_well_reagent(wells_used):
+    '''
+        Finds the next available well from a list of used wells
+        for a 24 well plate
+    '''
     letter = ['A', 'B', 'C', 'D']
     well_avail = None
     for i in range(24):
@@ -368,6 +418,11 @@ def next_well_reagent(wells_used):
 
 
 def count_part_occurences(constructs_list, part):
+    '''
+        Counts the number of times a part is used in the constructs.
+        Differentiates between upstream uses, downstream uses,
+        and plasmid uses: all require different digests.
+    '''
     # upstream_counts, downstream_counts, plasmid_counts = 0
     counts = [0, 0, 0]
     constructs_in_upstream = []
@@ -389,6 +444,10 @@ def count_part_occurences(constructs_list, part):
 
 
 def create_assembly_dicts(constructs, parts, digests, reagents):
+    '''
+        Returns assembly dictionaries to be used in the assembly protocol,
+        instructing which transfers need to be made.
+    '''
     source_to_digest = {}
     reagent_to_digest = {}
     digest_to_construct = {}
@@ -470,6 +529,10 @@ def create_assembly_dicts(constructs, parts, digests, reagents):
 
 def create_tranformation_dicts(constructs, water_well='A1',
                                controls_per_cons=False):
+    '''
+        Returns transformation dictionaries to be used in the transformation
+        protocol, instructing which transfers need to be made.
+    '''
 
     competent_source_to_dest = {}
     control_source_to_dest = {}
@@ -560,6 +623,10 @@ def create_assembly_protocol(template_path, output_path, source_to_digest,
                              digest_to_construct, reagent_to_construct,
                              p10_mount, p10_type, well_plate_type,
                              tube_rack_type, thermocycle):
+    '''
+        Generates the assembly protocol used by opentrons.
+        Returns the path of the assembly script.
+    '''
     with open(template_path) as template_file:
         template_string = template_file.read()
     assembly_path = os.path.join(output_path, 'bb_assembly_protocol.py')
@@ -597,7 +664,10 @@ def create_transformation_protocol(template_path, output_path,
                                    transformation_plate_type,
                                    tube_rack_type,
                                    soc_plate_type):
-
+    '''
+        Generates the transformation protocol used by opentrons.
+        Returns the path of the transform script.
+    '''
     with open(template_path) as template_file:
         template_string = template_file.read()
     transform_path = os.path.join(output_path, 'bb_transformation_protocol.py')
@@ -642,12 +712,13 @@ def dfs_to_csv(path, index=True, **kw_dfs):
 
 
 '''
-generator_dir = os.getcwd()
-construct_path = os.path.join(
-    os.path.split(os.path.split(generator_dir)[0])[0],
-    'examples/biobricks-constructs.csv')
-part_path = os.path.join(
-    os.path.split(os.path.split(generator_dir)[0])[0],
-    'examples/biobricks-parts.csv')
+Below is an example of how this would be run through the command line:
+To use this, replace the output_folder name, construct_path, and part_path.
+'''
+'''
+construct_path = [
+    'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/biobricks-constructs.csv']
+part_path = [
+    'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/biobricks-parts.csv']
 biobricks(construct_path, part_path, thermocycle=True, **labware_dict)
 '''

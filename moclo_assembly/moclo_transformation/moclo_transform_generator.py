@@ -253,6 +253,7 @@ def create_metainformation(output_path, dna_plate_map_dict,
                            labware_dict, thermocycle, triplicate):
 
     parts_df = create_parts_df(dna_plate_map_dict)
+    print('parts_df=', parts_df)
 
     combination_df_list = []
     for comb_index, combination_dict in enumerate(combinations_to_make):
@@ -272,11 +273,22 @@ def create_metainformation(output_path, dna_plate_map_dict,
                 else:
                     parts_df.at[part_index, 'combinations'].append(
                         combination_dict['name'])
-    combinations_df = pd.concat(combination_df_list, ignore_index=True)
+    if combination_df_list:
+        combinations_df = pd.concat(combination_df_list, ignore_index=True)
+    else:
+        combination_df_dict['name'] = None
+        combination_df_dict['parts'] = None
+        combination_df_dict['well'] = None
+        combination_df_dict['no_parts'] = None
+        combination_df_dict['plate'] = None
+        combinations_df = pd.DataFrame(combination_df_dict, index=len(combination_df_dict))
+    print('combinations_df=', combinations_df)
 
     mm_df = create_mm_df(combinations_df)
+    print('mm_df=', mm_df)
 
     reagents_df = create_reagents_df(mm_df)
+    print('reagents_df=', reagents_df)
 
     with open(output_path, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
@@ -310,7 +322,7 @@ def create_metainformation(output_path, dna_plate_map_dict,
         csvwriter.writerow('')
 
         kw_dfs = {'PARTS': parts_df, 'COMBINATIONS': combinations_df,
-                  'MASTER_MIX': mm_df, 'REAGENTS': reagents_df}
+                    'MASTER_MIX': mm_df, 'REAGENTS': reagents_df}
 
         for key, value in kw_dfs.items():
             csvwriter.writerow([str(key)])
@@ -323,18 +335,19 @@ def create_metainformation(output_path, dna_plate_map_dict,
 def create_parts_df(dna_plate_map_dict):
     letter_dict = {'0': 'A', '1': 'B', '2': 'C', '3': 'D', '4': 'E', '5': 'F',
                    '6': 'G', '7': 'H'}
-    for plate, plate_wells in dna_plate_map_dict.items():
-        part_df_list = []
-        for row_index, row in enumerate(plate_wells):
-            row_letter = letter_dict[str(row_index)]
-            for col_index, part in enumerate(row):
-                if len(part) > 0:
-                    part_dict = {}
-                    well_name = row_letter + str(col_index + 1)
-                    part_dict['name'] = [part]
-                    part_dict['well'] = [well_name]
-                    part_dict['plate'] = [plate]
-                    part_df_list.append(pd.DataFrame.from_dict(part_dict))
+    for dna_plate_dict in dna_plate_map_dict:
+        for plate, plate_wells in dna_plate_dict.items():
+            part_df_list = []
+            for row_index, row in enumerate(plate_wells):
+                row_letter = letter_dict[str(row_index)]
+                for col_index, part in enumerate(row):
+                    if len(part) > 0:
+                        part_dict = {}
+                        well_name = row_letter + str(col_index + 1)
+                        part_dict['name'] = [part]
+                        part_dict['well'] = [well_name]
+                        part_dict['plate'] = [plate]
+                        part_df_list.append(pd.DataFrame.from_dict(part_dict))
     parts_df = pd.concat(part_df_list, ignore_index=True)
     parts_df['combinations'] = pd.Series(['0'] * len(parts_df.index),
                                          index=parts_df.index)
@@ -414,6 +427,7 @@ def create_mm_df(combinations_df):
     if mm_df_list:
         mm_df = pd.concat(mm_df_list, ignore_index=True)
     else:  # If mm_df is empty, make default
+        mm_dict = {}
         mm_dict['well'] = None
         mm_dict['no_parts'] = None
         mm_dict['vol_per_assembly'] = None
@@ -424,7 +438,7 @@ def create_mm_df(combinations_df):
         mm_dict['enzyme_vol'] = None
         mm_dict['water_vol'] = None
         mm_dict['plate'] = None
-        mm_df = pd.DataFrame(mm_dict)
+        mm_df = pd.DataFrame(mm_dict, index=range(len(mm_dict)))
     return mm_df
 
 

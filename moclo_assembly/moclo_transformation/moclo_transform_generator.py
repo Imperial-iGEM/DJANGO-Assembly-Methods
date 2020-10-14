@@ -23,6 +23,11 @@ def moclo_function(output_folder, construct_path, part_path,
 
     output_paths = []
     full_output_path = output_folder
+    
+    # In case construct path is list: can only have one path
+    if type(construct_path) == 'list':
+      construct_path = construct_path[0]
+
     # Online
     config = {
         'output_folder_path': full_output_path,

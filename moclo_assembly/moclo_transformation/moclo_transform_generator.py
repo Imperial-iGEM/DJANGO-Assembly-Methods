@@ -29,7 +29,8 @@ def moclo_function(output_folder, construct_path, part_path,
         'assembly_template_path':
         '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/moclo_assembly/moclo_transformation/data/moclo_assembly_template.py',
         'transform_template_path':
-        '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/moclo_assembly/moclo_transformation/data/moclo_assembly_template.py'}
+        '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/moclo_assembly/moclo_transformation/data/moclo_assembly_template.py'
+    }
     '''
     # Offline (should also work online)
     config = {
@@ -48,16 +49,29 @@ def moclo_function(output_folder, construct_path, part_path,
         multi = False
     try:
         print("Running Try!")
-        print("part_path: ", part_path)
         # Load in CSV files as a dict containing lists of lists.
-        part_path = part_path[0] if type(part_path)==list else part_path
-        print("part_path CHANGED: ", part_path)
-        dna_plate_map_dict = generate_plate_maps(part_path)
-        print("dna_plate_map_dict: ", dna_plate_map_dict)
-        combinations_to_make = generate_combinations(construct_path)
-        check_number_of_combinations(combinations_limit, combinations_to_make)
+        ## Loop through all part_path's and merge dicts 
+        dna_plate_map_dict = {}
+        if type(part_path)==list:
+            for path in part_path:
+                dna_plate_map_dict_local = generate_plate_maps(path)
+                dna_plate_map_dict.update(dna_plate_map_dict_local)
+            print("dna_plate_map_dict: ", dna_plate_map_dict)
+        else:
+            dna_plate_map_dict = generate_plate_maps(part_path)
 
+        combinations_to_make = {}
+        if type(construct_path)==list:
+            for path in construct_path:
+                combinations_to_make_local = generate_combinations(path)
+                combinations_to_make.update(combinations_to_make_local)
+            print("combinations_to_make: ", combinations_to_make)
+        else:
+            combinations_to_make = generate_combinations(construct_path)
+
+        check_number_of_combinations(combinations_limit, combinations_to_make)
         # Generate and save output plate maps.
+        print("config['output_folder_path']: ", config['output_folder_path'])
         triplicate, agar_path = generate_and_save_output_plate_maps(
             combinations_to_make, combinations_limit, config['output_folder_path'])
 
@@ -144,6 +158,7 @@ def generate_combinations(combinations_filename):
 def check_number_of_combinations(combinations_limit, combinations_to_make):
     number_of_combinations = len(combinations_to_make)
     if combinations_limit == 'single':
+        print("check_number_of_combinations: should be fine w single")
         if number_of_combinations > 88:
             raise ValueError('Too many combinations ({0}) requested.'
                              'Max for single combinations is '
@@ -166,16 +181,14 @@ def generate_and_save_output_plate_maps(combinations_to_make,
                                         output_folder_path):
     # Split combinations_to_make into 8x6 plate maps.
     output_plate_map_flipped = []
-    for i, combo in enumerate(combinations_to_make):
-        name = combo["name"]
+    for i, (key, value) in enumerate(combinations_to_make.items()):
+        name = value if key=="name" else None
         # if i % 32 == 0:
         #   # new plate
         #   output_plate_maps_flipped.append([[name]])
-
         if i % 8 == 0:
             # new column
             output_plate_map_flipped.append([name])
-
         else:
             output_plate_map_flipped[-1].append(name)
 

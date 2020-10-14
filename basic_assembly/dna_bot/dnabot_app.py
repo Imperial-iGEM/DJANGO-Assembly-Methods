@@ -53,7 +53,6 @@ SPOTTING_VOLS_DICT = {2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5}
 SOURCE_DECK_POS = ['2', '5', '8', '7', '10', '11']
 
 # labware dictionary - filled in by front end
-
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'p10_type': 'p10_single', 'p300_type': 'p300_multi',
                 'well_plate': 'biorad_96_wellplate_200ul_pcr',
@@ -82,9 +81,24 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     '''
         Main function, creates scripts and metainformation
         Can take specific args or just **labware_dict for all labware
+        Args:
+            output_folder: the full file path of the intended output folder
+            for files generated
+            ethanol_well_for_stage_2 = ethanol well in letter format e.g.
+            'A1' to be used in purification
+            deep_well_plate_stage_4 = soc well to be used in transformation
+            please only enter wells from 'A1' to 'A12' as this is a trough
+            construct_path: a one element list with the full path of the
+            construct csv
+            part_path: a list of full paths to part csv(s) (one or more)
+            see labware_dict for rest of arguments
     '''
     # Parent directories
     generator_dir = os.getcwd()
+    '''
+        Ensure that template directories are correct.
+        Important for running this script through the front end.
+    '''
     if os.path.split(generator_dir)[1] == 'dna_bot':
         template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
     elif os.path.split(generator_dir)[1] == 'basic_assembly':
@@ -158,7 +172,7 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         out_full_path_4 = generate_ot2_script(
             full_output_path, TRANS_SPOT_FNAME,
             os.path.join(template_dir_path, TRANS_SPOT_TEMP_FNAME),
-            spotting_tuples=spotting_tuples, soc_well="A1",
+            spotting_tuples=spotting_tuples, soc_well=deep_well_plate_stage_4,
             p10_mount=p10_mount,
             p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
             well_plate_type=well_plate, tube_rack_type=tube_rack,
@@ -814,7 +828,7 @@ To use this, replace the output_folder name, construct_path, and part_paths.
 '''
 output_folder_name = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/output'
 ethanol_well = 'A11'
-deep_well = '1'
+deep_well = 'A1'
 construct_path = ["C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/20201014_14_57_16/construct.csv"]
 part_paths = ["C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/20201014_14_57_16/part_linker_1.csv"]
 

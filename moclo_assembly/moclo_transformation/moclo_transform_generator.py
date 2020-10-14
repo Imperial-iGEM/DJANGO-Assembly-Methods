@@ -5,6 +5,7 @@ import csv
 import json
 import pandas as pd
 
+# labware dictionary - filled in by front end
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'p10_type': 'p10_single', 'p300_type': 'p300_multi',
                 'well_plate': 'biorad_96_wellplate_200ul_pcr',
@@ -20,26 +21,54 @@ def moclo_function(output_folder, construct_path, part_path,
                    trough='usascientific_12_reservoir_22ml',
                    reagent_plate='biorad_96_wellplate_200ul_pcr',
                    agar_plate='thermofisher_96_wellplate_180ul'):
+    '''
+        Main function, creates scripts and metainformation
+        Can take specific args or just **labware_dict for all labware
+        Args:
+            output_folder: the full file path of the intended output folder
+            for files generated
+            construct_path: a one element list with the full path of the
+            construct csv
+            part_path: a list of full paths to part csv(s) (one or more)
+            thermocyle: True or False, indicating whether the user has
+            and would like to use the Opentrons Thermocycler
+            see labware_dict for rest of arguments
+    '''
 
     output_paths = []
     full_output_path = output_folder
-    
+
     # In case construct path is list: can only have one path
     if type(construct_path) == list:
         construct_path = construct_path[0]
 
     current_dir = os.getcwd()
-    
-    if os.path.split(current_dir)[1] == 'moclo_transformation':
-      assembly_path = os.path.join(current_dir, 'data', 'moclo_assembly_template.py')
-      transform_path = os.path.join(current_dir, 'data', 'transform_moclo_template.py')
-    elif os.path.split(current_dir)[1] == 'moclo_assembly':
-      assembly_path = os.path.join(current_dir, 'moclo_assembly', 'moclo_transformation', 'data', 'moclo_assembly_template.py')
-      transform_path = os.path.join(current_dir, 'moclo_assembly', 'moclo_transformation', 'data', 'transform_moclo_template.py')
-    else:
-      assembly_path = os.path.join(current_dir, 'moclo_assembly', 'moclo_transformation', 'data', 'moclo_assembly_template.py')
-      transform_path = os.path.join(current_dir, 'moclo_assembly', 'moclo_transformation', 'data', 'transform_moclo_template.py')
 
+    '''
+        Ensure that template directories are correct.
+        Important for running this script through the front end.
+    '''
+    if os.path.split(current_dir)[1] == 'moclo_transformation':
+        assembly_path = os.path.join(
+            current_dir, 'data', 'moclo_assembly_template.py')
+        transform_path = os.path.join(
+            current_dir, 'data', 'transform_moclo_template.py')
+    elif os.path.split(current_dir)[1] == 'moclo_assembly':
+        assembly_path = os.path.join(
+            current_dir, 'moclo_assembly', 'moclo_transformation', 'data',
+            'moclo_assembly_template.py')
+        transform_path = os.path.join(
+            current_dir, 'moclo_assembly', 'moclo_transformation', 'data',
+            'transform_moclo_template.py')
+    else:
+        assembly_path = os.path.join(
+            current_dir, 'moclo_assembly', 'moclo_transformation', 'data',
+            'moclo_assembly_template.py')
+        transform_path = os.path.join(
+            current_dir, 'moclo_assembly', 'moclo_transformation', 'data',
+            'transform_moclo_template.py')
+
+    # sets paths to be used by script gen
     config = {
         'output_folder_path': full_output_path,
         'assembly_template_path': assembly_path,
@@ -53,6 +82,7 @@ def moclo_function(output_folder, construct_path, part_path,
         multi = True
     else:
         multi = False
+
     try:
         # Load in CSV files as a dict containing lists of lists.
         # Loop through all part_path's and merge dicts
@@ -66,53 +96,55 @@ def moclo_function(output_folder, construct_path, part_path,
             dna_plate_map_dict = generate_plate_maps(part_path)
 
         combinations_to_make = []
-        if type(construct_path)==list:
-            for path in construct_path:
-                combinations_to_make_local = generate_combinations(path)
-                combinations_to_make.append(combinations_to_make_local[0])
-            print("combinations_to_make: ", combinations_to_make)
-        else:
-            combinations_to_make = generate_combinations(construct_path)
+        combinations_to_make = generate_combinations(construct_path)
 
         check_number_of_combinations(combinations_limit, combinations_to_make)
+
         # Generate and save output plate maps.
         print("config['output_folder_path']: ", config['output_folder_path'])
         triplicate, agar_path = generate_and_save_output_plate_maps(
-            combinations_to_make, combinations_limit, config['output_folder_path'])
+            combinations_to_make, combinations_limit,
+            config['output_folder_path'])
 
+        # Define assembly metainformation path
         assembly_metainformation_path = os.path.join(
             config['output_folder_path'], 'assembly_metainformation.csv')
-        print('assembly_metainformation_path: ', assembly_metainformation_path)
-        print('triplicate: ', triplicate)
-        print('thermocycle: ', thermocycle)
-        print('labware_dict: ', labware_dict)
+        # print('assembly_metainformation_path: ',
+        # assembly_metainformation_path)
+        # print('triplicate: ', triplicate)
+        # print('thermocycle: ', thermocycle)
+        # print('labware_dict: ', labware_dict)
+
+        # Create and save assembly metainformation
         parts, comb, mm, reagents = create_metainformation(
             assembly_metainformation_path,
-            dna_plate_map_dict, combinations_to_make, labware_dict, thermocycle,
-            triplicate)
-        print('passed create_metainformation')
+            dna_plate_map_dict, combinations_to_make, labware_dict,
+            thermocycle, triplicate)
+        # print('passed create_metainformation')
 
+        # create master mix dictionary to use in assembly protocol
         reagent_to_mm_dict, mm_dict = get_mm_dicts(mm, reagents)
-        print('passed get_mm_dicts')
+        # print('passed get_mm_dicts')
 
         transform_metainformation_path = os.path.join(
             config['output_folder_path'], 'transform_metainformation.csv')
-        print('transform_metainformation_path: ', transform_metainformation_path)
+        print('transform_metainformation_path: ',
+              transform_metainformation_path)
         create_transform_metainformation(
             transform_metainformation_path,
             labware_dict, triplicate, multi)
-        print('passed create_transform_metainformation')
+        # print('passed create_transform_metainformation')
 
         # Create a protocol file and hard code the plate maps into it.
         assembly_path, transform_path = create_protocol(
-            dna_plate_map_dict, combinations_to_make, reagent_to_mm_dict, mm_dict,
-            config['assembly_template_path'], config['transform_template_path'],
-            config['output_folder_path'], thermocycle, triplicate, multi,
-            p10Mount=p10_mount, p300Mount=p300_mount, p10_type=p10_type,
-            p300_type=p300_type, reaction_plate_type=well_plate,
-            reagent_plate_type=reagent_plate, trough_type=trough,
-            agar_plate_type=agar_plate)
-        print('passed create_protocol')
+            dna_plate_map_dict, combinations_to_make, reagent_to_mm_dict,
+            mm_dict, config['assembly_template_path'],
+            config['transform_template_path'], config['output_folder_path'],
+            thermocycle, triplicate, multi, p10Mount=p10_mount,
+            p300Mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
+            reaction_plate_type=well_plate, reagent_plate_type=reagent_plate,
+            trough_type=trough, agar_plate_type=agar_plate)
+        print('Succesfully created opentrons scripts')
 
         output_paths.append(assembly_path)
         output_paths.append(transform_path)
@@ -121,17 +153,14 @@ def moclo_function(output_folder, construct_path, part_path,
         output_paths.append(agar_path)
 
     except Exception as e:
-        print("Running Exception :((")
         error_path = os.path.join(full_output_path, 'MoClo_error.txt')
         print("Exception: error_path", error_path)
 
         with open(error_path, 'w') as f:
             f.write("Failed to generate MoClo scripts: {}\n".format(str(e)))
         output_paths.append(error_path)
-        print("Exception: output_paths", output_paths)
     finally:
-        print("Running finally :(( (")
-        print("finally: output_paths", output_paths)
+        print("output_paths:", output_paths)
         return output_paths
 
 ###############################################################################
@@ -140,6 +169,9 @@ def moclo_function(output_folder, construct_path, part_path,
 
 
 def generate_plate_maps(filename):
+    '''
+        Generates dictionaries for the part csvs
+    '''
     plate_maps = {}
     plate_map = []
     with open(filename, encoding='utf-8-sig') as file:
@@ -155,6 +187,9 @@ def generate_plate_maps(filename):
 
 
 def generate_combinations(combinations_filename):
+    '''
+        Generates a list of dictionaries of constructs to be made
+    '''
     combinations_to_make = []
     with open(combinations_filename, encoding='utf-8-sig') as f:
         for row in csv.reader(f, dialect='excel'):
@@ -170,6 +205,9 @@ def generate_combinations(combinations_filename):
 
 
 def check_number_of_combinations(combinations_limit, combinations_to_make):
+    '''
+        Ensures that the number of constructs does not exceed the maximum
+    '''
     number_of_combinations = len(combinations_to_make)
     if combinations_limit == 'single':
         print("check_number_of_combinations: should be fine w single")
@@ -193,6 +231,13 @@ def check_number_of_combinations(combinations_limit, combinations_to_make):
 def generate_and_save_output_plate_maps(combinations_to_make,
                                         combinations_limit,
                                         output_folder_path):
+    '''
+        Saves the mapping of the agar plate for use in transformation.
+        Args:
+            combinations_to_make = list of construct dictionaries
+            combinations_limit = 'single' or 'triplicate'
+            output_folder_path = where to save mapping
+    '''
     # Split combinations_to_make into 8x6 plate maps.
     output_plate_map_flipped = []
     for i, combo in enumerate(combinations_to_make):
@@ -206,7 +251,7 @@ def generate_and_save_output_plate_maps(combinations_to_make,
         else:
             output_plate_map_flipped[-1].append(name)
 
-   #  print("output_plate_map_flipped", output_plate_map_flipped)
+    # print("output_plate_map_flipped", output_plate_map_flipped)
 
     # Correct row/column flip.
     output_plate_map = []
@@ -256,10 +301,25 @@ def generate_and_save_output_plate_maps(combinations_to_make,
 def create_metainformation(output_path, dna_plate_map_dict,
                            combinations_to_make,
                            labware_dict, thermocycle, triplicate):
+    '''
+        Returns detailed metainformation and saves in a csv.
+        Includes a parts dataframe, a combinations (constructs)
+        dataframe, a reagents dataframe, and a master mix dataframe.
+        Args:
+            output_path = the full path of the output folder
+            dna_plate_map_dict = the dictionary of parts
+            combinations_to_make = the list of dictionaries of 
+            constructs
+            labware_dict = the dictionary of labware chosen
+            thermocyle = whether the thermocycler module is used
+            triplicate = whether 'single' or 'triplicate is selected'
+    '''
 
+    # Create parts dataframe
     parts_df = create_parts_df(dna_plate_map_dict)
-    print('parts_df=', parts_df)
+    # print('parts_df=', parts_df)
 
+    # Creates combinations dataframe
     combination_df_list = []
     for comb_index, combination_dict in enumerate(combinations_to_make):
         combination_df_dict = {}
@@ -287,15 +347,19 @@ def create_metainformation(output_path, dna_plate_map_dict,
         combination_df_dict['well'] = None
         combination_df_dict['no_parts'] = None
         combination_df_dict['plate'] = None
-        combinations_df = pd.DataFrame(combination_df_dict, index=len(combination_df_dict))
-    print('combinations_df=', combinations_df)
+        combinations_df = pd.DataFrame(
+            combination_df_dict, index=len(combination_df_dict))
+    # print('combinations_df=', combinations_df)
 
+    # Creates master mix dataframe
     mm_df = create_mm_df(combinations_df)
-    print('mm_df=', mm_df)
+    # print('mm_df=', mm_df)
 
+    # Creates reagents dataframe
     reagents_df = create_reagents_df(mm_df)
-    print('reagents_df=', reagents_df)
+    # print('reagents_df=', reagents_df)
 
+    # saves as csv, adding extra info on run and labware
     with open(output_path, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         if triplicate:
@@ -328,7 +392,7 @@ def create_metainformation(output_path, dna_plate_map_dict,
         csvwriter.writerow('')
 
         kw_dfs = {'PARTS': parts_df, 'COMBINATIONS': combinations_df,
-                    'MASTER_MIX': mm_df, 'REAGENTS': reagents_df}
+                  'MASTER_MIX': mm_df, 'REAGENTS': reagents_df}
 
         for key, value in kw_dfs.items():
             csvwriter.writerow([str(key)])
@@ -339,6 +403,10 @@ def create_metainformation(output_path, dna_plate_map_dict,
 
 
 def create_parts_df(dna_plate_map_dict):
+    '''
+        Returns a dataframe of parts and delegates wells.
+        Takes in the dictionary of parts.
+    '''
     letter_dict = {'0': 'A', '1': 'B', '2': 'C', '3': 'D', '4': 'E', '5': 'F',
                    '6': 'G', '7': 'H'}
     for dna_plate_dict in dna_plate_map_dict:
@@ -355,12 +423,19 @@ def create_parts_df(dna_plate_map_dict):
                         part_dict['plate'] = [plate]
                         part_df_list.append(pd.DataFrame.from_dict(part_dict))
     parts_df = pd.concat(part_df_list, ignore_index=True)
+
+    # Empty column to be filled after combinations df is generated
     parts_df['combinations'] = pd.Series(['0'] * len(parts_df.index),
                                          index=parts_df.index)
     return parts_df
 
 
 def create_mm_df(combinations_df):
+    '''
+        Creates a master mix dataframe and delegates wells.
+        Different master mixes must be created depending on
+        the number of parts per construct.
+    '''
     TOT_VOL_PER_ASSEMBLY = 20
     BUFFER_VOL_PER_ASSEMBLY = 2
     LIGASE_VOL_PER_ASSEMBLY = 0.5
@@ -369,11 +444,15 @@ def create_mm_df(combinations_df):
     avail_mm_wells_no = list(range(95, len(combinations_df)-2, -1))
     avail_mm_wells = [index_to_well_name(no) for no in avail_mm_wells_no]
     mm_df_list = []
+    
+    # minimum of 2 parts per construct; max of 8
     for i in range(2, 9):
+        # count number of combinations with i parts
         combinations_i = combinations_df[
             combinations_df['no_parts'] == i].index.values
         combinations = [combinations_df.loc[i] for i in combinations_i]
         if len(combinations) > 0:
+            # create a new dictionary and fill
             mm_dict = {}
             well = avail_mm_wells.pop(0)
             mm_dict['well'] = [well]
@@ -382,6 +461,8 @@ def create_mm_df(combinations_df):
             mm_vol_per_assembly = TOT_VOL_PER_ASSEMBLY - \
                 parts_per_assembly*PART_VOL
             mm_dict['vol_per_assembly'] = [mm_vol_per_assembly]
+            # number of assemblies is limited and dead vol is
+            # accounted for
             max_assemblies = 180 // mm_vol_per_assembly
             mm_combinations = []
             if max_assemblies % 2 == 0:
@@ -395,6 +476,8 @@ def create_mm_df(combinations_df):
                     mm_combinations.append(comb_row['name'])
                     no_assemblies += 1
                     if comb_index == tot_assemblies-1:
+                        # no more assemblies for no of parts
+                        # save the dictionary after filling
                         if no_assemblies % 2 == 0:
                             no = no_assemblies + 2
                         else:
@@ -411,6 +494,8 @@ def create_mm_df(combinations_df):
                         mm_dict['plate'] = ['reaction_plate']
                         mm_df_list.append(pd.DataFrame.from_dict(mm_dict))
                 else:
+                    # run out of space for assemblies in mm well
+                    # save mm_dict before creating new one
                     no = max_assemblies + 2
                     mm_dict['combinations'] = [mm_combinations]
                     mm_dict['no_assemblies'] = [no_assemblies]
@@ -430,6 +515,7 @@ def create_mm_df(combinations_df):
                     mm_dict['no_parts'] = [i]
                     mm_dict['vol_per_assembly'] = [mm_vol_per_assembly]
                     no_assemblies = 1
+    # turn into dataframe
     if mm_df_list:
         mm_df = pd.concat(mm_df_list, ignore_index=True)
     else:  # If mm_df is empty, make default
@@ -449,6 +535,13 @@ def create_mm_df(combinations_df):
 
 
 def create_reagents_df(mm_df):
+    '''
+        Creates a dataframe of reagents used to make master mixes.
+        More than one buffer well may be required, and water is
+        held on a separate plate.
+        Also indicates which master mix wells the reagent is
+        transferred to.
+    '''
     water_vol = 15000
     reagents_df_list = []
     ligase_dict = {'name': ['ligase'], 'well': ['H12'], 'plate':
@@ -486,10 +579,12 @@ def create_reagents_df(mm_df):
 
     tot_buffer = buffer_vol + buffer_dead_vol
 
+    # round to the nearest 10
     if tot_buffer % 10 > 0:
         tot_buffer = 10*((tot_buffer // 10) + 1)
 
     if tot_buffer > 180:
+        # need to create more than one well
         for i in range(len(mm_df)-2, 0, -1):
             buffer_vol1 = mm_df.loc[0:i, 'buffer_vol'].sum()
             # buffer_dead_vol1 = 2*(buffer_vol1 // (i + 1))
@@ -499,6 +594,9 @@ def create_reagents_df(mm_df):
                 tot_buffer1 = 10*((tot_buffer1 // 10) + 1)
 
             if tot_buffer1 <= 180:
+                # find configuration in which both buffer wells
+                # have max 180 uL
+                # there should never need to be more than 2 wells
                 wells1 = list(mm_df.loc[0:i, 'well'])
                 buffer_vol2 = mm_df.loc[i+1:len(mm_df)-1, 'buffer_vol'].sum()
                 # buffer_dead_vol2 = 2*(buffer_vol2 // (len(mm_df)-i-1))
@@ -541,6 +639,10 @@ def create_reagents_df(mm_df):
 
 
 def get_mm_dicts(mm_df, reagents_df):
+    '''
+        Master mix dictionary purely for use in the assembly script. 
+        Provides instructions on tranfers.
+    '''
     reagent_to_mm_dict = {}
     for index, row in reagents_df.iterrows():
         source_well = row['well']
@@ -548,7 +650,8 @@ def get_mm_dicts(mm_df, reagents_df):
         if row['mm_wells']:
             for well in row['mm_wells']:
                 if not (mm_df[mm_df['well'] == well].empty):
-                    mm_well_index = mm_df[mm_df['well'] == well].index.values[0]
+                    mm_well_index = mm_df[
+                        mm_df['well'] == well].index.values[0]
                 else:
                     continue
                 if 'ligase' in row['name']:
@@ -559,8 +662,8 @@ def get_mm_dicts(mm_df, reagents_df):
                     transfer_vol = mm_df.at[mm_well_index, 'buffer_vol']
                 elif 'water' in row['name']:
                     transfer_vol = mm_df.at[mm_well_index, 'water_vol']
-                reagent_to_mm_dict[source_well].append(tuple([row['plate'], well,
-                                                            str(transfer_vol)]))
+                reagent_to_mm_dict[source_well].append(
+                    tuple([row['plate'], well, str(transfer_vol)]))
         else:
             reagent_to_mm_dict[source_well].append(None, None, None)
     mm_dict_list = []
@@ -571,6 +674,10 @@ def get_mm_dicts(mm_df, reagents_df):
 
 
 def index_to_well_name(no):
+    '''
+        Converts well from number format e.g. 1 to letter format e.g.
+        'A1'
+    '''
     sample_number = no + 1
     letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     final_well_column = sample_number // 8 + \
@@ -583,10 +690,11 @@ def index_to_well_name(no):
 def create_transform_metainformation(output_path, labware_dict, triplicate,
                                      multi):
     '''
-        soc used in two steps: adding soc (150 uL) and dilution (45 uL)
+        Saves transform metainformation and labware informaiton.
+        SOC used in two steps: adding soc (150 uL) and dilution (45 uL)
         times by 96 as reaction plate has 96 wells
-        add 300 (150*2) and 90 (45*2) as dead vols
-        agar plate positions in agar plate csv
+        Add 300 (150*2) and 90 (45*2) as dead vols
+        Agar plate positions in agar plate csv
     '''
     required_soc = (150 + 45)*96 + 300 + 90
 
@@ -630,6 +738,10 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
                     p10Mount, p300Mount, p10_type, p300_type, 
                     reaction_plate_type,
                     reagent_plate_type, trough_type, agar_plate_type):
+    '''
+        Generates the assembly and transformation protocols used by opentrons.
+        Returns the paths of the assembly and transform scripts.
+    '''
 
     # Get the contents of colony_pick_template.py, which contains the body of
     # the protocol.
@@ -686,10 +798,14 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
 
 
 '''
-# Example of offline:
-construct_path = "C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/moclo_combinations.csv"
-part_path = "C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/moclo_dna_map.csv"
+Below is an example of how this would be run through the command line:
+To use this, replace the output_folder name, construct_path, and part_path.
+'''
+'''
+output_folder = "C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/output"
+construct_path = ["C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/moclo_combinations.csv"]
+part_path = ["C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/moclo_dna_map.csv"]
 
-moclo_function('output', [construct_path], [part_path], thermocycle=True,
+moclo_function('output', construct_path, part_path, thermocycle=True,
               **labware_dict)
 '''

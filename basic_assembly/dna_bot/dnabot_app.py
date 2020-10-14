@@ -89,7 +89,7 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     full_output_path = output_folder
     
     # In case construct path is list: can only have one path
-    if type(input_construct_path) == 'list':
+    if type(input_construct_path) == list:
       input_construct_path = input_construct_path[0]
 
     construct_base = os.path.basename(input_construct_path)

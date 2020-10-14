@@ -132,7 +132,7 @@ def process_construct(construct_entry):
     return construct_dict
 
 
-def get_parts(path, constructs_list):
+def get_parts(paths, constructs_list):
     '''
         Returns list of part dictionaries from part csv file.
         Uses constructs_list to record the number of times the part is used
@@ -140,17 +140,19 @@ def get_parts(path, constructs_list):
     '''
 
     parts_list = []
-    with open(path, 'r') as csvfile:
-        csv_reader = csv.reader(csvfile)
-        for index, part in enumerate(csv_reader):
-            if index != 0:
-                part = list(filter(None, part))
-                parts_list.append(process_part(part, constructs_list))
+    source_plate_pos = ['2', '5', '6']
+    for index, path in enumerate(paths):
+      with open(path, 'r') as csvfile:
+          csv_reader = csv.reader(csvfile)
+          for index, part in enumerate(csv_reader):
+              if index != 0:
+                  part = list(filter(None, part))
+                  parts_list.append(process_part(part, constructs_list, plate))
     merged_parts_list = pd.concat(parts_list, ignore_index=True)
     return merged_parts_list
 
 
-def process_part(part, constructs_list):
+def process_part(part, constructs_list, plate):
     '''
         Returns a part dictionary with detailed information.
     '''
@@ -194,6 +196,7 @@ def process_part(part, constructs_list):
     part_dict['water_vol_tot'] = [water_vol_tot]
     part_dict['occurences'] = [part_dict['occurences']]
     part_dict['constructs_in'] = [cons_in]
+    part_dict['plate] = [plate]
     part_df = pd.DataFrame.from_dict(part_dict)
     return part_df
 

@@ -46,9 +46,9 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
     if os.path.split(generator_dir)[1] == 'biobricks10':
       template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
     elif os.path.split(generator_dir)[1] == 'biobricks_assembly':
-      template_dir_path = os.path.join(generator_dir, 'biobricks10' TEMPLATE_DIR_NAME)
+      template_dir_path = os.path.join(generator_dir, 'biobricks10', TEMPLATE_DIR_NAME)
     else:
-      template_dir_path = os.path.join(generator_dir, 'biobricks_assembly/biobricks10' TEMPLATE_DIR_NAME)
+      template_dir_path = os.path.join(generator_dir, 'biobricks_assembly/biobricks10', TEMPLATE_DIR_NAME)
     assembly_template_path = os.path.join(template_dir_path,
                                           'bbassembly10template.py')
     transformation_template_path = os.path.join(template_dir_path,

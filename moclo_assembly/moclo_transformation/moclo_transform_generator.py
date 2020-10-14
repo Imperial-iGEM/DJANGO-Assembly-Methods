@@ -51,20 +51,20 @@ def moclo_function(output_folder, construct_path, part_path,
         print("Running Try!")
         # Load in CSV files as a dict containing lists of lists.
         ## Loop through all part_path's and merge dicts 
-        dna_plate_map_dict = {}
+        dna_plate_map_dict = []
         if type(part_path)==list:
             for path in part_path:
                 dna_plate_map_dict_local = generate_plate_maps(path)
-                dna_plate_map_dict.update(dna_plate_map_dict_local)
+                dna_plate_map_dict.append(dna_plate_map_dict_local)
             print("dna_plate_map_dict: ", dna_plate_map_dict)
         else:
             dna_plate_map_dict = generate_plate_maps(part_path)
 
-        combinations_to_make = {}
+        combinations_to_make = []
         if type(construct_path)==list:
             for path in construct_path:
                 combinations_to_make_local = generate_combinations(path)
-                combinations_to_make.update(combinations_to_make_local)
+                combinations_to_make.append(combinations_to_make_local[0])
             print("combinations_to_make: ", combinations_to_make)
         else:
             combinations_to_make = generate_combinations(construct_path)
@@ -77,18 +77,26 @@ def moclo_function(output_folder, construct_path, part_path,
 
         assembly_metainformation_path = os.path.join(
             config['output_folder_path'], 'assembly_metainformation.csv')
+        print('assembly_metainformation_path: ', assembly_metainformation_path)
+        print('triplicate: ', triplicate)
+        print('thermocycle: ', thermocycle)
+        print('labware_dict: ', labware_dict)
         parts, comb, mm, reagents = create_metainformation(
             assembly_metainformation_path,
             dna_plate_map_dict, combinations_to_make, labware_dict, thermocycle,
             triplicate)
+        print('passed create_metainformation')
 
         reagent_to_mm_dict, mm_dict = get_mm_dicts(mm, reagents)
+        print('passed get_mm_dicts')
 
         transform_metainformation_path = os.path.join(
             config['output_folder_path'], 'transform_metainformation.csv')
+        print('transform_metainformation_path: ', transform_metainformation_path)
         create_transform_metainformation(
             transform_metainformation_path,
             labware_dict, triplicate, multi)
+        print('passed create_transform_metainformation')
 
         # Create a protocol file and hard code the plate maps into it.
         assembly_path, transform_path = create_protocol(
@@ -99,6 +107,7 @@ def moclo_function(output_folder, construct_path, part_path,
             p300_type=p300_type, reaction_plate_type=well_plate,
             reagent_plate_type=reagent_plate, trough_type=trough,
             agar_plate_type=agar_plate)
+        print('passed create_protocol')
 
         output_paths.append(assembly_path)
         output_paths.append(transform_path)
@@ -181,8 +190,8 @@ def generate_and_save_output_plate_maps(combinations_to_make,
                                         output_folder_path):
     # Split combinations_to_make into 8x6 plate maps.
     output_plate_map_flipped = []
-    for i, (key, value) in enumerate(combinations_to_make.items()):
-        name = value if key=="name" else None
+    for i, combo in enumerate(combinations_to_make):
+        name = combo["name"]
         # if i % 32 == 0:
         #   # new plate
         #   output_plate_maps_flipped.append([[name]])
@@ -312,10 +321,8 @@ def create_metainformation(output_path, dna_plate_map_dict,
 
 
 def create_parts_df(dna_plate_map_dict):
-
     letter_dict = {'0': 'A', '1': 'B', '2': 'C', '3': 'D', '4': 'E', '5': 'F',
                    '6': 'G', '7': 'H'}
-
     for plate, plate_wells in dna_plate_map_dict.items():
         part_df_list = []
         for row_index, row in enumerate(plate_wells):
@@ -404,7 +411,20 @@ def create_mm_df(combinations_df):
                     mm_dict['no_parts'] = [i]
                     mm_dict['vol_per_assembly'] = [mm_vol_per_assembly]
                     no_assemblies = 1
-    mm_df = pd.concat(mm_df_list, ignore_index=True)
+    if mm_df_list:
+        mm_df = pd.concat(mm_df_list, ignore_index=True)
+    else:  # If mm_df is empty, make default
+        mm_dict['well'] = None
+        mm_dict['no_parts'] = None
+        mm_dict['vol_per_assembly'] = None
+        mm_dict['combinations'] = None
+        mm_dict['no_assemblies'] = None
+        mm_dict['buffer_vol'] = None
+        mm_dict['ligase_vol'] = None
+        mm_dict['enzyme_vol'] = None
+        mm_dict['water_vol'] = None
+        mm_dict['plate'] = None
+        mm_df = pd.DataFrame(mm_dict)
     return mm_df
 
 

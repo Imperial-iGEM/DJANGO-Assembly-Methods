@@ -39,7 +39,7 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
     full_output_path = output_folder
     
     # In case construct path is list: can only have one path
-    if type(construct_path) == 'list':
+    if type(construct_path) == list:
       construct_path = construct_path[0]
 
     generator_dir = os.getcwd()

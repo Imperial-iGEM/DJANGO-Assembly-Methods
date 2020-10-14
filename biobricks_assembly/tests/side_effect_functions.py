@@ -33,34 +33,34 @@ part_dfs = [pd.DataFrame(data={'name': ['BBa_B0034'], 'well': ['A1'],
                                [['upstream']], 'digests': [1], 'concentration':
                                [500], 'part_vol': [1], 'water_vol': [42],
                                'part_vol_tot': [1], 'water_vol_tot': [42],
-                               'constructs_in': [[[0, 1], [], []]]}),
+                               'constructs_in': [[[0, 1], [], []]], 'plate' = ['2']}),
             pd.DataFrame(data={'name': ['BBa_C0040'], 'well': ['A2'],
                                'occurences': [[0, 1, 0]], 'roles':
                                [['downstream']], 'digests': [1],
                                'concentration': [500], 'part_vol': [1],
                                'water_vol': [42], 'part_vol_tot': [1],
                                'water_vol_tot': [42], 'constructs_in':
-                               [[[], [0], []]]}),
+                               [[[], [0], []]], 'plate' = ['2']}),
             pd.DataFrame(data={'name': ['BBa_pSB1AK3'], 'well': ['A3'],
                                'occurences': [[0, 0, 3]], 'roles':
                                [['plasmid']], 'digests': [1], 'concentration':
                                [500], 'part_vol': [1], 'water_vol': [42],
                                'part_vol_tot': [1], 'water_vol_tot': [42],
-                               'constructs_in': [[[], [], [0, 1, 2]]]}),
+                               'constructs_in': [[[], [], [0, 1, 2]]], 'plate' = ['2']}),
             pd.DataFrame(data={'name': ['BBa_C0012'], 'well': ['A4'],
                                'occurences': [[1, 1, 0]], 'roles':
                                [['upstream', 'downstream']], 'digests': [2],
                                'concentration': [500], 'part_vol': [1],
                                'water_vol': [42], 'part_vol_tot': [2],
                                'water_vol_tot': [84], 'constructs_in':
-                               [[[2], [1], []]]}),
+                               [[[2], [1], []]], 'plate' = ['2']}),
             pd.DataFrame(data={'name': ['BBa_B0015'], 'well': ['A5'],
                                'occurences': [[0, 1, 0]], 'roles':
                                [['downstream']], 'digests': [1],
                                'concentration': [500], 'part_vol': [1],
                                'water_vol': [42], 'part_vol_tot': [1],
                                'water_vol_tot': [42], 'constructs_in':
-                               [[[], [2], []]]})]
+                               [[[], [2], []]], 'plate' = ['2']})]
 
 
 def process_cons(construct):
@@ -75,7 +75,7 @@ def process_cons(construct):
         return bbinput.process_construct(construct)
 
 
-def process_part(part, constructs_df):
+def process_part(part, constructs_df, plate):
     success_mock = 0
     for i in range(len(part_dfs)):
         if part == parts_list[i + 1]:
@@ -84,6 +84,6 @@ def process_part(part, constructs_df):
             break
     if success_mock == 0:
         print('Unable to mock. Using actual function')
-        return bbinput.process_part(part, constructs_df)
+        return bbinput.process_part(part, constructs_df, plate)
 
         

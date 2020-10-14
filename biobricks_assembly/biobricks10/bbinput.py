@@ -196,7 +196,7 @@ def process_part(part, constructs_list, plate):
     part_dict['water_vol_tot'] = [water_vol_tot]
     part_dict['occurences'] = [part_dict['occurences']]
     part_dict['constructs_in'] = [cons_in]
-    part_dict['plate] = [plate]
+    part_dict['plate'] = [plate]
     part_df = pd.DataFrame.from_dict(part_dict)
     return part_df
 

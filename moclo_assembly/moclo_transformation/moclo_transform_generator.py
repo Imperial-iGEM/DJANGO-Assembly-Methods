@@ -26,10 +26,10 @@ def moclo_function(output_folder, construct_path, part_path,
     # Online
     config = {
         'output_folder_path': full_output_path,
-        'assembly_template_path':
-        '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/moclo_assembly/moclo_transformation/data/moclo_assembly_template.py',
+        'assembly_template_path': 
+        os.path.join('moclo_assembly', 'moclo_transformation', 'data', 'moclo_assembly_template.py'),
         'transform_template_path':
-        '/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/moclo_assembly/moclo_transformation/data/moclo_assembly_template.py'
+        os.path.join('moclo_assembly', 'moclo_transformation', 'data', 'transform_moclo_template.py'),
     }
     '''
     # Offline (should also work online)
@@ -539,18 +539,24 @@ def get_mm_dicts(mm_df, reagents_df):
     for index, row in reagents_df.iterrows():
         source_well = row['well']
         reagent_to_mm_dict[source_well] = []
-        for well in row['mm_wells']:
-            mm_well_index = mm_df[mm_df['well'] == well].index.values[0]
-            if 'ligase' in row['name']:
-                transfer_vol = mm_df.at[mm_well_index, 'ligase_vol']
-            elif 'restriction_enzyme' in row['name']:
-                transfer_vol = mm_df.at[mm_well_index, 'enzyme_vol']
-            elif 'buffer' in row['name']:
-                transfer_vol = mm_df.at[mm_well_index, 'buffer_vol']
-            elif 'water' in row['name']:
-                transfer_vol = mm_df.at[mm_well_index, 'water_vol']
-            reagent_to_mm_dict[source_well].append(tuple([row['plate'], well,
-                                                         str(transfer_vol)]))
+        if row['mm_wells']:
+            for well in row['mm_wells']:
+                if not (mm_df[mm_df['well'] == well].empty):
+                    mm_well_index = mm_df[mm_df['well'] == well].index.values[0]
+                else:
+                    continue
+                if 'ligase' in row['name']:
+                    transfer_vol = mm_df.at[mm_well_index, 'ligase_vol']
+                elif 'restriction_enzyme' in row['name']:
+                    transfer_vol = mm_df.at[mm_well_index, 'enzyme_vol']
+                elif 'buffer' in row['name']:
+                    transfer_vol = mm_df.at[mm_well_index, 'buffer_vol']
+                elif 'water' in row['name']:
+                    transfer_vol = mm_df.at[mm_well_index, 'water_vol']
+                reagent_to_mm_dict[source_well].append(tuple([row['plate'], well,
+                                                            str(transfer_vol)]))
+        else:
+            reagent_to_mm_dict[source_well].append(None, None, None)
     mm_dict_list = []
     for index, row in mm_df.iterrows():
         mm_dict = row.to_dict()

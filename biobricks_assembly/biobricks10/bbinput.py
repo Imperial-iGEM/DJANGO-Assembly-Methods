@@ -37,6 +37,10 @@ def biobricks(output_folder, construct_path, part_path, thermocycle=True,
               transformation_plate='corning_96_wellplate_360ul_flat'):
 
     full_output_path = output_folder
+    
+    # In case construct path is list: can only have one path
+    if type(construct_path) == 'list':
+      construct_path = construct_path[0]
 
     generator_dir = os.getcwd()
     template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)

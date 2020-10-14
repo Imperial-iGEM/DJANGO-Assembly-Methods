@@ -23,23 +23,29 @@ def moclo_function(output_folder, construct_path, part_path,
 
     output_paths = []
     full_output_path = output_folder
-    # Online
+    
+    # In case construct path is list: can only have one path
+    if type(construct_path) == list:
+        construct_path = construct_path[0]
+
+    current_dir = os.getcwd()
+    
+    if os.path.split(current_dir)[1] == 'moclo_transformation':
+      assembly_path = os.path.join(current_dir, 'data', 'moclo_assembly_template.py')
+      transform_path = os.path.join(current_dir, 'data', 'transform_moclo_template.py')
+    elif os.path.split(current_dir)[1] == 'moclo_assembly':
+      assembly_path = os.path.join(current_dir, 'moclo_assembly', 'moclo_transformation', 'data', 'moclo_assembly_template.py')
+      transform_path = os.path.join(current_dir, 'moclo_assembly', 'moclo_transformation', 'data', 'transform_moclo_template.py')
+    else:
+      assembly_path = os.path.join(current_dir, 'moclo_assembly', 'moclo_transformation', 'data', 'moclo_assembly_template.py')
+      transform_path = os.path.join(current_dir, 'moclo_assembly', 'moclo_transformation', 'data', 'transform_moclo_template.py')
+
     config = {
         'output_folder_path': full_output_path,
-        'assembly_template_path': 
-        os.path.join('moclo_assembly', 'moclo_transformation', 'data', 'moclo_assembly_template.py'),
-        'transform_template_path':
-        os.path.join('moclo_assembly', 'moclo_transformation', 'data', 'transform_moclo_template.py'),
+        'assembly_template_path': assembly_path,
+        'transform_template_path': transform_path
     }
-    '''
-    # Offline (should also work online)
-    config = {
-        'output_folder_path': full_output_path,
-        'assembly_template_path':
-        os.path.join(current_dir, 'data/moclo_assembly_template.py')
-        'transform_template_path':
-        os.path.join(current_dir, 'data/moclo_assembly_template.py')}
-    '''
+
     # for now only do single (other option = triplicate)
     combinations_limit = 'single'
 
@@ -48,11 +54,10 @@ def moclo_function(output_folder, construct_path, part_path,
     else:
         multi = False
     try:
-        print("Running Try!")
         # Load in CSV files as a dict containing lists of lists.
-        ## Loop through all part_path's and merge dicts 
-        dna_plate_map_dict = []
-        if type(part_path)==list:
+        # Loop through all part_path's and merge dicts
+        dna_plate_map_dict = {}
+        if type(part_path) == list:
             for path in part_path:
                 dna_plate_map_dict_local = generate_plate_maps(path)
                 dna_plate_map_dict.append(dna_plate_map_dict_local)
@@ -191,7 +196,7 @@ def generate_and_save_output_plate_maps(combinations_to_make,
     # Split combinations_to_make into 8x6 plate maps.
     output_plate_map_flipped = []
     for i, combo in enumerate(combinations_to_make):
-        name = combo["name"]
+        name = combo['name']
         # if i % 32 == 0:
         #   # new plate
         #   output_plate_maps_flipped.append([[name]])
@@ -201,7 +206,7 @@ def generate_and_save_output_plate_maps(combinations_to_make,
         else:
             output_plate_map_flipped[-1].append(name)
 
-    print("output_plate_map_flipped", output_plate_map_flipped)
+   #  print("output_plate_map_flipped", output_plate_map_flipped)
 
     # Correct row/column flip.
     output_plate_map = []
@@ -258,7 +263,8 @@ def create_metainformation(output_path, dna_plate_map_dict,
     combination_df_list = []
     for comb_index, combination_dict in enumerate(combinations_to_make):
         combination_df_dict = {}
-        combination_df_dict['name'] = [combination_dict['name']]
+        name = combination_dict['name']
+        combination_df_dict['name'] = [name]
         combination_df_dict['parts'] = [combination_dict['parts']]
         combination_df_dict['well'] = [index_to_well_name(comb_index)]
         combination_df_dict['no_parts'] = [len(combination_dict['parts'])]
@@ -680,10 +686,10 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
 
 
 '''
-Example of offline:
-construct_path = "C:/Users/gabri/Documents/Uni/iGEM/OT2-MoClo-Transformation-Ecoli-master/examples/combination_to_make_csv/combination-to-make-72.csv"
-part_path = "C:/Users/gabri/Documents/Uni/iGEM/OT2-MoClo-Transformation-Ecoli-master/examples/input_DNA_plate_csv/input-plate-map.csv"
+# Example of offline:
+construct_path = "C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/moclo_combinations.csv"
+part_path = "C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/moclo_dna_map.csv"
 
-moclo_function('output/test1', construct_path, part_path, thermocycle=True,
-               **labware_dict)
+moclo_function('output', [construct_path], [part_path], thermocycle=True,
+              **labware_dict)
 '''

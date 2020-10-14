@@ -91,6 +91,7 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     construct_base = os.path.basename(input_construct_path[0]) if type(input_construct_path) == list else os.path.basename(input_construct_path)
     construct_base = os.path.splitext(construct_base)[0]
 
+    all_my_output_paths = []
     try:
         print('Runinng try')
         if type(input_construct_path) == list:
@@ -172,7 +173,6 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
             os.path.join(template_dir_path, THERMOCYCLE_TEMP_NAME),
             well_plate_type=well_plate)
 
-        all_my_output_paths = []
         all_my_output_paths.append(out_full_path_1)
         all_my_output_paths.append(out_full_path_2)
         all_my_output_paths.append(out_full_path_3)
@@ -215,7 +215,6 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         os.chdir(generator_dir)
 
     except Exception as e:
-        all_my_output_paths = []
         error_path = os.path.join(full_output_path, 'BASIC_error.txt')
         with open(error_path) as f:
             f.write("Failed to generate BASIC scripts: {}\n".format(str(e)))
@@ -244,6 +243,7 @@ def generate_constructs_list(path):
             """
             if len(linker) >= 4:
                 if linker[:3] == 'UTR':
+                    # TODO: Revert this to the comment
                     # return linker[:4] + '-S'
                     return linker + '-S'
             else:

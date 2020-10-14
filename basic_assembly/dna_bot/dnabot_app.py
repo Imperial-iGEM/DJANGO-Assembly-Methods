@@ -88,30 +88,48 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
 
     full_output_path = output_folder
 
-    construct_base = os.path.basename(input_construct_path)
+    construct_base = os.path.basename(input_construct_path[0]) if type(input_construct_path) == list else os.path.basename(input_construct_path)
     construct_base = os.path.splitext(construct_base)[0]
 
     try:
-        constructs_list = generate_constructs_list(input_construct_path)
+        print('Runinng try')
+        if type(input_construct_path) == list:
+            constructs_list = generate_constructs_list(input_construct_path[0])
+        else:
+            constructs_list = generate_constructs_list(input_construct_path)
+        print('passed generate_constructs_list')
+        print('constructs_list=', constructs_list)
         clips_df = generate_clips_df(constructs_list)
+        print('clips_df=', clips_df)
         sources_dict, parts_df = generate_sources_dict(output_sources_paths)
+        print('sources_dict=', sources_dict)
+        print('parts_df=', parts_df)
         parts_df_temp = fill_parts_df(clips_df, parts_df)
+        print('parts_df_temp=', parts_df_temp)
         parts_df = parts_df_temp.copy()
 
         # calculate OT2 script variables
         clips_dict = generate_clips_dict(clips_df, sources_dict, parts_df)
+        print('clips_dict=', clips_dict)
         magbead_sample_number = clips_df['number'].sum()
+        print('magbead_sample_number=', magbead_sample_number)
         final_assembly_dict, clips_df, parts_df = generate_final_assembly_dict(
             constructs_list, clips_df, parts_df)
+        print('final_assembly_dict=', final_assembly_dict)
+        print('clips_df=', clips_df)
+        print('parts_df=', parts_df)
         final_assembly_tipracks = calculate_final_assembly_tipracks(
             final_assembly_dict)
         spotting_tuples = generate_spotting_tuples(constructs_list,
                                                    SPOTTING_VOLS_DICT)
+        print('final_assembly_tipracks=', final_assembly_tipracks)
+        print('spotting_tuples=', spotting_tuples)
 
         if 'multi' in p300_type.lower():
             multi = True
         else:
             multi = False
+        print('multi=', multi)
 
         # Write OT2 scripts
         out_full_path_1 = generate_ot2_script(
@@ -120,6 +138,7 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
             clips_dict=clips_dict,
             p10_mount=p10_mount, p10_type=p10_type, well_plate_type=well_plate,
             tube_rack_type=tube_rack)
+        print('out_full_path_1=', out_full_path_1)
 
         out_full_path_2 = generate_ot2_script(
             full_output_path, MAGBEAD_FNAME,
@@ -225,7 +244,8 @@ def generate_constructs_list(path):
             """
             if len(linker) >= 4:
                 if linker[:3] == 'UTR':
-                    return linker[:4] + '-S'
+                    # return linker[:4] + '-S'
+                    return linker + '-S'
             else:
                 return linker + "-S"
 
@@ -373,14 +393,21 @@ def fill_parts_df(clips_df, parts_df_temp):
                                          index=parts_df.index)
     parts_df['number'] = pd.Series(['0'] * len(parts_df.index),
                                    index=parts_df.index)
+    print('parts_df=', parts_df)
     # Iterate through clips dataframe
     for index, row in clips_df.iterrows():
+        print('clips_df=', clips_df)
+        print('index=', index)
+        print('row=', row)
         prefix_index = parts_df[
-                parts_df['name'] == row['prefixes']].index.values[0]
+                parts_df['name'] == row['prefixes'][:-2]].index.values[0]
+        print('prefix_index=', prefix_index)
         part_index = parts_df[
                 parts_df['name'] == row['parts']].index.values[0]
+        print('part_index=', part_index)
         suffix_index = parts_df[
-                parts_df['name'] == row['suffixes']].index.values[0]
+                parts_df['name'] == row['suffixes'][:-2]].index.values[0]
+        print('suffix_index=', suffix_index)
         if parts_df.at[prefix_index, 'clip_well'] == '0':
             parts_df.at[prefix_index, 'clip_well'] = list(row['clip_well'])
         else:
@@ -438,6 +465,7 @@ def fill_parts_df(clips_df, parts_df_temp):
         else:
             parts_df.at[index, 'total_vol'] = 0
 
+    print('FINAL parts_df=', parts_df)
     return parts_df
 
 

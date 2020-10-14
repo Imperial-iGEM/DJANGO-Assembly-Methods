@@ -136,3 +136,7 @@ STATIC_URL = '/static/'
 GRAPHENE = {
     'SCHEMA': 'assembly_methods.schema.schema'
 }
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "output/")
+
+MEDIA_URL = "http://localhost:8000/output/"

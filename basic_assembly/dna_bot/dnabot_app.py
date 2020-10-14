@@ -49,6 +49,7 @@ PART_DEAD_VOL = 15
 SPOTTING_VOLS_DICT = {2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5}
 
 # Constant lists
+# These are positions that the dna source plate can take
 SOURCE_DECK_POS = ['2', '5', '8', '7', '10', '11']
 
 # labware dictionary - filled in by front end
@@ -92,7 +93,11 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         template_dir_path = os.path.join(generator_dir, 'basic_assembly/dna_bot', TEMPLATE_DIR_NAME)
     full_output_path = output_folder
     
-    # In case construct path is list: can only have one path
+    '''In case construct path is list: can only have one path
+       In future more than one construct plate could be allowed,
+       but given that the well plate has 96 wells already this is
+       not a priority.
+    '''
     if type(input_construct_path) == list:
         input_construct_path = input_construct_path[0]
 
@@ -117,7 +122,8 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
             final_assembly_dict)
         spotting_tuples = generate_spotting_tuples(constructs_list,
                                                     SPOTTING_VOLS_DICT)
-
+        
+        # check if p300_single (1 channel) or p300_multi (8 channel)
         if 'multi' in p300_type.lower():
             multi = True
         else:
@@ -157,7 +163,9 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
             p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
             well_plate_type=well_plate, tube_rack_type=tube_rack,
             soc_plate_type=soc_plate, agar_plate_type=agar_plate)
-
+        
+        # optional thermocycling script; run between clip reactions and purification
+        # requires the thermocycler module
         out_full_path_5 = generate_ot2_script(
             full_output_path, THERMOCYCLE_FNAME, 
             os.path.join(template_dir_path, THERMOCYCLE_TEMP_NAME),
@@ -169,26 +177,35 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         all_my_output_paths.append(out_full_path_4)
         all_my_output_paths.append(out_full_path_5)
 
-        # Write non-OT2 scripts
+        # Write non-OT2 scripts - metainformation
         os.chdir(generator_dir)
-
+        
         my_meta_dir = os.path.join(full_output_path, 'metainformation')
         if not os.path.exists(my_meta_dir):
             os.chdir(full_output_path)
             os.makedirs(my_meta_dir)
         os.chdir(my_meta_dir)
+        
+        # create master mix dataframe so that users know proportions
         master_mix_df = generate_master_mix_df(clips_df['number'].sum())
+        
+        # give information on source paths
         sources_paths_df = generate_sources_paths_df(
             output_sources_paths, SOURCE_DECK_POS)
+        
+        # create labware dataframe from labware_dict
         labwareDf = pd.DataFrame(
             data={'name': list(labware_dict.keys()),
                     'definition': list(labware_dict.values())})
+    
+        # save dfs as csv
         dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
                     MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
                     CLIP_REACTIONS=clips_df, PART_INFO=parts_df,
                     LABWARE=labwareDf)
         output_sources_paths.append(os.path.join(
             my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
+        # final assembly dictionary - from original dnabot
         with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
                     'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
@@ -196,6 +213,8 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
                 csvwriter.writerow([final_assembly_well, construct_clips])
         output_sources_paths.append(os.path.join(
             my_meta_dir, construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME))
+
+        # additional well info - from original dnabot
         with open(construct_base + '_' + WELL_OUTPUT_FNAME, 'w') as f:
             f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
             f.write('\n')
@@ -205,12 +224,15 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
         os.chdir(generator_dir)
 
     except Exception as e:
+        # write error to file in case of failure
         error_path = os.path.join(full_output_path, 'BASIC_error.txt')
         with open(error_path) as f:
             f.write("Failed to generate BASIC scripts: {}\n".format(str(e)))
         all_my_output_paths.append(error_path)
 
     finally:
+        # return the paths of the outputs
+        # changed to output_paths for consistency with other assembly methods
         output_paths = all_my_output_paths
         return output_paths
 
@@ -385,28 +407,47 @@ def generate_sources_dict(paths):
 
 
 def fill_parts_df(clips_df, parts_df_temp):
-    """Fill dataframe of parts with metainformation.
-       Still need to add final assembly well.
+    """Fill dataframe of parts with metainformation to be stored in csv.
+       Will add final assembly well in generate_final_assembly_dict()
+       Args:
+          clips_df: the dataframe of clips created as intermediate steps
+          before assembly
+          parts_df_temp: the previous parts_df dataframe to be expanded on
+       Returns:
+          parts_df, with new columns of 'clip_well', 'mag_well', 'total_vol',
+          'vol_per_clip', and 'number'
     """
     parts_df = parts_df_temp.copy()
+    
+    # Create new columns and fill with dummy value '0'
+    # 'clip_well' = the clip reaction wells the part will go into
     parts_df['clip_well'] = pd.Series(['0'] * len(parts_df.index),
                                       index=parts_df.index)
+    # 'mag_well' = the purification wells the part will go into as
+    # part of a clip
     parts_df['mag_well'] = pd.Series(['0'] * len(parts_df.index),
                                      index=parts_df.index)
+    # 'total_vol' = the total volume of part, compensating for dead volume
     parts_df['total_vol'] = pd.Series(['0'] * len(parts_df.index),
                                       index=parts_df.index)
+    # 'vol_per_clip' = the volume of the part needed per clip it is in
     parts_df['vol_per_clip'] = pd.Series(['0'] * len(parts_df.index),
                                          index=parts_df.index)
+    # 'number' = the number of clips that the part will go in
     parts_df['number'] = pd.Series(['0'] * len(parts_df.index),
                                    index=parts_df.index)
+ 
     # Iterate through clips dataframe
     for index, row in clips_df.iterrows():
+        # find clip indices in parts_df
         prefix_index = parts_df[
                 parts_df['name'] == row['prefixes']].index.values[0]
         part_index = parts_df[
                 parts_df['name'] == row['parts']].index.values[0]
         suffix_index = parts_df[
                 parts_df['name'] == row['suffixes']].index.values[0]
+        
+        # fill 'clip_well', checking for dummy value
         if parts_df.at[prefix_index, 'clip_well'] == '0':
             parts_df.at[prefix_index, 'clip_well'] = list(row['clip_well'])
         else:
@@ -423,6 +464,7 @@ def fill_parts_df(clips_df, parts_df_temp):
             parts_df.at[
                 suffix_index, 'clip_well'].extend(list(row['clip_well']))
         
+        # fill 'mag_well', checking for dummy value
         if parts_df.at[prefix_index, 'mag_well'] == '0':
             parts_df.at[prefix_index, 'mag_well'] = list(row['mag_well'])
         else:
@@ -438,7 +480,8 @@ def fill_parts_df(clips_df, parts_df_temp):
         else:
             parts_df.at[
                 suffix_index, 'mag_well'].extend(list(row['mag_well']))
-
+      
+        # fill number column
         parts_df.at[prefix_index, 'number'] = int(
             parts_df.at[prefix_index, 'number']) + int(row['number'])
         parts_df.at[part_index, 'number'] = int(
@@ -446,8 +489,10 @@ def fill_parts_df(clips_df, parts_df_temp):
         parts_df.at[suffix_index, 'number'] = int(
             parts_df.at[suffix_index, 'number']) + int(row['number'])
 
+    # iterate through parts dataframe to fill 'vol_per_clip' and 'total_vol'
     for index, row in parts_df.iterrows():
         noClips = int(row['number'])
+        # check if prefix or suffix: volume = 1 uL
         if row['name'][len(row['name'])-2:len(row['name'])-1] == '-P':
             vol_per_clip = 1
         elif row['name'][len(row['name'])-2:len(row['name'])-1] == '-S':
@@ -482,9 +527,6 @@ def generate_clips_dict(clips_df, sources_dict, parts_df):
     try:
         for _, clip_info in clips_df.iterrows():
             prefix_linker = clip_info['prefixes']
-            # print('my prefix linkers: {}'.format(prefix_linker))
-            # print('my sources dict: {}'.format(sources_dict))
-            # print('my clip info {}'.format(clip_info))
             clips_dict['prefixes_wells'].append(
                 [sources_dict[prefix_linker][0]]*clip_info['number'])
             clips_dict['prefixes_plates'].append([handle_2_columns(
@@ -766,8 +808,8 @@ def final_well(sample_number):
 
 
 '''
-Uncomment out everything in the comment below this to run command line version.
-Enter your own construct path and enter your part path or paths as a list
+Below is an example of how this would be run through the command line:
+To use this, replace the output_folder name, construct_path, and part_paths.
 '''
 '''
 output_folder_name = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/output'

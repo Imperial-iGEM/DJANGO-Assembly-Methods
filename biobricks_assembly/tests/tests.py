@@ -48,7 +48,7 @@ class BioBricksInputTestCase(unittest.TestCase):
                                             'part_vol_tot': [1],
                                             'water_vol_tot': [42],
                                             'constructs_in': [[[0, 1], [],
-                                                              []]]}),
+                                                              []]], 'plate' = ['2']}),
                          pd.DataFrame(data={'name': ['BBa_C0040'], 'well':
                                             ['A2'], 'occurences': [[0, 1, 0]],
                                             'roles': [['downstream']],
@@ -56,7 +56,7 @@ class BioBricksInputTestCase(unittest.TestCase):
                                             [500], 'part_vol': [1],
                                             'water_vol': [42], 'part_vol_tot':
                                             [1], 'water_vol_tot': [42],
-                                            'constructs_in': [[[], [0], []]]}),
+                                            'constructs_in': [[[], [0], []]], 'plate' = ['2']}),
                          pd.DataFrame(data={'name': ['BBa_pSB1AK3'], 'well':
                                             ['A3'], 'occurences': [[0, 0, 3]],
                                             'roles': [['plasmid']], 'digests':
@@ -65,7 +65,7 @@ class BioBricksInputTestCase(unittest.TestCase):
                                             'part_vol_tot': [1],
                                             'water_vol_tot': [42],
                                             'constructs_in': [[[], [], [0, 1,
-                                                                        2]]]}),
+                                                                        2]]], 'plate' = ['2']}),
                          pd.DataFrame(data={'name': ['BBa_C0012'], 'well':
                                             ['A4'], 'occurences': [[1, 1, 0]],
                                             'roles': [['upstream', 'downstream'
@@ -75,7 +75,7 @@ class BioBricksInputTestCase(unittest.TestCase):
                                             'part_vol_tot': [2],
                                             'water_vol_tot': [84],
                                             'constructs_in': [[[2], [1],
-                                                              []]]}),
+                                                              []]], 'plate' = ['2']}),
                          pd.DataFrame(data={'name': ['BBa_B0015'], 'well':
                                             ['A5'], 'occurences': [[0, 1, 0]],
                                             'roles': [['downstream']],
@@ -83,7 +83,7 @@ class BioBricksInputTestCase(unittest.TestCase):
                                             [500], 'part_vol': [1],
                                             'water_vol': [42], 'part_vol_tot':
                                             [1], 'water_vol_tot': [42],
-                                            'constructs_in': [[[], [2], []]]})]
+                                            'constructs_in': [[[], [2], []]], 'plate' = ['2']})]
 
         self.parts_df = pd.concat(self.part_dfs, ignore_index=True)
 
@@ -342,7 +342,7 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_process_part(self):
         for index, part in enumerate(self.parts_list):
             if index != 0:
-                df = bbinput.process_part(part, self.constructs_df)
+                df = bbinput.process_part(part, self.constructs_df, '2')
                 part_df = self.part_dfs[index - 1]
                 for col in df.columns:
                     self.assertListEqual(df[col].to_list(),
@@ -353,8 +353,8 @@ class BioBricksInputTestCase(unittest.TestCase):
     def test_get_parts(self, mock_process_part):
         with patch('csv.reader') as mocked_reader:
             mocked_reader.return_value = self.parts_list
-            df = bbinput.get_parts(os.path.join(TEST_DIR,
-                                                'testfiles/parts.csv'),
+            df = bbinput.get_parts([os.path.join(TEST_DIR,
+                                                'testfiles/parts.csv')],
                                    self.constructs_df)
             for col in df.columns:
                 self.assertListEqual(df[col].to_list(),

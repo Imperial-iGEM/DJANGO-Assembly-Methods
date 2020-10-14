@@ -637,11 +637,11 @@ def create_protocol(dna_plate_map_dict, combinations_to_make,
     return assembly_path, transform_path
 
 
-
+'''
 # Example of offline:
 construct_path = "C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/moclo_combinations.csv"
 part_path = "C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/examples/moclo_dna_map.csv"
 
 moclo_function('output', [construct_path], [part_path], thermocycle=True,
               **labware_dict)
-
+'''

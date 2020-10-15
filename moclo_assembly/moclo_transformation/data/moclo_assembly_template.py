@@ -130,6 +130,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 no_assemblies_dict[str(no_parts)] += 1
             else:
                 no_assemblies_dict[str(no_parts)] = 1
+        print('combinations_to_make', combinations_to_make)
 
         wells_assembly = get_combination_well_no_parts(combinations_to_make)
         protocol.comment("--------------------------------------------")

@@ -13,19 +13,21 @@ import json
 import sys
 
 # Constant str
-TEMPLATE_DIR_NAME = 'template_ot2_scripts'
+CLIP_FNAME = '1_clip.ot2.py'
+CLIPS_INFO_FNAME = 'clip_run_info.csv'
 CLIP_TEMP_FNAME = 'clip_template.py'
-MAGBEAD_TEMP_FNAME = 'purification_template.py'
+F_ASSEMBLY_FNAME = '3_assembly.ot2.py'
 F_ASSEMBLY_TEMP_FNAME = 'assembly_template.py'
+FINAL_ASSEMBLIES_INFO_FNAME = 'final_assembly_run_info.csv'
+MAGBEAD_FNAME = '2_purification.ot2.py'
+MAGBEAD_TEMP_FNAME = 'purification_template.py'
+PREFIX_ENDING = '-P'    # String ending for internally marking BASIC prefix
+SUFFIX_ENDING = '-S'    # and suffix linkers relative to the current part
+TEMPLATE_DIR_NAME = 'template_ot2_scripts'
 TRANS_SPOT_TEMP_FNAME = 'transformation_template.py'
 THERMOCYCLE_TEMP_NAME = 'thermocycle_template.py'
-CLIP_FNAME = '1_clip.ot2.py'
-MAGBEAD_FNAME = '2_purification.ot2.py'
-F_ASSEMBLY_FNAME = '3_assembly.ot2.py'
 TRANS_SPOT_FNAME = '4_transformation.ot2.py'
 THERMOCYCLE_FNAME = '1_5_thermocycle.ot2.py'
-CLIPS_INFO_FNAME = 'clip_run_info.csv'
-FINAL_ASSEMBLIES_INFO_FNAME = 'final_assembly_run_info.csv'
 WELL_OUTPUT_FNAME = 'wells.txt'
 
 # Constant floats/ints
@@ -121,6 +123,7 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     all_my_output_paths = []
 
     try:
+        print('Running try')
         constructs_list = generate_constructs_list(input_construct_path)
         clips_df = generate_clips_df(constructs_list)
         sources_dict, parts_df = generate_sources_dict(output_sources_paths)
@@ -193,25 +196,25 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
 
         # Write non-OT2 scripts - metainformation
         os.chdir(generator_dir)
-        
+
         my_meta_dir = os.path.join(full_output_path, 'metainformation')
         if not os.path.exists(my_meta_dir):
             os.chdir(full_output_path)
             os.makedirs(my_meta_dir)
         os.chdir(my_meta_dir)
-        
+
         # create master mix dataframe so that users know proportions
         master_mix_df = generate_master_mix_df(clips_df['number'].sum())
-        
+
         # give information on source paths
         sources_paths_df = generate_sources_paths_df(
             output_sources_paths, SOURCE_DECK_POS)
-        
+
         # create labware dataframe from labware_dict
         labwareDf = pd.DataFrame(
             data={'name': list(labware_dict.keys()),
-                    'definition': list(labware_dict.values())})
-    
+                  'definition': list(labware_dict.values())})
+
         # save dfs as csv
         dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
                     MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
@@ -270,9 +273,9 @@ def generate_constructs_list(path):
             """
             if len(linker) >= 4:
                 if linker[:3] == 'UTR':
-                    return linker[:4] + '-S'
+                    return linker[:4] + SUFFIX_ENDING
             else:
-                return linker + "-S"
+                return linker + SUFFIX_ENDING
 
         clips_info = {'prefixes': [], 'parts': [],
                       'suffixes': []}
@@ -280,7 +283,7 @@ def generate_constructs_list(path):
             if i % 2 != 0:
                 clips_info['parts'].append(sequence)
                 clips_info['prefixes'].append(
-                    construct[i - 1] + '-P')
+                    construct[i - 1] + PREFIX_ENDING)
                 if i == len(construct) - 1:
                     suffix_linker = interogate_linker(construct[0])
                     clips_info['suffixes'].append(suffix_linker)
@@ -397,19 +400,19 @@ def generate_sources_dict(paths):
                     if name.find('_Prefix') > 0:
                         index = name.index('Prefix')
                         if name[index-1] == '-':
-                            name = name.replace('Prefix', 'P')
+                            name = name.replace('Prefix', PREFIX_ENDING)
                         elif name[index-1] == '_':
-                            name = name.replace('_Prefix', '-P')
+                            name = name.replace('_Prefix', PREFIX_ENDING)
                         else:
-                            name = name.replace('Prefix', '-P')
+                            name = name.replace('Prefix', PREFIX_ENDING)
                     elif 'Suffix' in name:
                         index = name.index('Suffix')
                         if name[index-1] == '-':
                             name = name.replace('Suffix', 'S')
                         elif name[index-1] == '_':
-                            name = name.replace('_Suffix', '-S')
+                            name = name.replace('_Suffix', SUFFIX_ENDING)
                         else:
-                            name = name.replace('Suffix', '-S')
+                            name = name.replace('Suffix', SUFFIX_ENDING)
                     sources_dict[name] = tuple(csv_values)
                     part_dict['name'] = [name]
                     part_dict['well'] = [str(source[1])]
@@ -450,66 +453,86 @@ def fill_parts_df(clips_df, parts_df_temp):
     # 'number' = the number of clips that the part will go in
     parts_df['number'] = pd.Series(['0'] * len(parts_df.index),
                                    index=parts_df.index)
- 
+
     # Iterate through clips dataframe
     for index, row in clips_df.iterrows():
         # find clip indices in parts_df
-        prefix_index = parts_df[
-                parts_df['name'] == row['prefixes']].index.values[0]
-        part_index = parts_df[
-                parts_df['name'] == row['parts']].index.values[0]
-        suffix_index = parts_df[
-                parts_df['name'] == row['suffixes']].index.values[0]
-        
+        if not parts_df[parts_df['name'] == row['prefixes']].empty:
+            prefix_index = parts_df[
+                    parts_df['name'] == row['prefixes']].index.values[0]
+        else:
+            prefix_index = None
+        if not parts_df[parts_df['name'] == row['parts']].empty:
+            part_index = parts_df[
+                    parts_df['name'] == row['parts']].index.values[0]
+        else:
+            part_index = None
+        if not parts_df[parts_df['name'] == row['suffixes']].empty:
+            suffix_index = parts_df[
+                    parts_df['name'] == row['suffixes']].index.values[0]
+        else:
+            suffix_index = None
+
         # fill 'clip_well', checking for dummy value
-        if parts_df.at[prefix_index, 'clip_well'] == '0':
-            parts_df.at[prefix_index, 'clip_well'] = list(row['clip_well'])
-        else:
-            parts_df.at[
-                prefix_index, 'clip_well'].extend(list(row['clip_well']))
-        if parts_df.at[part_index, 'clip_well'] == '0':
-            parts_df.at[part_index, 'clip_well'] = list(row['clip_well'])
-        else:
-            parts_df.at[
-                part_index, 'clip_well'].extend(list(row['clip_well']))
-        if parts_df.at[suffix_index, 'clip_well'] == '0':
-            parts_df.at[suffix_index, 'clip_well'] = list(row['clip_well'])
-        else:
-            parts_df.at[
-                suffix_index, 'clip_well'].extend(list(row['clip_well']))
+        ## Prefix
+        if prefix_index:
+            if parts_df.at[prefix_index, 'clip_well'] == '0':
+                parts_df.at[prefix_index, 'clip_well'] = list(row['clip_well'])
+            else:
+                parts_df.at[
+                    prefix_index, 'clip_well'].extend(list(row['clip_well']))
+        ## Part
+        if part_index:
+            if parts_df.at[part_index, 'clip_well'] == '0':
+                parts_df.at[part_index, 'clip_well'] = list(row['clip_well'])
+            else:
+                parts_df.at[
+                    part_index, 'clip_well'].extend(list(row['clip_well']))
+        if suffix_index:
+            if parts_df.at[suffix_index, 'clip_well'] == '0':
+                parts_df.at[suffix_index, 'clip_well'] = list(row['clip_well'])
+            else:
+                parts_df.at[
+                    suffix_index, 'clip_well'].extend(list(row['clip_well']))
         
         # fill 'mag_well', checking for dummy value
-        if parts_df.at[prefix_index, 'mag_well'] == '0':
-            parts_df.at[prefix_index, 'mag_well'] = list(row['mag_well'])
-        else:
-            parts_df.at[
-                prefix_index, 'mag_well'].extend(list(row['mag_well']))
-        if parts_df.at[part_index, 'mag_well'] == '0':
-            parts_df.at[part_index, 'mag_well'] = list(row['mag_well'])
-        else:
-            parts_df.at[
-                part_index, 'mag_well'].extend(list(row['mag_well']))
-        if parts_df.at[suffix_index, 'mag_well'] == '0':
-            parts_df.at[suffix_index, 'mag_well'] = list(row['mag_well'])
-        else:
-            parts_df.at[
-                suffix_index, 'mag_well'].extend(list(row['mag_well']))
+        if prefix_index:
+            if parts_df.at[prefix_index, 'mag_well'] == '0':
+                parts_df.at[prefix_index, 'mag_well'] = list(row['mag_well'])
+            else:
+                parts_df.at[
+                    prefix_index, 'mag_well'].extend(list(row['mag_well']))
+        if part_index:
+            if parts_df.at[part_index, 'mag_well'] == '0':
+                parts_df.at[part_index, 'mag_well'] = list(row['mag_well'])
+            else:
+                parts_df.at[
+                    part_index, 'mag_well'].extend(list(row['mag_well']))
+        if suffix_index:
+            if parts_df.at[suffix_index, 'mag_well'] == '0':
+                parts_df.at[suffix_index, 'mag_well'] = list(row['mag_well'])
+            else:
+                parts_df.at[
+                    suffix_index, 'mag_well'].extend(list(row['mag_well']))
       
         # fill number column
-        parts_df.at[prefix_index, 'number'] = int(
-            parts_df.at[prefix_index, 'number']) + int(row['number'])
-        parts_df.at[part_index, 'number'] = int(
-            parts_df.at[part_index, 'number']) + int(row['number'])
-        parts_df.at[suffix_index, 'number'] = int(
-            parts_df.at[suffix_index, 'number']) + int(row['number'])
+        if prefix_index:
+            parts_df.at[prefix_index, 'number'] = int(
+                parts_df.at[prefix_index, 'number']) + int(row['number'])
+        if part_index:
+            parts_df.at[part_index, 'number'] = int(
+                parts_df.at[part_index, 'number']) + int(row['number'])
+        if suffix_index:
+            parts_df.at[suffix_index, 'number'] = int(
+                parts_df.at[suffix_index, 'number']) + int(row['number'])
 
     # iterate through parts dataframe to fill 'vol_per_clip' and 'total_vol'
     for index, row in parts_df.iterrows():
         noClips = int(row['number'])
         # check if prefix or suffix: volume = 1 uL
-        if row['name'][len(row['name'])-2:len(row['name'])-1] == '-P':
+        if row['name'][:-2] == PREFIX_ENDING:
             vol_per_clip = 1
-        elif row['name'][len(row['name'])-2:len(row['name'])-1] == '-S':
+        elif row['name'][:-2] == SUFFIX_ENDING:
             vol_per_clip = 1
         else:
             vol_per_clip = int(round(

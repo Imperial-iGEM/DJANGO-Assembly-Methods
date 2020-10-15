@@ -1275,7 +1275,7 @@ class ParserSBOL:
                     filepath,
                     index=False
                 )
-                self.part_csv_paths(filepath)
+                self.part_csv_paths.append(filepath)
 
     def is_linkers_order_correct(
         self,

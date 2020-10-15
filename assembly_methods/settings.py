@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'r24xxs@d1m9%9su*dypo@+e5c%ek_#qvuc&d!p+-)#j1lqhml+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "FALSE") == "TRUE"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 
 # Application definition
@@ -138,5 +138,7 @@ GRAPHENE = {
 }
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "output/")
-
-MEDIA_URL = "http://localhost:8000/output/"
+if DEBUG:
+    MEDIA_URL = "http://localhost:8000/output/"
+else:
+    MEDIA_URL = "http://soaplab.io/output/"

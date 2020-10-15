@@ -240,7 +240,7 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     except Exception as e:
         # write error to file in case of failure
         error_path = os.path.join(full_output_path, 'BASIC_error.txt')
-        with open(error_path) as f:
+        with open(error_path, 'w') as f:
             f.write("Failed to generate BASIC scripts: {}\n".format(str(e)))
         all_my_output_paths.append(error_path)
 

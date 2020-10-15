@@ -1103,7 +1103,7 @@ class ParserSBOL:
         '''
         constructDf = \
             self.getConstructDfFromPlateoPlate(constructPlate, assembly)
-        if assembly == "BASIC" or "BioBricks":
+        if assembly == "BASIC" or assembly == "BioBricks":
             filepath = os.path.join(self.outdir, "construct.csv")
             constructDf.to_csv(
                 filepath,

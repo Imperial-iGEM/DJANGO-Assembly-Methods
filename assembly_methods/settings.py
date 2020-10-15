@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "FALSE") == "TRUE"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,app.soaplab.io,django-assembly-methods-tn3pz.ondigitalocean.app").split(",")
 
 
 # Application definition
@@ -145,4 +145,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "output/")
 if DEBUG:
     MEDIA_URL = "http://localhost:8000/output/"
 else:
-    MEDIA_URL = "http://soaplab.io/output/"
+    MEDIA_URL = "http://app.soaplab.io/output/"

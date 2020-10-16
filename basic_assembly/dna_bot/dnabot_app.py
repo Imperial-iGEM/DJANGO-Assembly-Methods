@@ -13,21 +13,19 @@ import json
 import sys
 
 # Constant str
-CLIP_FNAME = '1_clip.ot2.py'
-CLIPS_INFO_FNAME = 'clip_run_info.csv'
-CLIP_TEMP_FNAME = 'clip_template.py'
-F_ASSEMBLY_FNAME = '3_assembly.ot2.py'
-F_ASSEMBLY_TEMP_FNAME = 'assembly_template.py'
-FINAL_ASSEMBLIES_INFO_FNAME = 'final_assembly_run_info.csv'
-MAGBEAD_FNAME = '2_purification.ot2.py'
-MAGBEAD_TEMP_FNAME = 'purification_template.py'
-PREFIX_ENDING = '-P'    # String ending for internally marking BASIC prefix
-SUFFIX_ENDING = '-S'    # and suffix linkers relative to the current part
 TEMPLATE_DIR_NAME = 'template_ot2_scripts'
+CLIP_TEMP_FNAME = 'clip_template.py'
+MAGBEAD_TEMP_FNAME = 'purification_template.py'
+F_ASSEMBLY_TEMP_FNAME = 'assembly_template.py'
 TRANS_SPOT_TEMP_FNAME = 'transformation_template.py'
 THERMOCYCLE_TEMP_NAME = 'thermocycle_template.py'
+CLIP_FNAME = '1_clip.ot2.py'
+MAGBEAD_FNAME = '2_purification.ot2.py'
+F_ASSEMBLY_FNAME = '3_assembly.ot2.py'
 TRANS_SPOT_FNAME = '4_transformation.ot2.py'
 THERMOCYCLE_FNAME = '1_5_thermocycle.ot2.py'
+CLIPS_INFO_FNAME = 'clip_run_info.csv'
+FINAL_ASSEMBLIES_INFO_FNAME = 'final_assembly_run_info.csv'
 WELL_OUTPUT_FNAME = 'wells.txt'
 
 # Constant floats/ints
@@ -122,144 +120,135 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
 
     all_my_output_paths = []
 
-    # try:
-    constructs_list = generate_constructs_list(input_construct_path)
-    clips_df = generate_clips_df(constructs_list)
-    sources_dict, parts_df = generate_sources_dict(output_sources_paths)
-    parts_df_temp = fill_parts_df(clips_df, parts_df)
-    parts_df = parts_df_temp.copy()
-    print('constructs_list', constructs_list)
-    print('parts_df', parts_df)
-    print('clips_df', clips_df)
+    try:
+        constructs_list = generate_constructs_list(input_construct_path)
+        clips_df = generate_clips_df(constructs_list)
+        sources_dict, parts_df = generate_sources_dict(output_sources_paths)
+        parts_df_temp = fill_parts_df(clips_df, parts_df)
+        parts_df = parts_df_temp.copy()
 
-    # calculate OT2 script variables
-    clips_dict = generate_clips_dict(clips_df, sources_dict, parts_df)
-    print('clips_dict', clips_dict)
-    magbead_sample_number = clips_df['number'].sum()
-    final_assembly_dict, clips_df, parts_df = generate_final_assembly_dict(
-        constructs_list, clips_df, parts_df)
-    print('final_assembly_dict', final_assembly_dict)
-    final_assembly_tipracks = calculate_final_assembly_tipracks(
-        final_assembly_dict)
-    print('final_assembly_tipracks', final_assembly_tipracks)
-    spotting_tuples = generate_spotting_tuples(constructs_list,
-                                                SPOTTING_VOLS_DICT)
-    print('spotting_tuples', spotting_tuples)
+        # calculate OT2 script variables
+        clips_dict = generate_clips_dict(clips_df, sources_dict, parts_df)
+        magbead_sample_number = clips_df['number'].sum()
+        final_assembly_dict, clips_df, parts_df = generate_final_assembly_dict(
+            constructs_list, clips_df, parts_df)
+        final_assembly_tipracks = calculate_final_assembly_tipracks(
+            final_assembly_dict)
+        spotting_tuples = generate_spotting_tuples(constructs_list,
+                                                    SPOTTING_VOLS_DICT)
+        
+        # check if p300_single (1 channel) or p300_multi (8 channel)
+        if 'multi' in p300_type.lower():
+            multi = True
+        else:
+            multi = False
+
+        # Write OT2 scripts
+        out_full_path_1 = generate_ot2_script(
+            full_output_path, CLIP_FNAME,
+            os.path.join(template_dir_path, CLIP_TEMP_FNAME),
+            clips_dict=clips_dict,
+            p10_mount=p10_mount, p10_type=p10_type, well_plate_type=well_plate,
+            tube_rack_type=tube_rack)
+
+        out_full_path_2 = generate_ot2_script(
+            full_output_path, MAGBEAD_FNAME,
+            os.path.join(template_dir_path, MAGBEAD_TEMP_FNAME),
+            p300_mount=p300_mount,
+            p300_type=p300_type, well_plate_type=well_plate,
+            reagent_plate_type=reagent_plate,
+            multi=multi, bead_container_type=bead_container,
+            sample_number=magbead_sample_number,
+            ethanol_well=ethanol_well_for_stage_2)
+
+        out_full_path_3 = generate_ot2_script(
+            full_output_path, F_ASSEMBLY_FNAME,
+            os.path.join(template_dir_path, F_ASSEMBLY_TEMP_FNAME),
+            final_assembly_dict=final_assembly_dict,
+            tiprack_num=final_assembly_tipracks,
+            p10_mount=p10_mount, p10_type=p10_type, mag_plate_type=mag_plate,
+            tube_rack_type=tube_rack, aluminum_block_type=aluminum_block)
+
+        out_full_path_4 = generate_ot2_script(
+            full_output_path, TRANS_SPOT_FNAME,
+            os.path.join(template_dir_path, TRANS_SPOT_TEMP_FNAME),
+            spotting_tuples=spotting_tuples, soc_well=deep_well_plate_stage_4,
+            p10_mount=p10_mount,
+            p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
+            well_plate_type=well_plate, tube_rack_type=tube_rack,
+            soc_plate_type=soc_plate, agar_plate_type=agar_plate)
+        
+        # optional thermocycling script; run between clip reactions and purification
+        # requires the thermocycler module
+        out_full_path_5 = generate_ot2_script(
+            full_output_path, THERMOCYCLE_FNAME, 
+            os.path.join(template_dir_path, THERMOCYCLE_TEMP_NAME),
+            well_plate_type=well_plate)
+
+        all_my_output_paths.append(out_full_path_1)
+        all_my_output_paths.append(out_full_path_2)
+        all_my_output_paths.append(out_full_path_3)
+        all_my_output_paths.append(out_full_path_4)
+        all_my_output_paths.append(out_full_path_5)
+
+        # Write non-OT2 scripts - metainformation
+        os.chdir(generator_dir)
+        
+        my_meta_dir = os.path.join(full_output_path, 'metainformation')
+        if not os.path.exists(my_meta_dir):
+            os.chdir(full_output_path)
+            os.makedirs(my_meta_dir)
+        os.chdir(my_meta_dir)
+        
+        # create master mix dataframe so that users know proportions
+        master_mix_df = generate_master_mix_df(clips_df['number'].sum())
+        
+        # give information on source paths
+        sources_paths_df = generate_sources_paths_df(
+            output_sources_paths, SOURCE_DECK_POS)
+        
+        # create labware dataframe from labware_dict
+        labwareDf = pd.DataFrame(
+            data={'name': list(labware_dict.keys()),
+                    'definition': list(labware_dict.values())})
     
-    # check if p300_single (1 channel) or p300_multi (8 channel)
-    if 'multi' in p300_type.lower():
-        multi = True
-    else:
-        multi = False
+        # save dfs as csv
+        dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
+                    MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
+                    CLIP_REACTIONS=clips_df, PART_INFO=parts_df,
+                    LABWARE=labwareDf)
+        output_sources_paths.append(os.path.join(
+            my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
+        # final assembly dictionary - from original dnabot
+        with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
+                    'w', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            for final_assembly_well, construct_clips in final_assembly_dict.items():
+                csvwriter.writerow([final_assembly_well, construct_clips])
+        output_sources_paths.append(os.path.join(
+            my_meta_dir, construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME))
 
-    # Write OT2 scripts
-    out_full_path_1 = generate_ot2_script(
-        full_output_path, CLIP_FNAME,
-        os.path.join(template_dir_path, CLIP_TEMP_FNAME),
-        clips_dict=clips_dict,
-        p10_mount=p10_mount, p10_type=p10_type, well_plate_type=well_plate,
-        tube_rack_type=tube_rack)
+        # additional well info - from original dnabot
+        with open(construct_base + '_' + WELL_OUTPUT_FNAME, 'w') as f:
+            f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
+            f.write('\n')
+            f.write('SOC column: {}'.format(deep_well_plate_stage_4))
+        output_sources_paths.append(os.path.join(
+            my_meta_dir, construct_base + '_' + WELL_OUTPUT_FNAME))
+        os.chdir(generator_dir)
 
-    out_full_path_2 = generate_ot2_script(
-        full_output_path, MAGBEAD_FNAME,
-        os.path.join(template_dir_path, MAGBEAD_TEMP_FNAME),
-        p300_mount=p300_mount,
-        p300_type=p300_type, well_plate_type=well_plate,
-        reagent_plate_type=reagent_plate,
-        multi=multi, bead_container_type=bead_container,
-        sample_number=magbead_sample_number,
-        ethanol_well=ethanol_well_for_stage_2)
+    except Exception as e:
+        # write error to file in case of failure
+        error_path = os.path.join(full_output_path, 'BASIC_error.txt')
+        with open(error_path) as f:
+            f.write("Failed to generate BASIC scripts: {}\n".format(str(e)))
+        all_my_output_paths.append(error_path)
 
-    out_full_path_3 = generate_ot2_script(
-        full_output_path, F_ASSEMBLY_FNAME,
-        os.path.join(template_dir_path, F_ASSEMBLY_TEMP_FNAME),
-        final_assembly_dict=final_assembly_dict,
-        tiprack_num=final_assembly_tipracks,
-        p10_mount=p10_mount, p10_type=p10_type, mag_plate_type=mag_plate,
-        tube_rack_type=tube_rack, aluminum_block_type=aluminum_block)
-
-    out_full_path_4 = generate_ot2_script(
-        full_output_path, TRANS_SPOT_FNAME,
-        os.path.join(template_dir_path, TRANS_SPOT_TEMP_FNAME),
-        spotting_tuples=spotting_tuples, soc_well=deep_well_plate_stage_4,
-        p10_mount=p10_mount,
-        p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
-        well_plate_type=well_plate, tube_rack_type=tube_rack,
-        soc_plate_type=soc_plate, agar_plate_type=agar_plate)
-    
-    # optional thermocycling script; run between clip reactions and purification
-    # requires the thermocycler module
-    out_full_path_5 = generate_ot2_script(
-        full_output_path, THERMOCYCLE_FNAME, 
-        os.path.join(template_dir_path, THERMOCYCLE_TEMP_NAME),
-        well_plate_type=well_plate)
-
-    all_my_output_paths.append(out_full_path_1)
-    all_my_output_paths.append(out_full_path_2)
-    all_my_output_paths.append(out_full_path_3)
-    all_my_output_paths.append(out_full_path_4)
-    all_my_output_paths.append(out_full_path_5)
-
-    # Write non-OT2 scripts - metainformation
-    os.chdir(generator_dir)
-
-    my_meta_dir = os.path.join(full_output_path, 'metainformation')
-    if not os.path.exists(my_meta_dir):
-        os.chdir(full_output_path)
-        os.makedirs(my_meta_dir)
-    os.chdir(my_meta_dir)
-
-    # create master mix dataframe so that users know proportions
-    master_mix_df = generate_master_mix_df(clips_df['number'].sum())
-
-    # give information on source paths
-    sources_paths_df = generate_sources_paths_df(
-        output_sources_paths, SOURCE_DECK_POS)
-
-    # create labware dataframe from labware_dict
-    labwareDf = pd.DataFrame(
-        data={'name': list(labware_dict.keys()),
-                'definition': list(labware_dict.values())})
-
-    # save dfs as csv
-    dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
-                MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
-                CLIP_REACTIONS=clips_df, PART_INFO=parts_df,
-                LABWARE=labwareDf)
-    output_sources_paths.append(os.path.join(
-        my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
-    # final assembly dictionary - from original dnabot
-    with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
-                'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        for final_assembly_well, construct_clips in final_assembly_dict.items():
-            csvwriter.writerow([final_assembly_well, construct_clips])
-    output_sources_paths.append(os.path.join(
-        my_meta_dir, construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME))
-
-    # additional well info - from original dnabot
-    with open(construct_base + '_' + WELL_OUTPUT_FNAME, 'w') as f:
-        f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
-        f.write('\n')
-        f.write('SOC column: {}'.format(deep_well_plate_stage_4))
-    output_sources_paths.append(os.path.join(
-        my_meta_dir, construct_base + '_' + WELL_OUTPUT_FNAME))
-    os.chdir(generator_dir)
-
-    return all_my_output_paths
-
-    # except Exception as e:
-    #     # write error to file in case of failure
-    #     error_path = os.path.join(full_output_path, 'BASIC_error.txt')
-    #     with open(error_path, 'w') as f:
-    #         f.write("Failed to generate BASIC scripts: {}\n".format(str(e)))
-    #     all_my_output_paths.append(error_path)
-
-    # finally:
-    #     # return the paths of the outputs
-    #     # changed to output_paths for consistency with other assembly methods
-    #     output_paths = all_my_output_paths
-    #     return output_paths
+    finally:
+        # return the paths of the outputs
+        # changed to output_paths for consistency with other assembly methods
+        output_paths = all_my_output_paths
+        return output_paths
 
 
 def generate_constructs_list(path):
@@ -281,9 +270,9 @@ def generate_constructs_list(path):
             """
             if len(linker) >= 4:
                 if linker[:3] == 'UTR':
-                    return linker[:4] + SUFFIX_ENDING
+                    return linker[:4] + '-S'
             else:
-                return linker + SUFFIX_ENDING
+                return linker + "-S"
 
         clips_info = {'prefixes': [], 'parts': [],
                       'suffixes': []}
@@ -291,7 +280,7 @@ def generate_constructs_list(path):
             if i % 2 != 0:
                 clips_info['parts'].append(sequence)
                 clips_info['prefixes'].append(
-                    construct[i - 1] + PREFIX_ENDING)
+                    construct[i - 1] + '-P')
                 if i == len(construct) - 1:
                     suffix_linker = interogate_linker(construct[0])
                     clips_info['suffixes'].append(suffix_linker)
@@ -408,19 +397,19 @@ def generate_sources_dict(paths):
                     if name.find('_Prefix') > 0:
                         index = name.index('Prefix')
                         if name[index-1] == '-':
-                            name = name.replace('Prefix', PREFIX_ENDING)
+                            name = name.replace('Prefix', 'P')
                         elif name[index-1] == '_':
-                            name = name.replace('_Prefix', PREFIX_ENDING)
+                            name = name.replace('_Prefix', '-P')
                         else:
-                            name = name.replace('Prefix', PREFIX_ENDING)
+                            name = name.replace('Prefix', '-P')
                     elif 'Suffix' in name:
                         index = name.index('Suffix')
                         if name[index-1] == '-':
                             name = name.replace('Suffix', 'S')
                         elif name[index-1] == '_':
-                            name = name.replace('_Suffix', SUFFIX_ENDING)
+                            name = name.replace('_Suffix', '-S')
                         else:
-                            name = name.replace('Suffix', SUFFIX_ENDING)
+                            name = name.replace('Suffix', '-S')
                     sources_dict[name] = tuple(csv_values)
                     part_dict['name'] = [name]
                     part_dict['well'] = [str(source[1])]
@@ -461,86 +450,66 @@ def fill_parts_df(clips_df, parts_df_temp):
     # 'number' = the number of clips that the part will go in
     parts_df['number'] = pd.Series(['0'] * len(parts_df.index),
                                    index=parts_df.index)
-
+ 
     # Iterate through clips dataframe
     for index, row in clips_df.iterrows():
         # find clip indices in parts_df
-        if not parts_df[parts_df['name'] == row['prefixes']].empty:
-            prefix_index = parts_df[
-                    parts_df['name'] == row['prefixes']].index.values[0]
-        else:
-            prefix_index = None
-        if not parts_df[parts_df['name'] == row['parts']].empty:
-            part_index = parts_df[
-                    parts_df['name'] == row['parts']].index.values[0]
-        else:
-            part_index = None
-        if not parts_df[parts_df['name'] == row['suffixes']].empty:
-            suffix_index = parts_df[
-                    parts_df['name'] == row['suffixes']].index.values[0]
-        else:
-            suffix_index = None
-
+        prefix_index = parts_df[
+                parts_df['name'] == row['prefixes']].index.values[0]
+        part_index = parts_df[
+                parts_df['name'] == row['parts']].index.values[0]
+        suffix_index = parts_df[
+                parts_df['name'] == row['suffixes']].index.values[0]
+        
         # fill 'clip_well', checking for dummy value
-        ## Prefix
-        if prefix_index:
-            if parts_df.at[prefix_index, 'clip_well'] == '0':
-                parts_df.at[prefix_index, 'clip_well'] = list(row['clip_well'])
-            else:
-                parts_df.at[
-                    prefix_index, 'clip_well'].extend(list(row['clip_well']))
-        ## Part
-        if part_index:
-            if parts_df.at[part_index, 'clip_well'] == '0':
-                parts_df.at[part_index, 'clip_well'] = list(row['clip_well'])
-            else:
-                parts_df.at[
-                    part_index, 'clip_well'].extend(list(row['clip_well']))
-        if suffix_index:
-            if parts_df.at[suffix_index, 'clip_well'] == '0':
-                parts_df.at[suffix_index, 'clip_well'] = list(row['clip_well'])
-            else:
-                parts_df.at[
-                    suffix_index, 'clip_well'].extend(list(row['clip_well']))
+        if parts_df.at[prefix_index, 'clip_well'] == '0':
+            parts_df.at[prefix_index, 'clip_well'] = list(row['clip_well'])
+        else:
+            parts_df.at[
+                prefix_index, 'clip_well'].extend(list(row['clip_well']))
+        if parts_df.at[part_index, 'clip_well'] == '0':
+            parts_df.at[part_index, 'clip_well'] = list(row['clip_well'])
+        else:
+            parts_df.at[
+                part_index, 'clip_well'].extend(list(row['clip_well']))
+        if parts_df.at[suffix_index, 'clip_well'] == '0':
+            parts_df.at[suffix_index, 'clip_well'] = list(row['clip_well'])
+        else:
+            parts_df.at[
+                suffix_index, 'clip_well'].extend(list(row['clip_well']))
         
         # fill 'mag_well', checking for dummy value
-        if prefix_index:
-            if parts_df.at[prefix_index, 'mag_well'] == '0':
-                parts_df.at[prefix_index, 'mag_well'] = list(row['mag_well'])
-            else:
-                parts_df.at[
-                    prefix_index, 'mag_well'].extend(list(row['mag_well']))
-        if part_index:
-            if parts_df.at[part_index, 'mag_well'] == '0':
-                parts_df.at[part_index, 'mag_well'] = list(row['mag_well'])
-            else:
-                parts_df.at[
-                    part_index, 'mag_well'].extend(list(row['mag_well']))
-        if suffix_index:
-            if parts_df.at[suffix_index, 'mag_well'] == '0':
-                parts_df.at[suffix_index, 'mag_well'] = list(row['mag_well'])
-            else:
-                parts_df.at[
-                    suffix_index, 'mag_well'].extend(list(row['mag_well']))
+        if parts_df.at[prefix_index, 'mag_well'] == '0':
+            parts_df.at[prefix_index, 'mag_well'] = list(row['mag_well'])
+        else:
+            parts_df.at[
+                prefix_index, 'mag_well'].extend(list(row['mag_well']))
+        if parts_df.at[part_index, 'mag_well'] == '0':
+            parts_df.at[part_index, 'mag_well'] = list(row['mag_well'])
+        else:
+            parts_df.at[
+                part_index, 'mag_well'].extend(list(row['mag_well']))
+        if parts_df.at[suffix_index, 'mag_well'] == '0':
+            parts_df.at[suffix_index, 'mag_well'] = list(row['mag_well'])
+        else:
+            parts_df.at[
+                suffix_index, 'mag_well'].extend(list(row['mag_well']))
       
         # fill number column
-        if prefix_index:
-            parts_df.at[prefix_index, 'number'] = int(
-                parts_df.at[prefix_index, 'number']) + int(row['number'])
-        if part_index:
-            parts_df.at[part_index, 'number'] = int(
-                parts_df.at[part_index, 'number']) + int(row['number'])
-        if suffix_index:
-            parts_df.at[suffix_index, 'number'] = int(
-                parts_df.at[suffix_index, 'number']) + int(row['number'])
+        parts_df.at[prefix_index, 'number'] = int(
+            parts_df.at[prefix_index, 'number']) + int(row['number'])
+        parts_df.at[part_index, 'number'] = int(
+            parts_df.at[part_index, 'number']) + int(row['number'])
+        parts_df.at[suffix_index, 'number'] = int(
+            parts_df.at[suffix_index, 'number']) + int(row['number'])
 
     # iterate through parts dataframe to fill 'vol_per_clip' and 'total_vol'
     for index, row in parts_df.iterrows():
         noClips = int(row['number'])
         # check if prefix or suffix: volume = 1 uL
-        if row['name'][:-2] == PREFIX_ENDING:
+        if row['name'][len(row['name'])-2:len(row['name'])-1] == '-P':
             vol_per_clip = 1
-        elif row['name'][:-2] == SUFFIX_ENDING:
+        elif row['name'][len(row['name'])-2:len(row['name'])-1] == '-S':
             vol_per_clip = 1
         else:
             vol_per_clip = int(round(
@@ -569,48 +538,48 @@ def generate_clips_dict(clips_df, sources_dict, parts_df):
                   'parts_wells': [], 'parts_plates': [], 'parts_vols': [],
                   'water_vols': []}
     # Generate clips_dict from args
-    # try:
-    for _, clip_info in clips_df.iterrows():
-        prefix_linker = clip_info['prefixes']
-        clips_dict['prefixes_wells'].append(
-            [sources_dict[prefix_linker][0]]*clip_info['number'])
-        clips_dict['prefixes_plates'].append([handle_2_columns(
-            sources_dict[prefix_linker])[2]]*clip_info['number'])
-        suffix_linker = clip_info['suffixes']
-        clips_dict['suffixes_wells'].append(
-            [sources_dict[suffix_linker][0]]*clip_info['number'])
-        clips_dict['suffixes_plates'].append(
-            [handle_2_columns(
-                sources_dict[suffix_linker])[2]]*clip_info['number'])
-        part = clip_info['parts']
-        clips_dict['parts_wells'].append([sources_dict[part][0]]
-                                            * clip_info['number'])
-        clips_dict['parts_plates'].append([handle_2_columns(
-            sources_dict[part])[2]]*clip_info['number'])
-        part_index = parts_df[parts_df['name'] == part].index.values[0]
-        part_concentration = parts_df.at[part_index, 'concentration']
-        if part_concentration != PART_PER_CLIP:
-            part_vol = round(
-                PART_PER_CLIP / float(sources_dict[part][1]), 1)
-            if part_vol < MIN_VOL:
-                part_vol = MIN_VOL
-            elif part_vol > max_part_vol:
-                part_vol = max_part_vol
-            water_vol = max_part_vol - part_vol
-            clips_dict['parts_vols'].append(
-                [part_vol] * clip_info['number'])
-            clips_dict['water_vols'].append(
-                [water_vol] * clip_info['number'])
-        else:
-            clips_dict['parts_vols'].append([DEFAULT_PART_VOL] *
-                                            clip_info['number'])
-            clips_dict['water_vols'].append(
-                [max_part_vol - DEFAULT_PART_VOL]*clip_info['number'])
+    try:
+        for _, clip_info in clips_df.iterrows():
+            prefix_linker = clip_info['prefixes']
+            clips_dict['prefixes_wells'].append(
+                [sources_dict[prefix_linker][0]]*clip_info['number'])
+            clips_dict['prefixes_plates'].append([handle_2_columns(
+                sources_dict[prefix_linker])[2]]*clip_info['number'])
+            suffix_linker = clip_info['suffixes']
+            clips_dict['suffixes_wells'].append(
+                [sources_dict[suffix_linker][0]]*clip_info['number'])
+            clips_dict['suffixes_plates'].append(
+                [handle_2_columns(
+                    sources_dict[suffix_linker])[2]]*clip_info['number'])
+            part = clip_info['parts']
+            clips_dict['parts_wells'].append([sources_dict[part][0]]
+                                                * clip_info['number'])
+            clips_dict['parts_plates'].append([handle_2_columns(
+                sources_dict[part])[2]]*clip_info['number'])
+            part_index = parts_df[parts_df['name'] == part].index.values[0]
+            part_concentration = parts_df.at[part_index, 'concentration']
+            if part_concentration != PART_PER_CLIP:
+                part_vol = round(
+                    PART_PER_CLIP / float(sources_dict[part][1]), 1)
+                if part_vol < MIN_VOL:
+                    part_vol = MIN_VOL
+                elif part_vol > max_part_vol:
+                    part_vol = max_part_vol
+                water_vol = max_part_vol - part_vol
+                clips_dict['parts_vols'].append(
+                    [part_vol] * clip_info['number'])
+                clips_dict['water_vols'].append(
+                    [water_vol] * clip_info['number'])
+            else:
+                clips_dict['parts_vols'].append([DEFAULT_PART_VOL] *
+                                                clip_info['number'])
+                clips_dict['water_vols'].append(
+                    [max_part_vol - DEFAULT_PART_VOL]*clip_info['number'])
 
-    # except KeyError:
-    #     sys.exit('likely part/linker not listed in parts.csv')
-    # for key, value in clips_dict.items():
-    #     clips_dict[key] = [item for sublist in value for item in sublist]
+    except KeyError:
+        sys.exit('likely part/linker not listed in sources.csv')
+    for key, value in clips_dict.items():
+        clips_dict[key] = [item for sublist in value for item in sublist]
     return clips_dict
 
 

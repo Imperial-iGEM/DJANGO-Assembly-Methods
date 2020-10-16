@@ -83,87 +83,73 @@ def moclo_function(output_folder, construct_path, part_path,
     else:
         multi = False
 
-    # try:
-    # Load in CSV files as a dict containing lists of lists.
-    # Loop through all part_path's and merge dicts
-    dna_plate_map_dict = {}
-    if type(part_path) == list:
-        for path in part_path:
-            dna_plate_map_dict_local = generate_plate_maps(path)
-            dna_plate_map_dict.update(dna_plate_map_dict_local)
-        print("dna_plate_map_dict: ", dna_plate_map_dict)
-    else:
-        dna_plate_map_dict = generate_plate_maps(part_path)
+    try:
+        # Load in CSV files as a dict containing lists of lists.
+        # Loop through all part_path's and merge dicts
+        dna_plate_map_dict = {}
+        if type(part_path) == list:
+            for path in part_path:
+                dna_plate_map_dict_local = generate_plate_maps(path)
+                dna_plate_map_dict.update(dna_plate_map_dict_local)
+        else:
+            dna_plate_map_dict = generate_plate_maps(part_path)
 
-    combinations_to_make = []
-    combinations_to_make = generate_combinations(construct_path)
+        combinations_to_make = []
+        combinations_to_make = generate_combinations(construct_path)
 
-    check_number_of_combinations(combinations_limit, combinations_to_make)
+        check_number_of_combinations(combinations_limit, combinations_to_make)
 
-    # Generate and save output plate maps.
-    print("config['output_folder_path']: ", config['output_folder_path'])
-    triplicate, agar_path = generate_and_save_output_plate_maps(
-        combinations_to_make, combinations_limit,
-        config['output_folder_path'])
+        # Generate and save output plate maps.
+        triplicate, agar_path = generate_and_save_output_plate_maps(
+            combinations_to_make, combinations_limit,
+            config['output_folder_path'])
 
-    # Define assembly metainformation path
-    assembly_metainformation_path = os.path.join(
-        config['output_folder_path'], 'assembly_metainformation.csv')
-    # print('assembly_metainformation_path: ',
-    # assembly_metainformation_path)
-    # print('triplicate: ', triplicate)
-    # print('thermocycle: ', thermocycle)
-    # print('labware_dict: ', labware_dict)
+        # Define assembly metainformation path
+        assembly_metainformation_path = os.path.join(
+            config['output_folder_path'], 'assembly_metainformation.csv')
 
-    # Create and save assembly metainformation
-    parts, comb, mm, reagents = create_metainformation(
-        assembly_metainformation_path,
-        dna_plate_map_dict, combinations_to_make, labware_dict,
-        thermocycle, triplicate)
-    # print('passed create_metainformation')
+        # Create and save assembly metainformation
+        parts, comb, mm, reagents = create_metainformation(
+            assembly_metainformation_path,
+            dna_plate_map_dict, combinations_to_make, labware_dict,
+            thermocycle, triplicate)
 
-    # create master mix dictionary to use in assembly protocol
-    reagent_to_mm_dict, mm_dict = get_mm_dicts(mm, reagents)
-    # print('passed get_mm_dicts')
+        # create master mix dictionary to use in assembly protocol
+        reagent_to_mm_dict, mm_dict = get_mm_dicts(mm, reagents)
 
-    transform_metainformation_path = os.path.join(
-        config['output_folder_path'], 'transform_metainformation.csv')
-    print('transform_metainformation_path: ',
-            transform_metainformation_path)
-    create_transform_metainformation(
-        transform_metainformation_path,
-        labware_dict, triplicate, multi)
-    # print('passed create_transform_metainformation')
+        transform_metainformation_path = os.path.join(
+            config['output_folder_path'], 'transform_metainformation.csv')
+        create_transform_metainformation(
+            transform_metainformation_path,
+            labware_dict, triplicate, multi)
 
-    # Create a protocol file and hard code the plate maps into it.
-    assembly_path, transform_path = create_protocol(
-        dna_plate_map_dict, combinations_to_make, reagent_to_mm_dict,
-        mm_dict, config['assembly_template_path'],
-        config['transform_template_path'], config['output_folder_path'],
-        thermocycle, triplicate, multi, p10Mount=p10_mount,
-        p300Mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
-        reaction_plate_type=well_plate, reagent_plate_type=reagent_plate,
-        trough_type=trough, agar_plate_type=agar_plate)
-    print('Succesfully created opentrons scripts')
+        # Create a protocol file and hard code the plate maps into it.
+        assembly_path, transform_path = create_protocol(
+            dna_plate_map_dict, combinations_to_make, reagent_to_mm_dict,
+            mm_dict, config['assembly_template_path'],
+            config['transform_template_path'], config['output_folder_path'],
+            thermocycle, triplicate, multi, p10Mount=p10_mount,
+            p300Mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
+            reaction_plate_type=well_plate, reagent_plate_type=reagent_plate,
+            trough_type=trough, agar_plate_type=agar_plate)
+        print('Succesfully created opentrons scripts')
 
-    output_paths.append(assembly_path)
-    output_paths.append(transform_path)
-    output_paths.append(assembly_metainformation_path)
-    output_paths.append(transform_metainformation_path)
-    output_paths.append(agar_path)
+        output_paths.append(assembly_path)
+        output_paths.append(transform_path)
+        output_paths.append(assembly_metainformation_path)
+        output_paths.append(transform_metainformation_path)
+        output_paths.append(agar_path)
 
-    return output_paths
+    except Exception as e:
+        error_path = os.path.join(full_output_path, 'MoClo_error.txt')
+        print("Exception: error_path", error_path)
 
-    # except Exception as e:
-    #     error_path = os.path.join(full_output_path, 'MoClo_error.txt')
-    #     print("Exception: error_path", error_path)
-
-    #     with open(error_path, 'w') as f:
-    #         f.write("Failed to generate MoClo scripts: {}\n".format(str(e)))
-    #     output_paths.append(error_path)
-    # finally:
-    #     print("output_paths:", output_paths)
-    #     return output_paths
+        with open(error_path, 'w') as f:
+            f.write("Failed to generate MoClo scripts: {}\n".format(str(e)))
+        output_paths.append(error_path)
+    finally:
+        print("output_paths:", output_paths)
+        return output_paths
 
 ###############################################################################
 # Functions for getting user input
@@ -202,7 +188,6 @@ def generate_combinations(combinations_filename):
                                             "name": row[0],
                                             "parts": [x for x in row[1:] if x]
                                             })
-    # print("combinations_to_make", combinations_to_make))
     return combinations_to_make
 
 
@@ -212,7 +197,6 @@ def check_number_of_combinations(combinations_limit, combinations_to_make):
     '''
     number_of_combinations = len(combinations_to_make)
     if combinations_limit == 'single':
-        print("check_number_of_combinations: should be fine w single")
         if number_of_combinations > 88:
             raise ValueError('Too many combinations ({0}) requested.'
                              'Max for single combinations is '
@@ -253,8 +237,6 @@ def generate_and_save_output_plate_maps(combinations_to_make,
         else:
             output_plate_map_flipped[-1].append(name)
 
-    # print("output_plate_map_flipped", output_plate_map_flipped)
-
     # Correct row/column flip.
     output_plate_map = []
     for i, row in enumerate(output_plate_map_flipped):
@@ -263,8 +245,6 @@ def generate_and_save_output_plate_maps(combinations_to_make,
                 output_plate_map.append([element])
             else:
                 output_plate_map[j].append(element)
-
-    print("output_plate_map", output_plate_map)
 
     triplicate = False
     # creating an output plate three copies of each column
@@ -319,7 +299,6 @@ def create_metainformation(output_path, dna_plate_map_dict,
 
     # Create parts dataframe
     parts_df = create_parts_df(dna_plate_map_dict)
-    # print('parts_df=', parts_df)
 
     # Creates combinations dataframe
     combination_df_list = []
@@ -351,15 +330,12 @@ def create_metainformation(output_path, dna_plate_map_dict,
         combination_df_dict['plate'] = None
         combinations_df = pd.DataFrame(
             combination_df_dict, index=len(combination_df_dict))
-    # print('combinations_df=', combinations_df)
 
     # Creates master mix dataframe
     mm_df = create_mm_df(combinations_df)
-    # print('mm_df=', mm_df)
 
     # Creates reagents dataframe
     reagents_df = create_reagents_df(mm_df)
-    # print('reagents_df=', reagents_df)
 
     # saves as csv, adding extra info on run and labware
     with open(output_path, 'w', newline='') as csvfile:

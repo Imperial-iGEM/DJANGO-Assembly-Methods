@@ -118,6 +118,7 @@ class FinalSpec(graphene.Mutation):
         output_folder = os.path.join(MEDIA_ROOT, date_time)
         os.mkdir(output_folder)
         part_types_dictionary = convert_part_info(linker_types)
+        print('part_types_dictionary=', part_types_dictionary)
         parser = ParserSBOL(sbolDocument=sbol_document, outdir=output_folder)
         if assembly_type == "basic":
             csv_links = parser.generateCsv_for_DNABot(dictOfParts=part_types_dictionary)

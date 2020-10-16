@@ -1,0 +1,60 @@
+{
+  "assemblyType": "basic",
+  "specificationsBasic": {
+    "labwareDict": {
+      "commonLabware": {
+        "p10Mount": "right",
+        "p300Mount": "left",
+        "p10Type": "p10_single",
+        "p300Type": "p300_single",
+        "wellPlate": "biorad_96_wellplate_200ul_pcr"
+      },
+      "reagentPlate": "usascientific_12_reservoir_22ml",
+      "tubeRack": "opentrons_24_tuberack_nest_1.5ml_snapcap",
+      "magPlate": "biorad_96_wellplate_200ul_pcr",
+      "aluminumBlock": "opentrons_96_aluminumblock_biorad_wellplate_200ul",
+      "beadContainer": "usascientific_96_wellplate_2.4ml_deep",
+      "socPlate": "usascientific_96_wellplate_2.4ml_deep",
+      "agarPlate": "thermofisher_96_wellplate_180ul"
+    },
+    "ethanolWellForStage2": "A1",
+    "deepWellPlateStage4": "1"
+  },
+  "specificationsMoClo": {
+    "labwareDict": {
+      "commonLabware": {
+        "p10Mount": "right",
+        "p300Mount": "left",
+        "p10Type": "p10_single",
+        "p300Type": "p300_single",
+        "wellPlate": "biorad_96_wellplate_200ul_pcr"
+      },
+      "reagentPlate": "biorad_96_wellplate_200ul_pcr",
+      "trough": "usascientific_12_reservoir_22ml",
+      "agarPlate": "thermofisher_96_wellplate_180ul"
+    },
+    "thermocycle": true
+  },
+  "specificationsBioBricks": {
+    "labwareDict": {
+      "commonLabware": {
+        "p10Mount": "right",
+        "p300Mount": "left",
+        "p10Type": "p10_single",
+        "p300Type": "p300_single",
+        "wellPlate": "biorad_96_wellplate_200ul_pcr"
+      },
+      "tubeRack": "opentrons_24_tuberack_nest_1.5ml_snapcap",
+      "socPlate": "usascientific_96_wellplate_2.4ml_deep",
+      "transformationPlate": "corning_96_wellplate_360ul_flat"
+    },
+    "thermocycle": true
+  },
+  "linkerTypes": [{
+    "linkerId": "String",
+		"concentration": 200,
+		"plateNumber": 1,
+		"well": "A1"
+  }],
+  "sbolFileString": ""
+}

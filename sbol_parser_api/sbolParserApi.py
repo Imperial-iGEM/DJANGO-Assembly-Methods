@@ -673,6 +673,9 @@ class ParserSBOL:
     def displayListOfParts(
         self,
     ) -> List[str]:
+        """ Extracts a list of unique parts from the design
+        for use in the table for customizing well location and
+        parts concentration on the frontend """
 
         def getExtendedDisplayId(
             combDeriv: CombinatorialDerivation
@@ -1164,6 +1167,8 @@ class ParserSBOL:
                 cd = well.data[contentName]
                 if "concentration" in well.data.keys():
                     conc = well.data['concentration']
+                    if conc == 0:
+                        conc = np.nan
                 else:
                     conc = np.nan
                 dictWellContent[wellname] = (cd, conc)

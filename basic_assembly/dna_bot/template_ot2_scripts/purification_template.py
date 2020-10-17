@@ -73,6 +73,14 @@ def run(protocol: protocol_api.ProtocolContext):
             raise ValueError('sample number cannot exceed 48')
 
         # Tips and pipette
+        if multi:
+            total_tips = sample_number * 2 * TIPS_PER_SAMPLE
+        else:
+            if sample_number % 8 > 0:
+                tip_mult = 8*((sample_number // 8) + 1)
+            else:
+                tip_mult = sample_number
+            total_tips = tip_mult * 2 * TIPS_PER_SAMPLE
         total_tips = sample_number * 2 * TIPS_PER_SAMPLE
         tiprack_num = total_tips // 96 + (1 if total_tips % 96 > 0 else 0)
         slots = CANDIDATE_TIPRACK_SLOTS[:tiprack_num]

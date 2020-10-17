@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "FALSE") == "TRUE"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,app.soaplab.io,django-assembly-methods-tn3pz.ondigitalocean.app,app.soaplab.io	").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,app.soaplab.io, django-assembly-methods-tn3pz.ondigitalocean.app,app.soaplab.io	").split(",")
 
 
 # Application definition

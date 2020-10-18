@@ -116,7 +116,7 @@ class FinalSpec(graphene.Mutation):
         sbol_document = get_sbol_document(sbol_file_string)
         date_time = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
         output_folder = os.path.join(MEDIA_ROOT, date_time)
-        os.mkdir(output_folder)
+        os.makedirs(output_folder)
         part_types_dictionary = convert_part_info(linker_types)
         print('part_types_dictionary=', part_types_dictionary)
         parser = ParserSBOL(sbolDocument=sbol_document, outdir=output_folder)

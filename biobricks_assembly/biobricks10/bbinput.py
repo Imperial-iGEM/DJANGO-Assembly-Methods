@@ -233,7 +233,8 @@ def process_part(part, constructs_list, plate):
         concentration = DEFAULT_CONCENTRATION
         part_vol = 1
     else:
-        concentration = int(part[2])
+        concentration = float(part[2])
+        concentration = int(concentration)
         part_vol = math.ceil(PART_AMOUNT/concentration)
     part_dict['digests'] = [digests]
     part_dict['concentration'] = [concentration]

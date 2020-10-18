@@ -141,8 +141,8 @@ GRAPHENE = {
     'SCHEMA': 'assembly_methods.schema.schema'
 }
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "output/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/output/")
 if DEBUG:
-    MEDIA_URL = "http://localhost:8000/output/"
+    MEDIA_URL = "http://localhost:8000/media/output/"
 else:
-    MEDIA_URL = "http://app.soaplab.io/output/"
+    MEDIA_URL = "http://app.soaplab.io/media/output/"

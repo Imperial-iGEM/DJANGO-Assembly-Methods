@@ -60,9 +60,13 @@ MIDDLEWARE = [
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
+    'http://soaplab.io',
+    'https://soaplab.io'
 ]
 CORS_ORIGIN_REGEX_WHITELIST = [
     'http://localhost:3000',
+    'http://soaplab.io',
+    'https://soaplab.io'
 ]
 
 ROOT_URLCONF = 'assembly_methods.urls'

@@ -1317,6 +1317,7 @@ class ParserSBOL:
 
         is_first_comp_linker = False
         is_prev_comp_linker = False
+        prev_comp = 0
         for i, comp in enumerate(primary_structure):
             is_curr_comp_linker = _is_linker(comp, linkers)
             # initialise
@@ -1325,10 +1326,13 @@ class ParserSBOL:
                 is_prev_comp_linker = is_curr_comp_linker
                 continue
             if is_prev_comp_linker == is_curr_comp_linker:
+                print('comp', comp)
+                print('prev_comp', prev_comp)
                 print('is_prev_comp_linker', is_prev_comp_linker)
                 print('is_curr_comp_linker', is_curr_comp_linker)
                 raise ValueError("Order of components is not alternating")
             is_prev_comp_linker = is_curr_comp_linker
+            prev_comp = comp
         if is_first_comp_linker:
             return True
         else:

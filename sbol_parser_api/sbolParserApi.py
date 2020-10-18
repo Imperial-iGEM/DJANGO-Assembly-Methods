@@ -1325,8 +1325,7 @@ class ParserSBOL:
                 is_prev_comp_linker = is_curr_comp_linker
                 continue
             if is_prev_comp_linker == is_curr_comp_linker:
-                # raise ValueError("Order of components is not alternating")
-                print("OH NO")
+                raise ValueError("Order of components is not alternating")
             is_prev_comp_linker = is_curr_comp_linker
         if is_first_comp_linker:
             return True

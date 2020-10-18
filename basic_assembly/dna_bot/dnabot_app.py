@@ -456,6 +456,8 @@ def fill_parts_df(clips_df, parts_df_temp):
     parts_df['number'] = pd.Series(['0'] * len(parts_df.index),
                                    index=parts_df.index)
 
+    print('parts_df', parts_df)
+
     # Iterate through clips dataframe
     for index, row in clips_df.iterrows():
         print("parts_df", parts_df)

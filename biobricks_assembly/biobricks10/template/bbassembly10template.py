@@ -24,7 +24,7 @@ def run(protocol: protocol_api.ProtocolContext):
                    p10_type='p10_single',
                    well_plate_type='biorad_96_wellplate_200ul_pcr',
                    tube_rack_type='opentrons_24_tuberack_nest_1.5ml_snapcap',
-                   thermocycle=True):
+                   thermocycle=False):
         # Define constants
         CANDIDATE_TIPRACK_SLOT = '3'
         TIPRACK_TYPE = 'opentrons_96_tiprack_10ul'

@@ -1,7 +1,7 @@
 import os
 
 import graphene
-from django.conf.global_settings import MEDIA_ROOT
+from assembly_methods.settings import MEDIA_ROOT
 from datetime import datetime
 from sbol_parser_api.sbolParserApi import ParserSBOL
 import base64
@@ -116,8 +116,9 @@ class FinalSpec(graphene.Mutation):
         sbol_document = get_sbol_document(sbol_file_string)
         date_time = "{:%Y%m%d_%H_%M_%S}".format(datetime.now())
         output_folder = os.path.join(MEDIA_ROOT, date_time)
-        os.mkdir(output_folder)
+        os.makedirs(output_folder)
         part_types_dictionary = convert_part_info(linker_types)
+        print('part_types_dictionary=', part_types_dictionary)
         parser = ParserSBOL(sbolDocument=sbol_document, outdir=output_folder)
         if assembly_type == "basic":
             csv_links = parser.generateCsv_for_DNABot(dictOfParts=part_types_dictionary)

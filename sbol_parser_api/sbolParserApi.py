@@ -1330,6 +1330,8 @@ class ParserSBOL:
                 cd = well.data[contentName]
                 if "concentration" in well.data.keys():
                     conc = well.data['concentration']
+                    if conc == 0:
+                        conc = np.nan
                 else:
                     conc = np.nan
                 dictWellContent[wellname] = (cd, conc)

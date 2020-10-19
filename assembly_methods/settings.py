@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "FALSE") == "TRUE"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,app.soaplab.io,django-assembly-methods-tn3pz.ondigitalocean.app,app.soaplab.io	").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,app.soaplab.io, django-assembly-methods-tn3pz.ondigitalocean.app,app.soaplab.io	").split(",")
 
 
 # Application definition
@@ -60,9 +60,13 @@ MIDDLEWARE = [
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
+    'http://soaplab.io',
+    'https://soaplab.io'
 ]
 CORS_ORIGIN_REGEX_WHITELIST = [
     'http://localhost:3000',
+    'http://soaplab.io',
+    'https://soaplab.io'
 ]
 
 ROOT_URLCONF = 'assembly_methods.urls'
@@ -141,8 +145,8 @@ GRAPHENE = {
     'SCHEMA': 'assembly_methods.schema.schema'
 }
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "output/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/output/")
 if DEBUG:
-    MEDIA_URL = "http://localhost:8000/output/"
+    MEDIA_URL = "http://localhost:8000/media/output/"
 else:
-    MEDIA_URL = "http://app.soaplab.io/output/"
+    MEDIA_URL = "http://app.soaplab.io/media/output/"

@@ -30,9 +30,11 @@ class ParserSBOL:
             self.linkerFile = linkerFile
         self.construct_csv_paths = []
         self.part_csv_paths = []
+        self.assembly_types = ["basic", "moclo", "bio_bricks"]
 
-    def generateCsv_for_DNABot(
+    def generate_csv(
             self,
+            assembly: str,
             dictOfParts: Dict[str, Dict[str, Union[str, int, float]]] = None,
             repeat: bool = False,
             maxWellsFilled: int = 96,
@@ -40,6 +42,7 @@ class ParserSBOL:
     ) -> Dict[str, List[str]]:
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
+            assembly(str): Assembly type.
             dictOfParts (Dict[str, Dict[str, Union[str, int, float]]]): 
                 Dictionary of information regarding parts to be assembled.
                 Structure:
@@ -54,9 +57,11 @@ class ParserSBOL:
             Dict[str,List[str]]: Dictionary containing lists of paths to csvs
                 generated.
         """
+        if assembly not in self.assembly_types:
+            raise ValueError("Invalid assembly type: %s" % assembly)
         numSamples = maxWellsFilled * numRuns
         allConstructs = []
-        print("Assembly Method: BASIC")
+        print("Assembly Method: %s" % assembly)
         # Get list of constructs
         allConstructs = self.getListOfConstructs()
         # Remove constructs with repeated parts using a filter
@@ -84,118 +89,11 @@ class ParserSBOL:
         )
         for plate in constructPlates:
             # Create construct CSV
-            self.getConstructCsvFromPlateoPlate(plate, "BASIC")
+            self.getConstructCsvFromPlateoPlate(plate, assembly)
             # Write parts/linkers csv
             self.getPartLinkerCsvFromPlateoPlate(
                 plate,
-                "BASIC",
-                dictOfParts
-            )
-        filepaths = {}
-        filepaths['construct_path'] = self.construct_csv_paths
-        filepaths['part_path'] = self.part_csv_paths
-        return filepaths
-
-    # TODO: Combine all generate csv functions
-    def generateCsv_for_MoClo(
-        self,
-        dictOfParts: Dict[str, float] = None,
-        repeat: bool = None,
-        maxWellsFilled: int = None,
-        numRuns: int = None
-    ) -> Dict[str, List[str]]:
-        maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
-        numRuns = 1 if numRuns is None else numRuns
-        numSamples = maxWellsFilled * numRuns
-        repeat = False if repeat is None else True
-        allConstructs = []
-        print("Assembly Method: MoClo")
-        # Get list of constructs
-        allConstructs = self.getListOfConstructs()
-        # Remove constructs with repeated parts using a filter
-        if not repeat:
-            allConstructs = self.filterConstructs(allConstructs)
-        # Sample constructs
-        if len(allConstructs) < numSamples:
-            numSamples = len(allConstructs)
-            print(
-                "Number of constructs specified is greater than number "
-                "of constructs contained within SBOL Document provided."
-            )
-            print("All constructs will be assembled.")
-        sampled = sample(allConstructs, numSamples)
-        # Display number of Component Definitions to be constructed
-        numberOfDesigns = len(sampled)
-        print(numberOfDesigns, "construct(s) will be assembled.")
-        # Create plateo construct plates
-        constructPlates = self.fillPlateoPlates(
-            sampled,
-            "Construct",
-            numRuns,
-            plateo.containers.Plate96,
-            maxWellsFilled
-        )
-        for plate in constructPlates:
-            # Create construct CSV
-            self.getConstructCsvFromPlateoPlate(plate, "MoClo")
-            # Write parts/linkers csv
-            self.getPartLinkerCsvFromPlateoPlate(
-                plate,
-                "MoClo",
-                dictOfParts
-            )
-        filepaths = {}
-        filepaths['construct_path'] = self.construct_csv_paths
-        filepaths['part_path'] = self.part_csv_paths
-        return filepaths
-
-    # TODO: Combine all generate csv functions
-    def generateCsv_for_BioBricks(
-        self,
-        dictOfParts: Dict[str, float] = None,
-        repeat: bool = None,
-        maxWellsFilled: int = None,
-        numRuns: int = None
-    ) -> Dict[str, List[str]]:
-        # TODO: Can be improved for hierarchical assembly (multiple runs)
-        maxWellsFilled = 96 if maxWellsFilled is None else maxWellsFilled
-        numRuns = 1 if numRuns is None else numRuns
-        numSamples = maxWellsFilled * numRuns
-        repeat = False if repeat is None else True
-        allConstructs = []
-        print("Assembly Method: BBF RFC 10")
-        # Get list of constructs
-        allConstructs = self.getListOfConstructs()
-        # Remove constructs with repeated parts using a filter
-        if not repeat:
-            allConstructs = self.filterConstructs(allConstructs)
-        # Sample constructs
-        if len(allConstructs) < numSamples:
-            numSamples = len(allConstructs)
-            print(
-                "Number of constructs specified is greater than number "
-                "of constructs contained within SBOL Document provided."
-            )
-            print("All constructs will be assembled.")
-        sampled = sample(allConstructs, numSamples)
-        # Display number of Component Definitions to be constructed
-        numberOfDesigns = len(sampled)
-        print(numberOfDesigns, "construct(s) will be assembled.")
-        # Create plateo construct plates
-        constructPlates = self.fillPlateoPlates(
-            sampled,
-            "Construct",
-            numRuns,
-            plateo.containers.Plate96,
-            maxWellsFilled
-        )
-        for plate in constructPlates:
-            # Create construct CSV
-            self.getConstructCsvFromPlateoPlate(plate, "BioBricks")
-            # Write parts/linkers csv
-            self.getPartLinkerCsvFromPlateoPlate(
-                plate,
-                "BioBricks",
+                assembly,
                 dictOfParts
             )
         filepaths = {}
@@ -1137,15 +1035,15 @@ class ParserSBOL:
             for key, value in well.data.items():
                 # Move linker at last position to front of the list
                 primaryStructure = value.getPrimaryStructure()
-                if assembly == "BASIC":
+                if assembly == "basic":
                     # Check part-linker order
                     if not self.is_linkers_order_correct(value):
                         # Shift linker to front
                         primaryStructure.insert(0, primaryStructure.pop())
                     dictWellComponent[wellname] = primaryStructure
-                elif assembly == "MoClo":
+                elif assembly == "moclo":
                     dictWellComponent[wellname] = primaryStructure
-                elif assembly == "BioBricks":
+                elif assembly == "bio_bricks":
                     # TODO: Confirm whether construct name is needed
                     # Check if valid biobrick construct
                     if self.validateBioBricksConstruct(value):
@@ -1176,7 +1074,7 @@ class ParserSBOL:
         """
         listWellComponent = []
         for k, v in dictWellComponent.items():
-            if assembly == "BioBricks":
+            if assembly == "bio_bricks":
                 listWellComponent.append([
                     v['Construct'].displayId,
                     k,
@@ -1206,16 +1104,16 @@ class ParserSBOL:
             self.getListFromWellComponentDict(dictWellComponent, assembly)
         # Create sparse array from list
         sparr = pd.arrays.SparseArray(listWellComponent)
-        if assembly == "BASIC":
+        if assembly == "basic":
             minNumberOfBasicParts = \
                 self.getMinNumberOfBasicParts(allComponents)
             header = self.getConstructCsvHeader(minNumberOfBasicParts)
             # Create df from sparr
             df = pd.DataFrame(data=sparr, columns=header)
-        elif assembly == "MoClo":
+        elif assembly == "moclo":
             df = pd.DataFrame(data=sparr)
             df = df.iloc[:, 1:]
-        elif assembly == "BioBricks":
+        elif assembly == "bio_bricks":
             header = ["Construct", "Well", "upstream", "downstream", "plasmid"]
             # Create df from sparr
             df = pd.DataFrame(data=sparr, columns=header)
@@ -1235,14 +1133,14 @@ class ParserSBOL:
         """
         constructDf = \
             self.getConstructDfFromPlateoPlate(constructPlate, assembly)
-        if assembly == "BASIC" or assembly == "BioBricks":
+        if assembly == "basic" or assembly == "bio_bricks":
             filepath = os.path.join(self.outdir, "construct.csv")
             constructDf.to_csv(
                 filepath,
                 index=False,
             )
             self.construct_csv_paths.append(filepath)
-        elif assembly == "MoClo":
+        elif assembly == "moclo":
             filepath = os.path.join(self.outdir, "construct.csv")
             constructDf.to_csv(
                 filepath,
@@ -1427,7 +1325,7 @@ class ParserSBOL:
             dictOfParts
         )
         for plate in partPlates:
-            if assembly == "BASIC":
+            if assembly == "basic":
                 # Create df
                 partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
                 filepath = \
@@ -1440,7 +1338,7 @@ class ParserSBOL:
                     index=False
                 )
                 self.part_csv_paths.append(filepath)
-            elif assembly == "MoClo":
+            elif assembly == "moclo":
                 filepath = \
                     os.path.join(
                         self.outdir,
@@ -1454,7 +1352,7 @@ class ParserSBOL:
                     headers=False
                 )
                 self.part_csv_paths.append(filepath)
-            elif assembly == "BioBricks":
+            elif assembly == "bio_bricks":
                 # Create df
                 partLinkerDf = self.getPartLinkerDfFromPlateoPlate(plate)
                 filepath = \

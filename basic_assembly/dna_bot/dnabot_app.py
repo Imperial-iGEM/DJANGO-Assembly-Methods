@@ -107,7 +107,6 @@ def dnabot(
             transformation), metainformation (clip run info, final assembly
             dict, wells - ethanol well and soc well)
     '''
-    print("Starting DNA-BOT...")
     # Parent directories
     generator_dir = os.getcwd()
     '''
@@ -489,12 +488,8 @@ def fill_parts_df(
     parts_df['number'] = pd.Series(['0'] * len(parts_df.index),
                                    index=parts_df.index)
 
-    print('parts_df', parts_df)
-
     # Iterate through clips dataframe
     for index, row in clips_df.iterrows():
-        print("row", row)
-        print("row['suffixes']", row['suffixes'])
         # find clip indices in parts_df
         prefix_index = parts_df[
                 parts_df['name'] == row['prefixes']].index.values[0]

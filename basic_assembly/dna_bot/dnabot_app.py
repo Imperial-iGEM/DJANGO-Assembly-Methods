@@ -739,7 +739,7 @@ def calculate_final_assembly_tipracks(
 def generate_spotting_tuples(
     constructs_list: List[pd.DataFrame],
     spotting_vols_dict: Dict[int, int]
-) -> List[Tuple, Tuple, Tuple]:
+) -> List[Tuple]:
     """Using constructs_list, generates a spotting tuple
     (Refer to 'transformation_spotting_template.py') for every column of 
     constructs, assuming the 1st construct is located in well A1 and wells

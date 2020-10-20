@@ -121,7 +121,7 @@ class FinalSpec(graphene.Mutation):
         print('part_types_dictionary=', part_types_dictionary)
         parser = ParserSBOL(sbolDocument=sbol_document, outdir=output_folder)
         if assembly_type == "basic":
-            csv_links = parser.generateCsv_for_DNABot(dictOfParts=part_types_dictionary)
+            csv_links = parser.generate_csv(assembly=assembly_type, dictOfParts=part_types_dictionary)
             labware_dict = specifications_basic.labware_dict
             common_labware = labware_dict.common_labware
             links = dnabot_app.dnabot(output_folder=output_folder,
@@ -145,7 +145,7 @@ class FinalSpec(graphene.Mutation):
         elif assembly_type == "bio_bricks":
             labware_dict = specifications_bio_bricks.labware_dict
             common_labware = labware_dict.common_labware
-            csv_links = parser.generateCsv_for_BioBricks(dictOfParts=part_types_dictionary)
+            csv_links = parser.generate_csv(assembly=assembly_type, dictOfParts=part_types_dictionary)
             links = bbinput.biobricks(output_folder=output_folder,
                                       construct_path=csv_links["construct_path"],
                                       part_path=csv_links["part_path"],
@@ -162,7 +162,7 @@ class FinalSpec(graphene.Mutation):
         elif assembly_type == "moclo":
             labware_dict = specifications_mo_clo.labware_dict
             common_labware = labware_dict.common_labware
-            csv_links = parser.generateCsv_for_MoClo(dictOfParts=part_types_dictionary)
+            csv_links = parser.generate_csv(assembly=assembly_type, dictOfParts=part_types_dictionary)
             links = moclo_transform_generator.moclo_function(
                 output_folder=output_folder,
                 construct_path=csv_links["construct_path"],

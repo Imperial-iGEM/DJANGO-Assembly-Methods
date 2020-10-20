@@ -20,8 +20,8 @@ Create construct and parts/linkers CSVs for DNABot input
 **Arguments**:
 
 - `assembly(str)` - Assembly type.
-  dictOfParts (Dict[str, Dict[str, Union[str, int, float]]]):
-  Dictionary of information regarding parts to be assembled.
+- `dictOfParts` _Dict[str, Dict[str, Union[str, int, float]]]_ - Dictionary
+  of information regarding parts to be assembled.
   Structure:
   {&lt;display ID&gt;: {&#x27;concentration&#x27;:..., &#x27;plate&#x27;:..., &#x27;well&#x27;:...}}
 - `repeat` _bool_ - If False, removes constructs that contain repeated

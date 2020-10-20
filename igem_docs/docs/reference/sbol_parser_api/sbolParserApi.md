@@ -9,18 +9,19 @@ title: sbol_parser_api.sbolParserApi
 class ParserSBOL()
 ```
 
-#### generateCsv\_for\_DNABot
+#### generate\_csv
 
 ```python
- | generateCsv_for_DNABot(dictOfParts: Dict[str, Dict[str, Union[str, int, float]]] = None, repeat: bool = False, maxWellsFilled: int = 96, numRuns: int = 1) -> Dict[str, List[str]]
+ | generate_csv(assembly: str, dictOfParts: Dict[str, Dict[str, Union[str, int, float]]] = None, repeat: bool = False, maxWellsFilled: int = 96, numRuns: int = 1) -> Dict[str, List[str]]
 ```
 
 Create construct and parts/linkers CSVs for DNABot input
 
 **Arguments**:
 
-- `dictOfParts` _Dict[str, Dict[str, Union[str, int, float]]]_ - Dictionary
-  of information regarding parts to be assembled.
+- `assembly(str)` - Assembly type.
+  dictOfParts (Dict[str, Dict[str, Union[str, int, float]]]):
+  Dictionary of information regarding parts to be assembled.
   Structure:
   {&lt;display ID&gt;: {&#x27;concentration&#x27;:..., &#x27;plate&#x27;:..., &#x27;well&#x27;:...}}
 - `repeat` _bool_ - If False, removes constructs that contain repeated

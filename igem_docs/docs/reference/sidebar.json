@@ -5,7 +5,7 @@
         "items": [
           "reference/biobricks_assembly/biobricks10/bbinput"
         ],
-        "label": "biobricks10",
+        "label": "biobricks_assembly.biobricks10",
         "type": "category"
       }
     ],
@@ -18,7 +18,7 @@
         "items": [
           "reference/moclo_assembly/moclo_transformation/moclo_transform_generator"
         ],
-        "label": "moclo_transformation",
+        "label": "moclo_assembly.moclo_transformation",
         "type": "category"
       }
     ],
@@ -31,7 +31,7 @@
         "items": [
           "reference/basic_assembly/dna_bot/dnabot_app"
         ],
-        "label": "dna_bot",
+        "label": "basic_assembly.dna_bot",
         "type": "category"
       }
     ],

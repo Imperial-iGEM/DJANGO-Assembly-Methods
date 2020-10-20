@@ -240,6 +240,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 '35 cycles of 37°C for 1.5 minutes and 16°C for 3 minutes')
             protocol.comment(
                 '1 cycle of 50°C for 5 minutes and 80°C for 10 minutes')
+            protocol.pause()
 
         protocol.comment('Remove the Input_DNA_Plate from the Deck Space.')
         protocol.comment(

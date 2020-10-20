@@ -1,9 +1,8 @@
-# Modified version 09/10/20
-
 import os
 import csv
 import json
 import pandas as pd
+from typing import List, Dict, Tuple
 
 # labware dictionary - filled in by front end
 labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
@@ -14,13 +13,16 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
 
-def moclo_function(output_folder, construct_path, part_path,
-                   thermocycle=True, p10_mount='right', p300_mount='left',
-                   p10_type='p10_single', p300_type='p300_multi',
-                   well_plate='biorad_96_wellplate_200ul_pcr',
-                   trough='usascientific_12_reservoir_22ml',
-                   reagent_plate='biorad_96_wellplate_200ul_pcr',
-                   agar_plate='thermofisher_96_wellplate_180ul'):
+def moclo_function(
+    output_folder: str, construct_path: List[str], part_path: List[str],
+    thermocycle: bool = True, p10_mount: str = 'right',
+    p300_mount: str = 'left', p10_type: str = 'p10_single',
+    p300_type: str = 'p300_multi',
+    well_plate: str = 'biorad_96_wellplate_200ul_pcr',
+    trough: str = 'usascientific_12_reservoir_22ml',
+    reagent_plate: str = 'biorad_96_wellplate_200ul_pcr',
+    agar_plate: str = 'thermofisher_96_wellplate_180ul'
+) -> List[str]:
     '''
         Main function, creates scripts and metainformation
         Can take specific args or just **labware_dict for all labware
@@ -33,6 +35,13 @@ def moclo_function(output_folder, construct_path, part_path,
             thermocyle: True or False, indicating whether the user has
             and would like to use the Opentrons Thermocycler
             see labware_dict for rest of arguments
+        Returns:
+            List of output paths
+            If there is an exception, the list of output paths will contain
+            only one element = the error path
+            Otherwise the list of output paths will contain:
+            OT-2 script paths (assembly, transformation),
+            metainformation (assembly, transformation, agar plate)
     '''
 
     output_paths = []
@@ -132,7 +141,6 @@ def moclo_function(output_folder, construct_path, part_path,
             p300Mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
             reaction_plate_type=well_plate, reagent_plate_type=reagent_plate,
             trough_type=trough, agar_plate_type=agar_plate)
-        print('Succesfully created opentrons scripts')
 
         output_paths.append(assembly_path)
         output_paths.append(transform_path)
@@ -142,13 +150,11 @@ def moclo_function(output_folder, construct_path, part_path,
 
     except Exception as e:
         error_path = os.path.join(full_output_path, 'MoClo_error.txt')
-        print("Exception: error_path", error_path)
 
         with open(error_path, 'w') as f:
             f.write("Failed to generate MoClo scripts: {}\n".format(str(e)))
         output_paths.append(error_path)
     finally:
-        print("output_paths:", output_paths)
         return output_paths
 
 ###############################################################################
@@ -156,9 +162,14 @@ def moclo_function(output_folder, construct_path, part_path,
 ###############################################################################
 
 
-def generate_plate_maps(filename):
+def generate_plate_maps(
+    filename: str
+) -> Dict[str, List[List]]:
     '''
         Generates dictionaries for the part csvs
+        Args: filename = absolute path to part csv
+        Returns: dictionary of plate maps with key = name of part csv,
+        value = list of rows (= list of lists)
     '''
     plate_maps = {}
     plate_map = []
@@ -174,9 +185,13 @@ def generate_plate_maps(filename):
     return plate_maps
 
 
-def generate_combinations(combinations_filename):
+def generate_combinations(
+    combinations_filename: str
+) -> List[Dict]:
     '''
         Generates a list of dictionaries of constructs to be made
+        Args: combinations_filename = absolute path to construct csv file
+        Returns: List of construct dictionaries with keys "name" and "parts"
     '''
     combinations_to_make = []
     with open(combinations_filename, encoding='utf-8-sig') as f:
@@ -191,9 +206,18 @@ def generate_combinations(combinations_filename):
     return combinations_to_make
 
 
-def check_number_of_combinations(combinations_limit, combinations_to_make):
+def check_number_of_combinations(
+    combinations_limit: str,
+    combinations_to_make: List[Dict]
+):
     '''
         Ensures that the number of constructs does not exceed the maximum
+        Args:
+            combinations_limit: "single" or "triplicate" - if "single" can do
+            max 88 constructs, if "triplicate" does every construct 3 times -
+            max 24 constructs
+        Raises: ValueError if there are too many constructs or
+        combinations_limit is not "single" or "triplicate"
     '''
     number_of_combinations = len(combinations_to_make)
     if combinations_limit == 'single':
@@ -214,15 +238,21 @@ def check_number_of_combinations(combinations_limit, combinations_to_make):
 ###############################################################################
 
 
-def generate_and_save_output_plate_maps(combinations_to_make,
-                                        combinations_limit,
-                                        output_folder_path):
+def generate_and_save_output_plate_maps(
+    combinations_to_make: List[Dict],
+    combinations_limit: str,
+    output_folder_path: str
+) -> Tuple[str, str]:
     '''
         Saves the mapping of the agar plate for use in transformation.
         Args:
             combinations_to_make = list of construct dictionaries
-            combinations_limit = 'single' or 'triplicate'
+            combinations_limit = "single" or "triplicate"
             output_folder_path = where to save mapping
+        Returns:
+            triplicate: whether 'single' (triplicate = False) or 'triplicate'
+            (triplicate = True) is selected
+            output_filename: the absolute path to the agar plate csv
     '''
     # Split combinations_to_make into 8x6 plate maps.
     output_plate_map_flipped = []
@@ -280,21 +310,33 @@ def generate_and_save_output_plate_maps(combinations_to_make,
     return triplicate, output_filename
 
 
-def create_metainformation(output_path, dna_plate_map_dict,
-                           combinations_to_make,
-                           labware_dict, thermocycle, triplicate):
+def create_metainformation(
+    output_path: str, dna_plate_map_dict: Dict[str, List[List]],
+    combinations_to_make: List[Dict],
+    labware_dict: Dict[str, str], thermocycle: bool, triplicate: str
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     '''
         Returns detailed metainformation and saves in a csv.
         Includes a parts dataframe, a combinations (constructs)
         dataframe, a reagents dataframe, and a master mix dataframe.
         Args:
-            output_path = the full path of the output folder
-            dna_plate_map_dict = the dictionary of parts
-            combinations_to_make = the list of dictionaries of 
+            output_path: the full path of the output folder
+            dna_plate_map_dict: the dictionary of parts
+            combinations_to_make: the list of dictionaries of
             constructs
-            labware_dict = the dictionary of labware chosen
-            thermocyle = whether the thermocycler module is used
-            triplicate = whether 'single' or 'triplicate is selected'
+            labware_dict: the dictionary of labware chosen
+            thermocyle: whether the thermocycler module is used
+            triplicate: whether 'single' (triplicate = False) or 'triplicate'
+            (triplicate = True) is selected
+        Returns:
+            parts_df: dataframe of parts
+            combinations_df: dataframe of constructs
+            mm_df: master mix dataframe, contains information on all of the
+            master mixes needed (different master mix needed for different
+            number of parts per construct)
+            reagents_df: reagents dataframe, contains information on all of the
+            reagents, does not include master mix but DOES include reagents to
+            go into master mixes
     '''
 
     # Create parts dataframe
@@ -380,10 +422,17 @@ def create_metainformation(output_path, dna_plate_map_dict,
     return parts_df, combinations_df, mm_df, reagents_df
 
 
-def create_parts_df(dna_plate_map_dict):
+def create_parts_df(
+    dna_plate_map_dict: Dict[str, List[List]]
+) -> pd.DataFrame:
     '''
         Returns a dataframe of parts and delegates wells.
         Takes in the dictionary of parts.
+        Args:
+            dna_plate_map_dict: dictionary with keys = plate names, values =
+            list of rows = list of list of parts
+        Returns:
+            parts_df: dataframe of parts with dummy '0' for combinations col
     '''
     letter_dict = {'0': 'A', '1': 'B', '2': 'C', '3': 'D', '4': 'E', '5': 'F',
                    '6': 'G', '7': 'H'}
@@ -407,11 +456,16 @@ def create_parts_df(dna_plate_map_dict):
     return parts_df
 
 
-def create_mm_df(combinations_df):
+def create_mm_df(
+    combinations_df: pd.DataFrame
+) -> pd.DataFrame:
     '''
         Creates a master mix dataframe and delegates wells.
         Different master mixes must be created depending on
         the number of parts per construct.
+        Args: combinations_df = dataframe of constructs
+        Returns: dataframe of master mixes with wells and volumes
+        of different reagents required
     '''
     TOT_VOL_PER_ASSEMBLY = 20
     BUFFER_VOL_PER_ASSEMBLY = 2
@@ -421,7 +475,7 @@ def create_mm_df(combinations_df):
     avail_mm_wells_no = list(range(95, len(combinations_df)-2, -1))
     avail_mm_wells = [index_to_well_name(no) for no in avail_mm_wells_no]
     mm_df_list = []
-    
+
     # minimum of 2 parts per construct; max of 8
     for i in range(2, 9):
         # count number of combinations with i parts
@@ -511,13 +565,17 @@ def create_mm_df(combinations_df):
     return mm_df
 
 
-def create_reagents_df(mm_df):
+def create_reagents_df(
+    mm_df: pd.DataFrame
+) -> pd.DataFrame:
     '''
         Creates a dataframe of reagents used to make master mixes.
         More than one buffer well may be required, and water is
         held on a separate plate.
         Also indicates which master mix wells the reagent is
         transferred to.
+        Args: master mix dataframe
+        Returns: dataframe of reagents used in master mix + water
     '''
     water_vol = 15000
     reagents_df_list = []
@@ -615,10 +673,22 @@ def create_reagents_df(mm_df):
     return reagents_df
 
 
-def get_mm_dicts(mm_df, reagents_df):
+def get_mm_dicts(
+    mm_df: pd.DataFrame, reagents_df: pd.DataFrame
+) -> Tuple[Dict[str, List[Tuple[str, str, str]]], Dict]:
     '''
-        Master mix dictionary purely for use in the assembly script. 
+        Master mix dictionary purely for use in the assembly script.
         Provides instructions on tranfers.
+        Args:
+            mm_df = dataframe of master mix, gives wells and diff vol needed
+            reagents_df = dataframe of reagents to be used in master mix and
+            other parts of assembly
+        Returns:
+            reagent_to_mm_dict: dictionary directing where to transfer each
+            reagent to to make master mixes, key = reagent well, value =
+            list of tuples of reagent plate (different for water and other
+            reagents), master mix well, and volume to be transferred
+            mm_dict_list = mm_df rows stored as dictionaries in list
     '''
     reagent_to_mm_dict = {}
     for index, row in reagents_df.iterrows():
@@ -650,10 +720,13 @@ def get_mm_dicts(mm_df, reagents_df):
     return reagent_to_mm_dict, mm_dict_list
 
 
-def index_to_well_name(no):
+def index_to_well_name(
+    no: int
+) -> str:
     '''
-        Converts well from number format e.g. 1 to letter format e.g.
-        'A1'
+        Converts well from number format to letter format
+        Args: well in number format e.g. 0
+        Returns: well in letter format e.g. 'A1'
     '''
     sample_number = no + 1
     letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -664,14 +737,24 @@ def index_to_well_name(no):
     return well
 
 
-def create_transform_metainformation(output_path, labware_dict, triplicate,
-                                     multi):
+def create_transform_metainformation(
+    output_path: str, labware_dict: Dict[str, str],
+    triplicate: str, multi: bool
+):
     '''
         Saves transform metainformation and labware informaiton.
         SOC used in two steps: adding soc (150 uL) and dilution (45 uL)
         times by 96 as reaction plate has 96 wells
         Add 300 (150*2) and 90 (45*2) as dead vols
         Agar plate positions in agar plate csv
+
+        Args:
+            output_path: absolute path to transformation metainformation file
+            labware_dict: dictionary of labware to be used
+            triplicate: whether 'single' (triplicate = False) or 'triplicate'
+            (triplicate = True) is selected
+            multi: whether an 8 channel (multi = True) or single channel
+            (mutli = False) p300 pipette is being used
     '''
     required_soc = (150 + 45)*96 + 300 + 90
 
@@ -708,16 +791,50 @@ def create_transform_metainformation(output_path, labware_dict, triplicate,
         csvwriter.writerow('')
 
 
-def create_protocol(dna_plate_map_dict, combinations_to_make,
-                    reagent_to_mm_dict, mm_dict,
-                    assembly_template_path, transform_template_path,
-                    output_folder_path, thermocycle, triplicate, multi,
-                    p10Mount, p300Mount, p10_type, p300_type, 
-                    reaction_plate_type,
-                    reagent_plate_type, trough_type, agar_plate_type):
+def create_protocol(
+    dna_plate_map_dict: Dict[str, List],
+    combinations_to_make: List[Dict],
+    reagent_to_mm_dict: Dict, mm_dict: Dict,
+    assembly_template_path: str, transform_template_path: str,
+    output_folder_path: str, thermocycle: bool, triplicate: str, multi: bool,
+    p10Mount: str, p300Mount: str, p10_type: str, p300_type: str,
+    reaction_plate_type: str, reagent_plate_type: str, trough_type: str,
+    agar_plate_type: str
+) -> Tuple[str, str]:
     '''
         Generates the assembly and transformation protocols used by opentrons.
         Returns the paths of the assembly and transform scripts.
+        Args:
+            dna_plate_map_dict: the dictionary of parts
+            combinations_to_make: the list of dictionaries of
+            constructs
+            reagent_to_mm_dict: dictionary directing where to transfer each
+            reagent to to make master mixes, key = reagent well, value =
+            list of tuples of reagent plate (different for water and other
+            reagents), master mix well, and volume to be transferred
+            mm_dict_list = mm_df rows stored as dictionaries in list
+            assembly_template_path: the absolute path of the assembly template
+            script
+            transform_template_path: the absolute path of the transformation
+            template script
+            output_folder_path: the absolute path to the output folder that
+            will contain the assembly and transformation protocols
+            thermocycle: whether or not the Opentrons thermocycler module
+            is being used
+            triplicate: whether 'single' (triplicate = False) or 'triplicate'
+            (triplicate = True) is selected
+            multi: whether an 8 channel (multi = True) or single channel
+            (mutli = False) p300 pipette is being used
+            p10_mount: "left" or "right", the Opentrons pipette mount options
+            p300_mount: "left" or "right", the Opentrons pipette mount options
+            p10_type: the name of the p10 pipette, e.g. "p10_single"
+            p300_type: the name of the p300 pipette, e.g. "p300_single"
+            reaction_plate_type: the name of the well plate type used as the
+            source and construct plate
+            reagent_plate_type: the name of the well plate type used as the
+            reagent plate (for master mix and non-water reagents)
+            trough_type: the name of the trough type used for water and soc
+            agar_plate_type: the name of the agar plate type used
     '''
 
     # Get the contents of colony_pick_template.py, which contains the body of

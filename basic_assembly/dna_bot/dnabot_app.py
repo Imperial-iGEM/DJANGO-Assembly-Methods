@@ -4,6 +4,7 @@ import csv
 import numpy as np
 import json
 import sys
+from typing import List, Dict, Tuple
 
 """
 Created on Thu Apr 11 14:26:07 2019
@@ -66,17 +67,21 @@ labware_dict = {'p10_mount': 'right', 'p300_mount': 'left',
                 'agar_plate': 'thermofisher_96_wellplate_180ul'}
 
 
-def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
-           input_construct_path, output_sources_paths,
-           p10_mount='right', p300_mount='left', p10_type='p10_single',
-           p300_type='p300_multi', well_plate='biorad_96_wellplate_200ul_pcr',
-           reagent_plate='usascientific_12_reservoir_22ml',
-           mag_plate='biorad_96_wellplate_200ul_pcr',
-           tube_rack='opentrons_24_tuberack_nest_1.5ml_snapcap',
-           aluminum_block='opentrons_96_aluminumblock_biorad_wellplate_200ul',
-           bead_container='usascientific_96_wellplate_2.4ml_deep',
-           soc_plate='usascientific_96_wellplate_2.4ml_deep',
-           agar_plate='thermofisher_96_wellplate_180ul'):
+def dnabot(
+    output_folder: str, ethanol_well_for_stage_2: str,
+    deep_well_plate_stage_4: str, input_construct_path: List[str],
+    output_sources_paths: List[str],
+    p10_mount: str = 'right', p300_mount: str = 'left',
+    p10_type: str = 'p10_single', p300_type: str = 'p300_multi',
+    well_plate: str = 'biorad_96_wellplate_200ul_pcr',
+    reagent_plate: str = 'usascientific_12_reservoir_22ml',
+    mag_plate: str = 'biorad_96_wellplate_200ul_pcr',
+    tube_rack: str = 'opentrons_24_tuberack_nest_1.5ml_snapcap',
+    aluminum_block: str = 'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+    bead_container: str = 'usascientific_96_wellplate_2.4ml_deep',
+    soc_plate: str = 'usascientific_96_wellplate_2.4ml_deep',
+    agar_plate: str = 'thermofisher_96_wellplate_180ul'
+) -> List[str]:
 
     '''
         Main function, creates scripts and metainformation
@@ -92,8 +97,16 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
             construct csv
             part_path: a list of full paths to part csv(s) (one or more)
             see labware_dict for rest of arguments
+
+        Returns:
+            List of output paths
+            If there is an exception, the list of output paths will contain
+            only one element = the error path
+            Otherwise the list of output paths will contain:
+            OT-2 script paths (clip, thermocycle, purification, assembly,
+            transformation), metainformation (clip run info, final assembly
+            dict, wells - ethanol well and soc well)
     '''
-    print("Starting DNA-BOT...")
     # Parent directories
     generator_dir = os.getcwd()
     '''
@@ -103,11 +116,13 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
     if os.path.split(generator_dir)[1] == 'dna_bot':
         template_dir_path = os.path.join(generator_dir, TEMPLATE_DIR_NAME)
     elif os.path.split(generator_dir)[1] == 'basic_assembly':
-        template_dir_path = os.path.join(generator_dir, 'dna_bot', TEMPLATE_DIR_NAME)
+        template_dir_path = os.path.join(generator_dir, 'dna_bot',
+                                         TEMPLATE_DIR_NAME)
     else:
-        template_dir_path = os.path.join(generator_dir, 'basic_assembly/dna_bot', TEMPLATE_DIR_NAME)
+        template_dir_path = os.path.join(
+            generator_dir, 'basic_assembly/dna_bot', TEMPLATE_DIR_NAME)
     full_output_path = output_folder
-    
+
     '''In case construct path is list: can only have one path
        In future more than one construct plate could be allowed,
        but given that the well plate has 96 wells already this is
@@ -121,144 +136,146 @@ def dnabot(output_folder, ethanol_well_for_stage_2, deep_well_plate_stage_4,
 
     all_my_output_paths = []
 
-    # try:
-    constructs_list = generate_constructs_list(input_construct_path)
-    clips_df = generate_clips_df(constructs_list)
-    sources_dict, parts_df = generate_sources_dict(output_sources_paths)
-    parts_df_temp = fill_parts_df(clips_df, parts_df)
-    parts_df = parts_df_temp.copy()
+    try:
+        constructs_list = generate_constructs_list(input_construct_path)
+        clips_df = generate_clips_df(constructs_list)
+        sources_dict, parts_df = generate_sources_dict(output_sources_paths)
+        parts_df_temp = fill_parts_df(clips_df, parts_df)
+        parts_df = parts_df_temp.copy()
 
-    # calculate OT2 script variables
-    clips_dict = generate_clips_dict(clips_df, sources_dict, parts_df)
-    magbead_sample_number = clips_df['number'].sum()
-    final_assembly_dict, clips_df, parts_df = generate_final_assembly_dict(
-        constructs_list, clips_df, parts_df)
-    final_assembly_tipracks = calculate_final_assembly_tipracks(
-        final_assembly_dict)
-    spotting_tuples = generate_spotting_tuples(constructs_list,
-                                                SPOTTING_VOLS_DICT)
-    
-    # check if p300_single (1 channel) or p300_multi (8 channel)
-    if 'multi' in p300_type.lower():
-        multi = True
-    else:
-        multi = False
+        # calculate OT2 script variables
+        clips_dict = generate_clips_dict(clips_df, sources_dict, parts_df)
+        magbead_sample_number = clips_df['number'].sum()
+        final_assembly_dict, clips_df, parts_df = generate_final_assembly_dict(
+            constructs_list, clips_df, parts_df)
+        final_assembly_tipracks = calculate_final_assembly_tipracks(
+            final_assembly_dict)
+        spotting_tuples = generate_spotting_tuples(constructs_list,
+                                                   SPOTTING_VOLS_DICT)
 
-    # Write OT2 scripts
-    out_full_path_1 = generate_ot2_script(
-        full_output_path, CLIP_FNAME,
-        os.path.join(template_dir_path, CLIP_TEMP_FNAME),
-        clips_dict=clips_dict,
-        p10_mount=p10_mount, p10_type=p10_type, well_plate_type=well_plate,
-        tube_rack_type=tube_rack)
+        # check if p300_single (1 channel) or p300_multi (8 channel)
+        if 'multi' in p300_type.lower():
+            multi = True
+        else:
+            multi = False
 
-    out_full_path_2 = generate_ot2_script(
-        full_output_path, MAGBEAD_FNAME,
-        os.path.join(template_dir_path, MAGBEAD_TEMP_FNAME),
-        p300_mount=p300_mount,
-        p300_type=p300_type, well_plate_type=well_plate,
-        reagent_plate_type=reagent_plate,
-        multi=multi, bead_container_type=bead_container,
-        sample_number=magbead_sample_number,
-        ethanol_well=ethanol_well_for_stage_2)
+        # Write OT2 scripts
+        out_full_path_1 = generate_ot2_script(
+            full_output_path, CLIP_FNAME,
+            os.path.join(template_dir_path, CLIP_TEMP_FNAME),
+            clips_dict=clips_dict,
+            p10_mount=p10_mount, p10_type=p10_type, well_plate_type=well_plate,
+            tube_rack_type=tube_rack)
 
-    out_full_path_3 = generate_ot2_script(
-        full_output_path, F_ASSEMBLY_FNAME,
-        os.path.join(template_dir_path, F_ASSEMBLY_TEMP_FNAME),
-        final_assembly_dict=final_assembly_dict,
-        tiprack_num=final_assembly_tipracks,
-        p10_mount=p10_mount, p10_type=p10_type, mag_plate_type=mag_plate,
-        tube_rack_type=tube_rack, aluminum_block_type=aluminum_block)
+        out_full_path_2 = generate_ot2_script(
+            full_output_path, MAGBEAD_FNAME,
+            os.path.join(template_dir_path, MAGBEAD_TEMP_FNAME),
+            p300_mount=p300_mount,
+            p300_type=p300_type, well_plate_type=well_plate,
+            reagent_plate_type=reagent_plate,
+            multi=multi, bead_container_type=bead_container,
+            sample_number=magbead_sample_number,
+            ethanol_well=ethanol_well_for_stage_2)
 
-    out_full_path_4 = generate_ot2_script(
-        full_output_path, TRANS_SPOT_FNAME,
-        os.path.join(template_dir_path, TRANS_SPOT_TEMP_FNAME),
-        spotting_tuples=spotting_tuples, soc_well=deep_well_plate_stage_4,
-        p10_mount=p10_mount,
-        p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
-        well_plate_type=well_plate, tube_rack_type=tube_rack,
-        soc_plate_type=soc_plate, agar_plate_type=agar_plate)
-    
-    # optional thermocycling script; run between clip reactions and purification
-    # requires the thermocycler module
-    out_full_path_5 = generate_ot2_script(
-        full_output_path, THERMOCYCLE_FNAME, 
-        os.path.join(template_dir_path, THERMOCYCLE_TEMP_NAME),
-        well_plate_type=well_plate)
+        out_full_path_3 = generate_ot2_script(
+            full_output_path, F_ASSEMBLY_FNAME,
+            os.path.join(template_dir_path, F_ASSEMBLY_TEMP_FNAME),
+            final_assembly_dict=final_assembly_dict,
+            tiprack_num=final_assembly_tipracks,
+            p10_mount=p10_mount, p10_type=p10_type, mag_plate_type=mag_plate,
+            tube_rack_type=tube_rack, aluminum_block_type=aluminum_block)
 
-    all_my_output_paths.append(out_full_path_1)
-    all_my_output_paths.append(out_full_path_2)
-    all_my_output_paths.append(out_full_path_3)
-    all_my_output_paths.append(out_full_path_4)
-    all_my_output_paths.append(out_full_path_5)
+        out_full_path_4 = generate_ot2_script(
+            full_output_path, TRANS_SPOT_FNAME,
+            os.path.join(template_dir_path, TRANS_SPOT_TEMP_FNAME),
+            spotting_tuples=spotting_tuples, soc_well=deep_well_plate_stage_4,
+            p10_mount=p10_mount,
+            p300_mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
+            well_plate_type=well_plate, tube_rack_type=tube_rack,
+            soc_plate_type=soc_plate, agar_plate_type=agar_plate)
 
-    # Write non-OT2 scripts - metainformation
-    os.chdir(generator_dir)
+        # optional thermocycling script; run between clip reactions and
+        # purification
+        # requires the thermocycler module
+        out_full_path_5 = generate_ot2_script(
+            full_output_path, THERMOCYCLE_FNAME, 
+            os.path.join(template_dir_path, THERMOCYCLE_TEMP_NAME),
+            well_plate_type=well_plate)
 
-    my_meta_dir = os.path.join(full_output_path, 'metainformation')
-    if not os.path.exists(my_meta_dir):
-        os.chdir(full_output_path)
-        os.makedirs(my_meta_dir)
-    os.chdir(my_meta_dir)
+        all_my_output_paths.append(out_full_path_1)
+        all_my_output_paths.append(out_full_path_2)
+        all_my_output_paths.append(out_full_path_3)
+        all_my_output_paths.append(out_full_path_4)
+        all_my_output_paths.append(out_full_path_5)
 
-    # create master mix dataframe so that users know proportions
-    master_mix_df = generate_master_mix_df(clips_df['number'].sum())
+        # Write non-OT2 scripts - metainformation
+        os.chdir(generator_dir)
 
-    # give information on source paths
-    sources_paths_df = generate_sources_paths_df(
-        output_sources_paths, SOURCE_DECK_POS)
+        my_meta_dir = os.path.join(full_output_path, 'metainformation')
+        if not os.path.exists(my_meta_dir):
+            os.chdir(full_output_path)
+            os.makedirs(my_meta_dir)
+        os.chdir(my_meta_dir)
 
-    # create labware dataframe from labware_dict
-    labwareDf = pd.DataFrame(
-        data={'name': list(labware_dict.keys()),
-                'definition': list(labware_dict.values())})
+        # create master mix dataframe so that users know proportions
+        master_mix_df = generate_master_mix_df(clips_df['number'].sum())
 
-    # save dfs as csv
-    dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
-                MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
-                CLIP_REACTIONS=clips_df, PART_INFO=parts_df,
-                LABWARE=labwareDf)
-    output_sources_paths.append(os.path.join(
-        my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
-    # final assembly dictionary - from original dnabot
-    with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
-                'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        for final_assembly_well, construct_clips in final_assembly_dict.items():
-            csvwriter.writerow([final_assembly_well, construct_clips])
-    output_sources_paths.append(os.path.join(
-        my_meta_dir, construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME))
+        # give information on source paths
+        sources_paths_df = generate_sources_paths_df(
+            output_sources_paths, SOURCE_DECK_POS)
 
-    # additional well info - from original dnabot
-    with open(construct_base + '_' + WELL_OUTPUT_FNAME, 'w') as f:
-        f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
-        f.write('\n')
-        f.write('SOC column: {}'.format(deep_well_plate_stage_4))
-    output_sources_paths.append(os.path.join(
-        my_meta_dir, construct_base + '_' + WELL_OUTPUT_FNAME))
-    os.chdir(generator_dir)
+        # create labware dataframe from labware_dict
+        labwareDf = pd.DataFrame(
+            data={'name': list(labware_dict.keys()),
+                  'definition': list(labware_dict.values())})
 
-    output_paths = all_my_output_paths
-    return output_paths
+        # save dfs as csv
+        dfs_to_csv(construct_base + '_' + CLIPS_INFO_FNAME, index=False,
+                   MASTER_MIX=master_mix_df, SOURCE_PLATES=sources_paths_df,
+                   CLIP_REACTIONS=clips_df, PART_INFO=parts_df,
+                   LABWARE=labwareDf)
+        output_sources_paths.append(os.path.join(
+            my_meta_dir, construct_base + '_' + CLIPS_INFO_FNAME))
+        # final assembly dictionary - from original dnabot
+        with open(construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME,
+                  'w', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            for final_assembly_well, construct_clips in final_assembly_dict.items():
+                csvwriter.writerow([final_assembly_well, construct_clips])
+        output_sources_paths.append(os.path.join(
+            my_meta_dir, construct_base + '_' + FINAL_ASSEMBLIES_INFO_FNAME))
 
-    # except Exception as e:
-    #     # write error to file in case of failure
-    #     error_path = os.path.join(full_output_path, 'BASIC_error.txt')
-    #     with open(error_path) as f:
-    #         f.write("Failed to generate BASIC scripts: {}\n".format(str(e)))
-    #     all_my_output_paths.append(error_path)
+        # additional well info - from original dnabot
+        with open(construct_base + '_' + WELL_OUTPUT_FNAME, 'w') as f:
+            f.write('Magbead ethanol well: {}'.format(ethanol_well_for_stage_2))
+            f.write('\n')
+            f.write('SOC column: {}'.format(deep_well_plate_stage_4))
+        output_sources_paths.append(os.path.join(
+            my_meta_dir, construct_base + '_' + WELL_OUTPUT_FNAME))
+        os.chdir(generator_dir)
 
-    # finally:
-    #     # return the paths of the outputs
-    #     # changed to output_paths for consistency with other assembly methods
-    #     output_paths = all_my_output_paths
-    #     return output_paths
+    except Exception as e:
+        # write error to file in case of failure
+        error_path = os.path.join(full_output_path, 'BASIC_error.txt')
+        with open(error_path) as f:
+            f.write("Failed to generate BASIC scripts: {}\n".format(str(e)))
+        all_my_output_paths.append(error_path)
+
+    finally:
+        # return the paths of the outputs
+        # changed to output_paths for consistency with other assembly methods
+        output_paths = all_my_output_paths
+        return output_paths
 
 
-def generate_constructs_list(path):
-    """Generates a list of dataframes corresponding to each construct. Each 
-    dataframe lists components of the CLIP reactions required.
-
+def generate_constructs_list(
+    path: str
+) -> List[pd.DataFrame]:
+    """
+        Generates a list of dataframes corresponding to each construct. Each
+        dataframe lists components of the CLIP reactions required.
+        Args: path = the absolute path of the constructs file
+        Returns: List of dataframes, in which each dataframe = construct
     """
 
     def process_construct(construct):
@@ -315,10 +332,14 @@ def generate_constructs_list(path):
         return constructs_list
 
 
-def generate_clips_df(constructs_list):
-    """Generates a dataframe containing information about all the unique CLIP 
-    reactions required to synthesise the constructs in constructs_list.
-
+def generate_clips_df(
+    constructs_list: List[pd.DataFrame]
+) -> pd.DataFrame:
+    """
+        Generates a dataframe containing information about all the unique clip
+        reactions required to synthesise the constructs in constructs_list.
+        Args: list of constructs stored as dataframes
+        Returns: dataframe of all constructs
     """
     merged_construct_dfs = pd.concat(constructs_list, ignore_index=True)
     unique_clips_df = merged_construct_dfs.drop_duplicates()
@@ -367,14 +388,22 @@ def generate_clips_df(constructs_list):
     return clips_df
 
 
-def generate_sources_dict(paths):
-    """Imports csvs files containing a series of parts/linkers with 
+def generate_sources_dict(
+    paths: List[str]
+) -> Tuple[Dict[str, Tuple], pd.DataFrame]:
+    """Imports csvs files containing a series of parts/linkers with
     corresponding information into a dictionary where the key corresponds with
     part/linker and the value contains a tuple of corresponding information.
 
     Args:
-        paths (list): list of strings each corresponding to a path for a 
-                      sources csv file. 
+        paths (list): list of strings each corresponding to a path for a
+                      sources csv file.
+    Returns:
+        sources_dict: a dictionary with keys = part names, values = tuple of
+        values - either well, concentration, plate or well, plate depending on
+        whether concentration is provided for the part
+        parts_df: dataframe of parts with cols = concentration, name, well,
+        plate
 
     """
     sources_dict = {}
@@ -425,7 +454,10 @@ def generate_sources_dict(paths):
     return sources_dict, parts_df
 
 
-def fill_parts_df(clips_df, parts_df_temp):
+def fill_parts_df(
+    clips_df: pd.DataFrame,
+    parts_df_temp: pd.DataFrame
+) -> pd.DataFrame:
     """Fill dataframe of parts with metainformation to be stored in csv.
        Will add final assembly well in generate_final_assembly_dict()
        Args:
@@ -437,7 +469,7 @@ def fill_parts_df(clips_df, parts_df_temp):
           'vol_per_clip', and 'number'
     """
     parts_df = parts_df_temp.copy()
-    
+
     # Create new columns and fill with dummy value '0'
     # 'clip_well' = the clip reaction wells the part will go into
     parts_df['clip_well'] = pd.Series(['0'] * len(parts_df.index),
@@ -456,12 +488,8 @@ def fill_parts_df(clips_df, parts_df_temp):
     parts_df['number'] = pd.Series(['0'] * len(parts_df.index),
                                    index=parts_df.index)
 
-    print('parts_df', parts_df)
-
     # Iterate through clips dataframe
     for index, row in clips_df.iterrows():
-        print("row", row)
-        print("row['suffixes']", row['suffixes'])
         # find clip indices in parts_df
         prefix_index = parts_df[
                 parts_df['name'] == row['prefixes']].index.values[0]
@@ -469,7 +497,7 @@ def fill_parts_df(clips_df, parts_df_temp):
                 parts_df['name'] == row['parts']].index.values[0]
         suffix_index = parts_df[
                 parts_df['name'] == row['suffixes']].index.values[0]
-        
+
         # fill 'clip_well', checking for dummy value
         if parts_df.at[prefix_index, 'clip_well'] == '0':
             parts_df.at[prefix_index, 'clip_well'] = list(row['clip_well'])
@@ -486,7 +514,7 @@ def fill_parts_df(clips_df, parts_df_temp):
         else:
             parts_df.at[
                 suffix_index, 'clip_well'].extend(list(row['clip_well']))
-        
+
         # fill 'mag_well', checking for dummy value
         if parts_df.at[prefix_index, 'mag_well'] == '0':
             parts_df.at[prefix_index, 'mag_well'] = list(row['mag_well'])
@@ -503,7 +531,7 @@ def fill_parts_df(clips_df, parts_df_temp):
         else:
             parts_df.at[
                 suffix_index, 'mag_well'].extend(list(row['mag_well']))
-      
+
         # fill number column
         parts_df.at[prefix_index, 'number'] = int(
             parts_df.at[prefix_index, 'number']) + int(row['number'])
@@ -535,10 +563,20 @@ def fill_parts_df(clips_df, parts_df_temp):
     return parts_df
 
 
-def generate_clips_dict(clips_df, sources_dict, parts_df):
-    """Using clips_df and sources_dict, returns a clips_dict which acts as the
-    sole variable for the opentrons script "clip.ot2.py".
-
+def generate_clips_dict(
+    clips_df: pd.DataFrame,
+    sources_dict: Dict[str, Tuple],
+    parts_df: pd.DataFrame
+) -> Dict[str, List]:
+    """
+        Using clips_df and sources_dict, returns a clips_dict which acts as the
+        sole variable for the opentrons script "clip.ot2.py".
+        Args:
+            clips_df: dataframe of clip reactions
+            sources_dict: dictionary of parts with csv values as keys
+            parts_df: dataframe of parts
+        Returns:
+            clips_dict: dictionary to be used by 1_clip.ot2.py
     """
     max_part_vol = CLIP_VOL - (T4_BUFF_VOL + BSAI_VOL + T4_LIG_VOL
                                + CLIP_MAST_WATER + 2)
@@ -592,11 +630,23 @@ def generate_clips_dict(clips_df, sources_dict, parts_df):
     return clips_dict
 
 
-def generate_final_assembly_dict(constructs_list, clips_df, parts_df):
-    """Using constructs_list and clips_df, returns a dictionary of final
-    assemblies with keys defining destination plate well positions and values
-    indicating which clip reaction wells are used.
-
+def generate_final_assembly_dict(
+    constructs_list: pd.DataFrame,
+    clips_df: pd.DataFrame,
+    parts_df: pd.DataFrame
+) -> Tuple[Dict[str, List[str]], pd.DataFrame, pd.DataFrame]:
+    """
+        Using constructs_list and clips_df, returns a dictionary of final
+        assemblies with keys defining destination plate well positions and
+        values indicating which clip reaction wells are used.
+        Args:
+            constructs_list: list of constructs, constructs = dataframes
+            clips_df: dataframe of clip reactions
+            parts_df: dataframe of parts
+        Returns:
+            dictionary of final assemblies with keys = destination plate,
+            values = list of clip wells
+            clips_df and parts_df updated with construct well column
     """
     final_assembly_dict = {}
     clips_count = np.zeros(len(clips_df.index))
@@ -654,9 +704,17 @@ def generate_final_assembly_dict(constructs_list, clips_df, parts_df):
     return final_assembly_dict, clips_df, parts_df
 
 
-def calculate_final_assembly_tipracks(final_assembly_dict):
-    """Calculates the number of final assembly tipracks required ensuring
-    no more than MAX_FINAL_ASSEMBLY_TIPRACKS are used.
+def calculate_final_assembly_tipracks(
+    final_assembly_dict: Dict[str, List[str]]
+) -> int:
+    """
+        Calculates the number of final assembly tipracks required ensuring
+        no more than MAX_FINAL_ASSEMBLY_TIPRACKS are used.
+        Args: final_assembly_dict = dictionary with keys = final assembly
+        wells, values = list of clip wells
+        Returns: number of tipracks needed in final assembly
+        (3_assembly.ot2.py)
+        Raises: ValueError if final assembly tiprack number > tiprack slots
 
     """
     final_assembly_lens = []
@@ -673,7 +731,10 @@ def calculate_final_assembly_tipracks(final_assembly_dict):
         return final_assembly_tipracks
 
 
-def generate_spotting_tuples(constructs_list, spotting_vols_dict):
+def generate_spotting_tuples(
+    constructs_list: List[pd.DataFrame],
+    spotting_vols_dict: Dict[int, int]
+) -> List[Tuple]:
     """Using constructs_list, generates a spotting tuple
     (Refer to 'transformation_spotting_template.py') for every column of 
     constructs, assuming the 1st construct is located in well A1 and wells
@@ -681,9 +742,10 @@ def generate_spotting_tuples(constructs_list, spotting_vols_dict):
     locations and spotting volumes are defined by spotting_vols_dict.
 
     Args:
-        spotting_vols_dict (dict): Part number defined by keys, spottting
+        spotting_vols_dict (dict): Part number defined by keys, spotting
             volumes defined by corresponding value.
-
+    Returns:
+        List of three tuples as instructions for transformation script
     """
     # Calculate wells and volumes
     wells = [final_well(x + 1) for x in range(len(constructs_list))]
@@ -710,7 +772,13 @@ def generate_ot2_script(parent_dir, ot2_script_path, template_path, **kwargs):
     written as global variables at the top of the script. For each kwarg, the
     keyword defines the variable name while the value defines the name of the
     variable. The remainder of template file is subsequently written below.
-
+    Args:
+        parent_dir (str): output folder dir
+        ot2_script_path (str): where the script should be saved, relative to
+        the parent_dir
+        template_path (str): where the template script can be found
+    Returns:
+        absolute path of script (str)
     """
     working_directory = os.getcwd()
 
@@ -746,10 +814,14 @@ def generate_ot2_script(parent_dir, ot2_script_path, template_path, **kwargs):
     return this_object_output_path
 
 
-def generate_master_mix_df(clip_number):
+def generate_master_mix_df(
+    clip_number: int
+) -> pd.DataFrame:
     """
-        Generates a dataframe detailing the components required in the clip 
+        Generates a dataframe detailing the components required in the clip
         reaction master mix.
+        Args: Number of clips needed in total
+        Returns: master mix dataframe containing reagents + volumes
     """
     COMPONENTS = {'Component': ['Promega T4 DNA Ligase buffer, 10X',
                                 'Water', 'NEB BsaI-HFv2',
@@ -764,12 +836,17 @@ def generate_master_mix_df(clip_number):
     return master_mix_df
 
 
-def generate_sources_paths_df(paths, deck_positions):
+def generate_sources_paths_df(
+    paths: List[str], deck_positions: List[str]
+) -> pd.DataFrame:
     """Generates a dataframe detailing source plate information.
 
     Args:
         paths (list): list of strings specifying paths to source plates.
-        deck_positions (list): list of strings specifying candidate deck positions.
+        deck_positions (list): list of strings specifying candidate deck
+        positions.
+    Returns:
+        Dataframe containing source plate information
 
     """
     source_plates_dict = {'Deck position': [], 'Source plate': [], 'Path': []}
@@ -781,7 +858,7 @@ def generate_sources_paths_df(paths, deck_positions):
 
 
 def dfs_to_csv(path, index=True, **kw_dfs):
-    """Generates a csv file defined by path, where kw_dfs are 
+    """Generates a csv file defined by path, where kw_dfs are
     written one after another with each key acting as a title. If index=True,
     df indexes are written to the csv file.
 
@@ -819,9 +896,12 @@ def handle_2_columns(datalist):
     return datalist
 
 
-def final_well(sample_number):
+def final_well(
+    sample_number: int
+) -> str:
     """Determines well containing the final sample from sample number.
-    
+        Args: sample_number = integer, e.g. 0 = well index
+        Returns: well in string form, e.g. 'A1' if sample_number = 0
     """
     letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     final_well_column = sample_number // 8 + \

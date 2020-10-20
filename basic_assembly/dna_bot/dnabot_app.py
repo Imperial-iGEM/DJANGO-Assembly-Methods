@@ -460,8 +460,6 @@ def fill_parts_df(clips_df, parts_df_temp):
 
     # Iterate through clips dataframe
     for index, row in clips_df.iterrows():
-        print("parts_df", parts_df)
-        print("parts_df['name']", parts_df['name'])
         print("row", row)
         print("row['suffixes']", row['suffixes'])
         # find clip indices in parts_df

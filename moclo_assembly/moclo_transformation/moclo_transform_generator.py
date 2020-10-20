@@ -678,7 +678,7 @@ def create_reagents_df(
 
 def get_mm_dicts(
     mm_df: pd.DataFrame, reagents_df: pd.DataFrame
-) -> Tuple[Dict[str, List[Tuple(str, str, str)]], Dict]:
+) -> Tuple[Dict[str, List[Tuple[str, str, str]]], Dict]:
     '''
         Master mix dictionary purely for use in the assembly script.
         Provides instructions on tranfers.

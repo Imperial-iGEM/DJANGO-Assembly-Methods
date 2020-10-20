@@ -64,8 +64,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 digest_wells.append(dest_plate.wells_by_name()[val[i][0]])
                 # vols.append(val[i][1])
             vol = val[0][1]
-            # pipette.transfer(vol, source_plate_well, digest_wells,
-                             # blow_out=True)
+
             pipette.pick_up_tip()
             for digest_well in digest_wells:
                 pipette.move_to(source_plate_well.bottom())
@@ -108,6 +107,7 @@ def run(protocol: protocol_api.ProtocolContext):
             tc_mod.execute_profile(steps=profile1, repetitions=1)
             tc_mod.open_lid()
         else:
+            protocol.pause()
             protocol.comment(
                 'Seal the reaction plate with adhesive film and remove.')
             protocol.comment(
@@ -130,9 +130,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 construct_wells.append(dest_plate.wells_by_name()[val[i][0]])
                 # vols.append(val[i][1])
             vol = val[0][1]
-            # pipette.transfer(vol, digest_plate_well, construct_wells,
-                             # blow_out=True)
-            
+
             # transfer from digest to construct
             pipette.pick_up_tip()
             for construct_well in construct_wells:
@@ -155,8 +153,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 storage_wells.append(tube_rack.wells_by_name()[val[i][0]])
                 # vols.append(val[i][1])
             vol = val[0][1]
-            # pipette.transfer(vol, digest_plate_well, storage_wells,
-                             # blow_out=True)
+
             pipette.pick_up_tip()
             for storage_well in storage_wells:
                 if vol > 10:
@@ -211,6 +208,7 @@ def run(protocol: protocol_api.ProtocolContext):
             tc_mod.open_lid()
 
         else:
+            protocol.pause()
             protocol.comment(
                 'Seal the reaction plate with adhesive film and remove.')
             protocol.comment(

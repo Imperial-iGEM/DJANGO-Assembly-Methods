@@ -147,7 +147,6 @@ def biobricks(
         # Handles error and writes to file
         output_paths = []
         error_path = os.path.join(full_output_path, 'BioBricks_error.txt')
-        print("Exception: error_path", error_path)
         with open(error_path) as f:
             f.write(
                 "Failed to generate BioBricks scripts: {}\n".format(str(e)))

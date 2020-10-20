@@ -141,7 +141,6 @@ def moclo_function(
             p300Mount=p300_mount, p10_type=p10_type, p300_type=p300_type,
             reaction_plate_type=well_plate, reagent_plate_type=reagent_plate,
             trough_type=trough, agar_plate_type=agar_plate)
-        print('Succesfully created opentrons scripts')
 
         output_paths.append(assembly_path)
         output_paths.append(transform_path)
@@ -151,13 +150,11 @@ def moclo_function(
 
     except Exception as e:
         error_path = os.path.join(full_output_path, 'MoClo_error.txt')
-        print("Exception: error_path", error_path)
 
         with open(error_path, 'w') as f:
             f.write("Failed to generate MoClo scripts: {}\n".format(str(e)))
         output_paths.append(error_path)
     finally:
-        print("output_paths:", output_paths)
         return output_paths
 
 ###############################################################################

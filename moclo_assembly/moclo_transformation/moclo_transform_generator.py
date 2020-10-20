@@ -173,7 +173,7 @@ def generate_plate_maps(
     '''
     plate_maps = {}
     plate_map = []
-    with open(filename, encoding='utf-8-sig') as file:
+    with open(filename, 'r', encoding='utf-8-sig') as file:
         for row in csv.reader(file, dialect='excel'):
             if len(row) == 0:
                 continue
@@ -194,7 +194,7 @@ def generate_combinations(
         Returns: List of construct dictionaries with keys "name" and "parts"
     '''
     combinations_to_make = []
-    with open(combinations_filename, encoding='utf-8-sig') as f:
+    with open(combinations_filename, 'r', encoding='utf-8-sig') as f:
         for row in csv.reader(f, dialect='excel'):
             if len(row) == 0:
                 continue

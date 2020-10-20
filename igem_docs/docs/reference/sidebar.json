@@ -1,0 +1,48 @@
+[
+  {
+    "items": [
+      {
+        "items": [
+          "reference/biobricks_assembly/biobricks10/bbinput"
+        ],
+        "label": "biobricks_assembly.biobricks10",
+        "type": "category"
+      }
+    ],
+    "label": "biobricks_assembly",
+    "type": "category"
+  },
+  {
+    "items": [
+      {
+        "items": [
+          "reference/moclo_assembly/moclo_transformation/moclo_transform_generator"
+        ],
+        "label": "moclo_assembly.moclo_transformation",
+        "type": "category"
+      }
+    ],
+    "label": "moclo_assembly",
+    "type": "category"
+  },
+  {
+    "items": [
+      {
+        "items": [
+          "reference/basic_assembly/dna_bot/dnabot_app"
+        ],
+        "label": "basic_assembly.dna_bot",
+        "type": "category"
+      }
+    ],
+    "label": "basic_assembly",
+    "type": "category"
+  },
+  {
+    "items": [
+      "reference/sbol_parser_api/sbolParserApi"
+    ],
+    "label": "sbol_parser_api",
+    "type": "category"
+  }
+]

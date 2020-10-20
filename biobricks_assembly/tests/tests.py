@@ -151,39 +151,39 @@ class BioBricksInputTestCase(unittest.TestCase):
                                               'role': ['upstream'], 'part':
                                               ['BBa_B0034'], 'source_well':
                                               ['A1'], 'dest_well': ['A4'],
-                                              'reagent_well': ['B1'],
+                                              'storage_well': ['B1'],
                                               'construct_wells':
                                               [['A1', 'A2']]}),
                            pd.DataFrame(data={'name': ['BBa_C0040-downstream'],
                                               'role': ['downstream'], 'part':
                                               ['BBa_C0040'], 'source_well':
                                               ['A2'], 'dest_well': ['A5'],
-                                              'reagent_well': ['B2'],
+                                              'storage_well': ['B2'],
                                               'construct_wells': [['A1']]}),
                            pd.DataFrame(data={'name': ['BBa_pSB1AK3-plasmid'],
                                               'role': ['plasmid'], 'part':
                                               ['BBa_pSB1AK3'], 'source_well':
                                               ['A3'], 'dest_well': ['A6'],
-                                              'reagent_well': ['B3'],
+                                              'storage_well': ['B3'],
                                               'construct_wells':
                                               [['A1', 'A2', 'A3']]}),
                            pd.DataFrame(data={'name': ['BBa_C0012-upstream'],
                                               'role': ['upstream'], 'part':
                                               ['BBa_C0012'], 'source_well':
                                               ['A4'], 'dest_well': ['A7'],
-                                              'reagent_well': ['B4'],
+                                              'storage_well': ['B4'],
                                               'construct_wells': [['A3']]}),
                            pd.DataFrame(data={'name': ['BBa_C0012-downstream'],
                                               'role': ['downstream'], 'part':
                                               ['BBa_C0012'], 'source_well':
                                               ['A4'], 'dest_well': ['A8'],
-                                              'reagent_well': ['B5'],
+                                              'storage_well': ['B5'],
                                               'construct_wells': [['A2']]}),
                            pd.DataFrame(data={'name': ['BBa_B0015-downstream'],
                                               'role': ['downstream'], 'part':
                                               ['BBa_B0015'], 'source_well':
                                               ['A5'], 'dest_well': ['A9'],
-                                              'reagent_well': ['B6'],
+                                              'storage_well': ['B6'],
                                               'construct_wells': [['A3']]})]
 
         self.digests_df = pd.concat(self.digest_dfs, ignore_index=True)
@@ -201,7 +201,6 @@ class BioBricksInputTestCase(unittest.TestCase):
         self.digest_to_storage = {"A4": [("B1", 48)], "A5": [("B2", 48)],
                                   "A6": [("B3", 48)], "A7": [("B4", 48)],
                                   "A8": [("B5", 48)], "A9": [("B6", 48)]}
-
 
         self.digest_to_construct = {'A4': [('A1', 2), ('A2', 2)],
                                     'A5': [('A1', 2)],

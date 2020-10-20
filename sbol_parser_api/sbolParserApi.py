@@ -1042,7 +1042,10 @@ class ParserSBOL:
                         primaryStructure.insert(0, primaryStructure.pop())
                     dictWellComponent[wellname] = primaryStructure
                 elif assembly == "moclo":
-                    dictWellComponent[wellname] = primaryStructure
+                    dictWellComponent[wellname] = {
+                        'Construct': value,
+                        'Parts': primaryStructure
+                    }
                 elif assembly == "bio_bricks":
                     # TODO: Confirm whether construct name is needed
                     # Check if valid biobrick construct
@@ -1080,8 +1083,14 @@ class ParserSBOL:
                     k,
                     *(x.displayId for x in v['Parts'])
                 ])
-            else:
+            elif assembly == "basic":
                 listWellComponent.append([k, *(x.displayId for x in v)])
+            elif assembly == "moclo":
+                listWellComponent.append([
+                    k,
+                    v['Construct'].displayId,
+                    *(x.displayId for x in v['Parts'])
+                ])
         return listWellComponent
 
     def getConstructDfFromPlateoPlate(

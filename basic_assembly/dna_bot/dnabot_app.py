@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Apr 11 14:26:07 2019
-
-@author: mh2210, Gabrielle Johnston, Benedict_Carling
-
-"""
 import pandas as pd
 import os
 import csv
 import numpy as np
 import json
 import sys
+
+"""
+Created on Thu Apr 11 14:26:07 2019
+
+@author: mh2210, Gabrielle Johnston, Benedict_Carling
+
+"""
 
 # Constant str
 TEMPLATE_DIR_NAME = 'template_ot2_scripts'

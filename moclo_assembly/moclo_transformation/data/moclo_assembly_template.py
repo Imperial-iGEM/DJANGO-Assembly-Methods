@@ -150,7 +150,7 @@ def run(protocol: protocol_api.ProtocolContext):
             for i, entries in enumerate(n_part_mm_dicts):
                 mm_vol_per_assembly = entries['vol_per_assembly']
                 p10_single.pick_up_tip()
-                mm_well = reagents_plate.wells_by_name()[entries['well']]
+                mm_well = reaction_plate.wells_by_name()[entries['well']]
                 no_assemblies_mm = entries['no_assemblies']
                 if i == len(entries) - 1:
                     dest_wells = wells_open_assembly

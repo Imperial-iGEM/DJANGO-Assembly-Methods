@@ -14,17 +14,16 @@ from plateo.exporters import plate_to_platemap_spreadsheet
 
 
 class ParserSBOL:
-
     def __init__(
         self,
         sbolDocument: Document,
         outdir: str = os.getcwd(),
-        linkerFile: Document = Document(os.path.join(os.getcwd(), "sbol_parser_api/basic_linkers_standard.xml"))
+        linkerFile: Document = Document(os.path.join(os.getcwd(), "sbol_parser_api", "basic_linkers_standard.xml"))
     ):
         self.doc = sbolDocument
         self.outdir = outdir
         if linkerFile is None:
-            filepath = os.path.join(os.getcwd(), "sbol_parser_api/basic_linkers_standard.xml")
+            filepath = os.path.join(os.getcwd(), "sbol_parser_api", "basic_linkers_standard.xml")
             self.linkerFile = Document(filepath)
         else:
             self.linkerFile = linkerFile
@@ -40,8 +39,8 @@ class ParserSBOL:
     ) -> Dict[str, List[str]]:
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
-            dictOfParts (Dict[str, Dict[str, Union[str, int, float]]]): 
-                Dictionary of information regarding parts to be assembled.
+            dictOfParts (Dict[str, Dict[str, Union[str, int, float]]]): Dictionary
+                of information regarding parts to be assembled.
                 Structure:
                 {<display ID>: {'concentration':..., 'plate':..., 'well':...}}
             repeat (bool): If False, removes constructs that contain repeated

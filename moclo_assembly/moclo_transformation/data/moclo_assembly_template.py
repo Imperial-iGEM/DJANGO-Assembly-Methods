@@ -80,9 +80,11 @@ def run(protocol: protocol_api.ProtocolContext):
             reaction_plate = tc_mod.load_labware(reaction_plate_type)
             tc_mod.set_block_temperature(10)
         else:
-            temp_deck = protocol.load_module('tempdeck', 10)
-            reaction_plate = temp_deck.load_labware(reaction_plate_type)
-            temp_deck.set_temperature(10)
+            # Set to 20 instead of 10 since temperature module does not
+            # cool well in room temp
+            # temp_deck = protocol.load_module('tempdeck', 10)
+            reaction_plate = protocol.load_labware(reaction_plate_type, 10)
+            # temp_deck.set_temperature(20)
 
         # Load in 2 10ul tipracks and 2 300ul tipracks
         tr_10 = [protocol.load_labware('opentrons_96_tiprack_10ul', '3'),
@@ -230,7 +232,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.comment(
                 'Insert the temperature module in position 10.')
         else:
-            temp_deck.deactivate()
+            # temp_deck.deactivate()
             protocol.comment(
                 'Seal the reaction plate with adhesive film and remove.')
             protocol.comment(

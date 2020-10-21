@@ -139,7 +139,7 @@ def run(protocol: protocol_api.ProtocolContext):
         for target, dest in zip(samples, mixing):
             # Aspirate beads
             pipette.pick_up_tip()
-            pipette.mix(5, mix_vol, beads)
+            # pipette.mix(5, mix_vol, beads)
             pipette.transfer(bead_volume, beads, dest, new_tip='never')
             pipette.move_to(target.bottom())
 

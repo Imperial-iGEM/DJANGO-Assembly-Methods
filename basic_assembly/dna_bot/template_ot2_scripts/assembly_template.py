@@ -86,7 +86,7 @@ def run(protocol: protocol_api.ProtocolContext):
         for key, values in list(final_assembly_dict.items()):
             mag_bead_wells = [magbead_plate.wells_by_name()[value]
                               for value in values]
-            for mag_bead_well in mag_bead_wells:
+            for i, mag_bead_well in enumerate(mag_bead_wells):
                 pipette.pick_up_tip()
                 pipette.move_to(mag_bead_well.bottom())
                 protocol.max_speeds['Z'] = 10
@@ -96,9 +96,11 @@ def run(protocol: protocol_api.ProtocolContext):
                 pipette.dispense(PART_VOL,
                                  destination_plate.wells_by_name()[key])
                 pipette.touch_tip(destination_plate.wells_by_name()[key])
-                pipette.mix(MIX_SETTINGS[0], MIX_SETTINGS[1],
-                            destination_plate.wells_by_name()[key])
-                pipette.drop_tip()
+                if i < len(mag_bead_wells)-1:
+                    pipette.drop_tip()
+            pipette.mix(MIX_SETTINGS[0], MIX_SETTINGS[1],
+                        destination_plate.wells_by_name()[key])
+            pipette.drop_tip()
 
         temp_mod.deactivate()
 

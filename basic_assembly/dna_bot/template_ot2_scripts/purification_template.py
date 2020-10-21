@@ -136,7 +136,7 @@ def run(protocol: protocol_api.ProtocolContext):
         total_vol = bead_volume + sample_volume + DEAD_TOTAL_VOL
 
         # Mix beads and PCR samples and incubate
-        for target, dest in zip(samples, output):
+        for target, dest in zip(samples, mixing):
             # Aspirate beads
             pipette.pick_up_tip()
             pipette.mix(5, mix_vol, beads)

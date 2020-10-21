@@ -70,9 +70,8 @@ def run(protocol: protocol_api.ProtocolContext):
                 (x - 1) // 6] + str(x - 1)
             dest_list = [
                 key for key, value in list(final_assembly_dict.items())]
-            destination_inds = [i for i, lens in enumerate(
+            dest_wells = [dest_list[i] for i, lens in enumerate(
                                 final_assembly_lens) if lens == x]
-            dest_wells = dest_list[destination_inds]
             destination_plate_wells = [
                 destination_plate.wells_by_name()[dest_well]
                 for dest_well in dest_wells]

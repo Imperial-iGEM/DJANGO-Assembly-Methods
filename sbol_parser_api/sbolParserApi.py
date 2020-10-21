@@ -42,8 +42,8 @@ class ParserSBOL:
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
             assembly(str): Assembly type.
-            dictOfParts (Dict[str, Dict[str, Union[str, int, float]]]): 
-                Dictionary of information regarding parts to be assembled.
+            dictOfParts (Dict[str, Dict[str, Union[str, int, float]]]): Dictionary
+                of information regarding parts to be assembled.
                 Structure:
                 {<display ID>: {'concentration':..., 'plate':..., 'well':...}}
             repeat (bool): If False, removes constructs that contain repeated

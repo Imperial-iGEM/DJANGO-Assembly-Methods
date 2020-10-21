@@ -9,7 +9,7 @@ metadata = {'apiLevel': '2.2',
 def run(protocol: protocol_api.ProtocolContext):
     def magbead(
         sample_number,
-        ethanol_well,
+        ethanol_well,  # Default is A11 in DNA-BOT
         elution_buffer_well,
         sample_volume=30,
         bead_ratio=1.8,

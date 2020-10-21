@@ -103,8 +103,8 @@ def run(protocol: protocol_api.ProtocolContext):
             MoClo protocol is completed, so at the beginning of the protocol
             there isn't an actual plate existing in this slot location.
         '''
-        #post_moclo_reaction_plate = protocol.load_labware(
-            #'biorad_96_wellplate_200ul_pcr', '9', 'Post-MoClo Reaction Plate')
+        # post_moclo_reaction_plate = protocol.load_labware(
+        # 'biorad_96_wellplate_200ul_pcr', '9', 'Post-MoClo Reaction Plate')
 
         # Load in water, SOC, and wash trough (USA Scientific 12 Well Reservoir
         # 22ml)

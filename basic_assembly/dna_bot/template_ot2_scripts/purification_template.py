@@ -114,11 +114,11 @@ def run(protocol: protocol_api.ProtocolContext):
                 sample_offset+6:sample_offset+6+col_num]]
         else:
             start = sample_offset
-            stop = sample_offset + (col_num + 1)*8
+            stop = start + sample_number
             samples = mag_plate.wells()[start:stop]
             mixing = mix_plate.wells()[start:stop]
             start = sample_offset + 6*8
-            stop = sample_offset + (6 + col_num + 1)*8
+            stop = start + sample_number
             output = mag_plate.wells()[start:stop]
 
         # Define reagents and liquid waste

@@ -80,11 +80,9 @@ def run(protocol: protocol_api.ProtocolContext):
             reaction_plate = tc_mod.load_labware(reaction_plate_type)
             tc_mod.set_block_temperature(10)
         else:
-            # Set to 20 instead of 10 since temperature module does not
-            # cool well in room temp
-            # temp_deck = protocol.load_module('tempdeck', 10)
-            reaction_plate = protocol.load_labware(reaction_plate_type, 10)
-            # temp_deck.set_temperature(20)
+            temp_deck = protocol.load_module('tempdeck', 10)
+            reaction_plate = temp_deck.load_labware(reaction_plate_type)
+            temp_deck.set_temperature(10)
 
         # Load in 2 10ul tipracks and 2 300ul tipracks
         tr_10 = [protocol.load_labware('opentrons_96_tiprack_10ul', '3'),
@@ -103,8 +101,8 @@ def run(protocol: protocol_api.ProtocolContext):
             MoClo protocol is completed, so at the beginning of the protocol
             there isn't an actual plate existing in this slot location.
         '''
-        # post_moclo_reaction_plate = protocol.load_labware(
-        # 'biorad_96_wellplate_200ul_pcr', '9', 'Post-MoClo Reaction Plate')
+        #post_moclo_reaction_plate = protocol.load_labware(
+            #'biorad_96_wellplate_200ul_pcr', '9', 'Post-MoClo Reaction Plate')
 
         # Load in water, SOC, and wash trough (USA Scientific 12 Well Reservoir
         # 22ml)
@@ -157,7 +155,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 if i == len(entries) - 1:
                     dest_wells = wells_open_assembly
                 else:
-                    dest_wells = wells_open_assembly[0:no_assemblies_mm-1]
+                    dest_wells = wells_open_assembly[0:no_assemblies_mm]
                 wells_new = [well for well in wells_open_assembly
                              if (well not in dest_wells)]
                 wells_open_assembly = wells_new
@@ -232,7 +230,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.comment(
                 'Insert the temperature module in position 10.')
         else:
-            # temp_deck.deactivate()
+            temp_deck.deactivate()
             protocol.comment(
                 'Seal the reaction plate with adhesive film and remove.')
             protocol.comment(

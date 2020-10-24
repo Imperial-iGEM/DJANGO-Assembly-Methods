@@ -910,7 +910,7 @@ def dfs_to_csv(path, index=True, **kw_dfs):
 Below is an example of how this would be run through the command line:
 To use this, replace the output_folder name, construct_path, and part_path.
 '''
-
+'''
 output_folder = 'C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/output/last'
 construct_path = [
     'C:/Users/gabri/Downloads/construct_b.csv']
@@ -918,4 +918,4 @@ part_path = [
     'C:/Users/gabri/Downloads/parts_1_b.csv']
 biobricks(output_folder, construct_path, part_path, thermocycle=True,
           **labware_dict)
-
+'''

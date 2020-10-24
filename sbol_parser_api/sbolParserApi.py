@@ -137,7 +137,7 @@ class ParserSBOL:
     ) -> List[CombinatorialDerivation]:
         """Get the root combinatorial derivations of an SBOL Document.
         Args:
-            sbolDocument (Document): SBOL document from
+            sbol_document (Document): SBOL document from
                 which to get root combinatorial derivations (default: self.doc)
         Returns:
             list: List of root combinatorial derivations.
@@ -1264,7 +1264,7 @@ class ParserSBOL:
         """Convert all linkers contained in a list of parts into linker
         prefixes and suffixes.
         Args:
-            listOfParts (List[ComponentDefinition]): List of parts
+            parts_list (List[ComponentDefinition]): List of parts
                 used in the assembly of all constructs.
         Returns:
             List[ComponentDefinition]: List of parts with linkers

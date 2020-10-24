@@ -5,11 +5,12 @@ from unittest.mock import patch
 import csv
 import sys
 import os
-#parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, '/biobricks10'))
 TEST_DIR = "/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/biobricks_assembly/tests/"
 sys.path.append("/home/runner/work/DJANGO-Assembly-Methods/DJANGO-Assembly-Methods/biobricks_assembly/biobricks10/")
+sys.path.append("C:/Users/gabri/Documents/Uni/iGEM/DJANGO-Assembly-Methods/biobricks_assembly/biobricks10")
 import bbinput
 from . import side_effect_functions
+
 
 class BioBricksInputTestCase(unittest.TestCase):
 
@@ -133,6 +134,9 @@ class BioBricksInputTestCase(unittest.TestCase):
                                                ['A6'], 'total_vol': [3]})]
         self.reagents_df = pd.concat(self.reagent_dfs, ignore_index=True)
         self.reagents_wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6']
+        self.reagents_dict = {'water': 'A1', 'mm_upstream': 'A2',
+                              'mm_downstream': 'A3',  'mm_plasmid': 'A4',
+                              'T4Ligase10X': 'A5', 'T4Ligase': 'A6'}
         self.mm_df = pd.DataFrame(
             data={'reagent': ['NEB Buffer 10X', 'EcoRI-HF', 'SpeI', 'XbaI',
                               'PstI'],
@@ -141,78 +145,69 @@ class BioBricksInputTestCase(unittest.TestCase):
                   'volume in plasmid mm': [15, 3, 0, 0, 3]})
         self.constructs_wells = ['A1', 'A2', 'A3']
 
-        self.parts_digest_wells = [['A4'], ['A5'], ['A6'], ['A7', 'A8'], ['A9']
+        self.parts_digest_wells = [['A1'], ['A2'], ['A3'], ['A4', 'A5'], ['A6']
                                    ]
         self.parts_df_full = self.parts_df.copy()
-        self.parts_df_full['digest_wells'] = [['A4'], ['A5'], ['A6'],
-                                              ['A7', 'A8'], ['A9']]
+        self.parts_df_full['digest_wells'] = [['A1'], ['A2'], ['A3'],
+                                              ['A4', 'A5'], ['A6']]
 
         self.digest_dfs = [pd.DataFrame(data={'name': ['BBa_B0034-upstream'],
                                               'role': ['upstream'], 'part':
                                               ['BBa_B0034'], 'source_well':
-                                              ['A1'], 'dest_well': ['A4'],
-                                              'storage_well': ['B1'],
+                                              ['A1'], 'dest_well': ['A1'],
                                               'construct_wells':
                                               [['A1', 'A2']]}),
                            pd.DataFrame(data={'name': ['BBa_C0040-downstream'],
                                               'role': ['downstream'], 'part':
                                               ['BBa_C0040'], 'source_well':
-                                              ['A2'], 'dest_well': ['A5'],
-                                              'storage_well': ['B2'],
+                                              ['A2'], 'dest_well': ['A2'],
                                               'construct_wells': [['A1']]}),
                            pd.DataFrame(data={'name': ['BBa_pSB1AK3-plasmid'],
                                               'role': ['plasmid'], 'part':
                                               ['BBa_pSB1AK3'], 'source_well':
-                                              ['A3'], 'dest_well': ['A6'],
-                                              'storage_well': ['B3'],
+                                              ['A3'], 'dest_well': ['A3'],
                                               'construct_wells':
                                               [['A1', 'A2', 'A3']]}),
                            pd.DataFrame(data={'name': ['BBa_C0012-upstream'],
                                               'role': ['upstream'], 'part':
                                               ['BBa_C0012'], 'source_well':
-                                              ['A4'], 'dest_well': ['A7'],
+                                              ['A4'], 'dest_well': ['A4'],
                                               'storage_well': ['B4'],
                                               'construct_wells': [['A3']]}),
                            pd.DataFrame(data={'name': ['BBa_C0012-downstream'],
                                               'role': ['downstream'], 'part':
                                               ['BBa_C0012'], 'source_well':
-                                              ['A4'], 'dest_well': ['A8'],
-                                              'storage_well': ['B5'],
+                                              ['A4'], 'dest_well': ['A5'],
                                               'construct_wells': [['A2']]}),
                            pd.DataFrame(data={'name': ['BBa_B0015-downstream'],
                                               'role': ['downstream'], 'part':
                                               ['BBa_B0015'], 'source_well':
-                                              ['A5'], 'dest_well': ['A9'],
-                                              'storage_well': ['B6'],
+                                              ['A5'], 'dest_well': ['A6'],
                                               'construct_wells': [['A3']]})]
 
         self.digests_df = pd.concat(self.digest_dfs, ignore_index=True)
 
-        self.source_to_digest = {'A1': [('A4', 1)], 'A2': [('A5', 1)], 'A3':
-                                 [('A6', 1)], 'A4': [('A7', 1), ('A8', 1)],
-                                 'A5': [('A9', 1)]}
+        self.source_to_digest = {'A1': [('A1', 1)], 'A2': [('A2', 1)], 'A3':
+                                 [('A3', 1)], 'A4': [('A4', 1), ('A5', 1)],
+                                 'A5': [('A6', 1)]}
 
-        self.reagent_to_digest = {"A1": [("A4", 42), ("A5", 42), ("A6", 42),
-                                         ("A7", 42), ("A8", 42), ("A9", 42)],
-                                  "A2": [("A4", 7), ("A7", 7)],
-                                  "A3": [("A5", 7), ("A8", 7), ("A9", 7)],
-                                  "A4": [("A6", 7)]}
+        self.reagent_to_digest = {"A1": [("A1", 42), ("A2", 42), ("A3", 42),
+                                         ("A4", 42), ("A5", 42), ("A6", 42)],
+                                  "A2": [("A1", 7), ("A4", 7)],
+                                  "A3": [("A2", 7), ("A5", 7), ("A6", 7)],
+                                  "A4": [("A3", 7)]}
 
-        self.digest_to_storage = {"A4": [("B1", 48)], "A5": [("B2", 48)],
-                                  "A6": [("B3", 48)], "A7": [("B4", 48)],
-                                  "A8": [("B5", 48)], "A9": [("B6", 48)]}
-
-        self.digest_to_construct = {'A4': [('A1', 2), ('A2', 2)],
-                                    'A5': [('A1', 2)],
-                                    'A6': [('A1', 2), ('A2', 2), ('A3', 2)],
-                                    'A7': [('A3', 2)], 'A8': [('A2', 2)],
-                                    'A9': [('A3', 2)]}
+        self.digest_to_construct = {'A1': [('A1', 2), ('A2', 2)],
+                                    'A2': [('A1', 2)],
+                                    'A3': [('A1', 2), ('A2', 2), ('A3', 2)],
+                                    'A4': [('A3', 2)], 'A5': [('A2', 2)],
+                                    'A6': [('A3', 2)]}
 
         self.reagent_to_construct = {'A1': [('A1', 11), ('A2', 11),
                                             ('A3', 11)],
                                      'A5': [('A1', 2), ('A2', 2), ('A3', 2)],
                                      'A6': [('A1', 1), ('A2', 1), ('A3', 1)]}
-        
+
         self.competent_source_to_dest = {"A4": [("A1", 50), ("A2", 50),
                                                 ("A3", 50)],
                                          "A5": [("A4", 50), ("A5", 50),
@@ -394,9 +389,9 @@ class BioBricksInputTestCase(unittest.TestCase):
                     self.reagents_df)
         self.assertDictEqual(dict1, self.source_to_digest)
         self.assertDictEqual(dict2, self.reagent_to_digest)
-        self.assertDictEqual(dict3, self.digest_to_storage)
-        self.assertDictEqual(dict4, self.digest_to_construct)
-        self.assertDictEqual(dict5, self.reagent_to_construct)
+        self.assertDictEqual(dict3, self.digest_to_construct)
+        self.assertDictEqual(dict4, self.reagent_to_construct)
+        self.assertDictEqual(dict5, self.reagents_dict)
 
     def test_create_tranformation_dicts(self):
         dict1, dict2, dict3, dict4, df = bbinput.create_tranformation_dicts(

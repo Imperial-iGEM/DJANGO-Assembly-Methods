@@ -69,10 +69,6 @@ class ParserSBOL:
         # Sample constructs
         if len(all_constructs) < num_samples:
             num_samples = len(all_constructs)
-            print(
-                "Number of constructs specified is greater than number "
-                "of constructs contained within SBOL Document provided."
-            )
             print("All constructs will be assembled.")
         sampled = sample(all_constructs, num_samples)
         # Display number of Component Definitions to be constructed

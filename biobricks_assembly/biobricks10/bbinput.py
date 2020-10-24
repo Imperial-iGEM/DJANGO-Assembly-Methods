@@ -86,63 +86,63 @@ def biobricks(
                                           'bbassembly10template.py')
     transformation_template_path = os.path.join(template_dir_path,
                                                 'bbtransformationtemplate.py')
-    # try:
-    # Creates constructs, parts, reagents, and digest dataframes
-    constructs, dest_well_list = get_constructs(construct_path)
-    parts = get_parts(part_path, constructs)
-    reagents, reagents_well_list, mm_df = get_reagents_wells(
-        constructs, parts)
-    digest_loc, parts_df = get_digests(
-        constructs, parts, reagents)
+    try:
+        # Creates constructs, parts, reagents, and digest dataframes
+        constructs, dest_well_list = get_constructs(construct_path)
+        parts = get_parts(part_path, constructs)
+        reagents, reagents_well_list, mm_df = get_reagents_wells(
+            constructs, parts)
+        digest_loc, parts_df = get_digests(
+            constructs, parts, reagents)
 
-    # Creates assembly dictionaries to be used in assembly protocol
-    source_to_digest, reagent_to_digest, \
-        digest_to_construct, reagent_to_construct, \
-        reagents_dict = create_assembly_dicts(constructs, parts, digest_loc,
-                                              reagents)
+        # Creates assembly dictionaries to be used in assembly protocol
+        source_to_digest, reagent_to_digest, \
+            digest_to_construct, reagent_to_construct, \
+            reagents_dict = create_assembly_dicts(constructs, parts,
+                                                  digest_loc, reagents)
 
-    # Creates and saves assembly protocol
-    assembly_path = create_assembly_protocol(
-        assembly_template_path, full_output_path, source_to_digest,
-        reagent_to_digest, digest_to_construct,
-        reagent_to_construct, reagents_dict, p10_mount=p10_mount,
-        p10_type=p10_type, well_plate_type=well_plate,
-        tube_rack_type=tube_rack, thermocycle=thermocycle)
-    output_paths = []
-    output_paths.append(assembly_path)
+        # Creates and saves assembly protocol
+        assembly_path = create_assembly_protocol(
+            assembly_template_path, full_output_path, source_to_digest,
+            reagent_to_digest, digest_to_construct,
+            reagent_to_construct, reagents_dict, p10_mount=p10_mount,
+            p10_type=p10_type, well_plate_type=well_plate,
+            tube_rack_type=tube_rack, thermocycle=thermocycle)
+        output_paths = []
+        output_paths.append(assembly_path)
 
-    # Creates transformation dictionaries to be used in transformation
-    # protocol
-    competent_source_to_dest, control_source_to_dest, \
-        assembly_source_to_dest, water_source_to_dest, transform_df \
-        = create_tranformation_dicts(constructs, water_well='A1',
-                                        controls_per_cons=False)
+        # Creates transformation dictionaries to be used in transformation
+        # protocol
+        competent_source_to_dest, control_source_to_dest, \
+            assembly_source_to_dest, water_source_to_dest, transform_df \
+            = create_tranformation_dicts(constructs, water_well='A1',
+                                            controls_per_cons=False)
 
-    # Creates and saves transformation protocol
-    transform_path = create_transformation_protocol(
-        transformation_template_path, full_output_path,
-        competent_source_to_dest,
-        control_source_to_dest, assembly_source_to_dest,
-        water_source_to_dest,
-        p10_mount=p10_mount, p300_mount=p300_mount, p10_type=p10_type,
-        p300_type=p300_type, well_plate_type=well_plate,
-        transformation_plate_type=transformation_plate,
-        tube_rack_type=tube_rack, soc_plate_type=soc_plate)
-    output_paths.append(transform_path)
-    labwareDf = pd.DataFrame(
-        data={'name': list(labware_dict.keys()),
-                'definition': list(labware_dict.values())})
+        # Creates and saves transformation protocol
+        transform_path = create_transformation_protocol(
+            transformation_template_path, full_output_path,
+            competent_source_to_dest,
+            control_source_to_dest, assembly_source_to_dest,
+            water_source_to_dest,
+            p10_mount=p10_mount, p300_mount=p300_mount, p10_type=p10_type,
+            p300_type=p300_type, well_plate_type=well_plate,
+            transformation_plate_type=transformation_plate,
+            tube_rack_type=tube_rack, soc_plate_type=soc_plate)
+        output_paths.append(transform_path)
+        labwareDf = pd.DataFrame(
+            data={'name': list(labware_dict.keys()),
+                    'definition': list(labware_dict.values())})
 
-    # Saves dataframes in metainformation csv
-    dfs_to_csv(
-        os.path.join(full_output_path, 'bb_metainformation.csv'),
-        index=False, PARTS_INFO=parts_df, REAGENTS=reagents,
-        MASTER_MIX=mm_df, DIGESTS=digest_loc, CONSTRUCTS=constructs,
-        LABWARE=labwareDf)
-    output_paths.append(
-        os.path.join(full_output_path, 'bb_metainformation.csv'))
+        # Saves dataframes in metainformation csv
+        dfs_to_csv(
+            os.path.join(full_output_path, 'bb_metainformation.csv'),
+            index=False, PARTS_INFO=parts_df, REAGENTS=reagents,
+            MASTER_MIX=mm_df, DIGESTS=digest_loc, CONSTRUCTS=constructs,
+            LABWARE=labwareDf)
+        output_paths.append(
+            os.path.join(full_output_path, 'bb_metainformation.csv'))
 
-    '''except Exception as e:
+    except Exception as e:
         # Handles error and writes to file
         output_paths = []
         error_path = os.path.join(full_output_path, 'BioBricks_error.txt')
@@ -151,7 +151,7 @@ def biobricks(
                 "Failed to generate BioBricks scripts: {}\n".format(str(e)))
         output_paths.append(error_path)
     finally:
-        return output_paths'''
+        return output_paths
 
 
 def get_constructs(
@@ -918,4 +918,5 @@ part_path = [
     'C:/Users/gabri/Downloads/parts_1_b.csv']
 biobricks(output_folder, construct_path, part_path, thermocycle=True,
           **labware_dict)
+
 '''

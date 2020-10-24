@@ -33,7 +33,7 @@ class TestSbolParserApi(TestCase):
         return
 
     def test_getRootComponentDefinitions(self):
-        for cd in self.parser.getRootComponentDefinitions():
+        for cd in self.parser.get_root_compdefs():
             self.assertEquals(cd.displayId, 'Dummy')
 
     '''def test_getListOfParts(self):
@@ -52,14 +52,14 @@ class TestSbolParserApi(TestCase):
 
     def test_getSortedListOfParts(self):
         listOfConstructs = self.generate_dummy_components()
-        sorted_parts = self.parser.getSortedListOfParts(listOfConstructs)
+        sorted_parts = self.parser.get_sorted_parts(listOfConstructs)
         assert sorted_parts[0].displayId < sorted_parts[1].displayId, f'Sorting of component definitions not working, {sorted_parts[0].displayId} is not smaller than {sorted_parts[1]}'
 
     def test_getDictOfComponents(self):
         listOfConstructs = self.generate_dummy_components()
         return
 
-        constructs_dict = self.parser.getDictOfComponents(listOfConstructs)  
+        constructs_dict = self.parser.get_comp_dict(listOfConstructs)  
         for key in constructs_dict.keys():
             assert type(key) == str, "Keys in dictionary of components not 'str' type displayId"
             assert constructs_dict[key] == list, "Values in dictionary of components not list"

@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='IBM1252'?>
+<?xml version='1.0' ?>
 <rdf:RDF xmlns:pr="http://www.dummy.org/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sbol="http://sbols.org/v2#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:prov="http://www.w3.org/ns/prov#">
   <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS3_Prefix">
     <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3_Prefix"/>

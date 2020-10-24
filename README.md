@@ -1,4 +1,10 @@
-# DJANGO-Assembly-Methods 🔬
+<p align="center">
+  <img src="https://github.com/Imperial-iGEM/igem_frontend/blob/master/public/ourlogo.png" height="200"/>
+</p>
+
+# SoapLabs Backend
+
+## DJANGO-Assembly-Methods 🔬
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Imperial-iGEM/DJANGO-Assembly-Methods/Django%20CI)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Imperial-iGEM/DJANGO-Assembly-Methods)

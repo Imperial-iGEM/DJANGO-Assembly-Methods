@@ -82,6 +82,7 @@ We implemented graphql technologies into our Django Backend with the python libr
 Because of this we only have 1 endpoint "/graphql"
 
 ## linkerList
+> Note Full docs are available by clicking docs at top right of http://app.soaplab.io/graphql
 
 One graphql mutation present at this endpoint is:
 
@@ -93,6 +94,7 @@ The only argument sbolFileString is of type String; contains an SBOL file in str
 The only output is an array LinkerList; an array containing strings of each Part/Linker name inside the SBOL file
 
 ## Final Spec
+> Note Full docs are available by clicking docs at top right of http://app.soaplab.io/graphql
 
 The only other mutation present at the graphql endpoint is:
 

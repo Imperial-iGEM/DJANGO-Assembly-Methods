@@ -373,8 +373,6 @@ class BioBricksInputTestCase(unittest.TestCase):
 
     def test_get_digests(self):
         digests, parts = bbinput.get_digests(self.constructs_df, self.parts_df,
-                                             self.reagents_wells,
-                                             self.constructs_wells,
                                              self.reagents_df)
         for col in digests.columns:
             self.assertListEqual(digests[col].to_list(),

@@ -152,7 +152,8 @@ class ParserSBOL:
             for vc in obj.variableComponents:
                 if vc.variantDerivations is not None:
                     for vd in vc.variantDerivations:
-                        child_deriv = sbol_document.combinatorialderivations.get(vd)
+                        child_deriv = \
+                            sbol_document.combinatorialderivations.get(vd)
                         if (child_deriv
                                 is not None and child_deriv in combderivs):
                             combderivs.remove(child_deriv)
@@ -213,7 +214,7 @@ class ParserSBOL:
                 enumerated constructs.
         """
 
-        def add_children(
+        def _add_children(
             orig_template: ComponentDefinition,
             orig_comp: Component,
             new_parent: ComponentDefinition,
@@ -234,7 +235,7 @@ class ParserSBOL:
             new_comp = new_parent.components[orig_comp.displayId]
             new_comp.wasDerivedFrom = orig_comp.identity
             if children is None:
-                remove_constr_refs(new_parent, new_comp)
+                _remove_constr_refs(new_parent, new_comp)
                 for sa in new_parent.sequenceAnnotations:
                     if sa.component \
                             is not None and sa.component == new_comp.identity:
@@ -250,7 +251,7 @@ class ParserSBOL:
                     first = False
                 else:
                     # Create new component
-                    unique_id = get_unique_displayid(
+                    unique_id = _get_unique_displayid(
                         new_parent,
                         None,
                         child.displayId + "_Component", "1",
@@ -263,10 +264,11 @@ class ParserSBOL:
                     link.wasDerivedFrom = orig_comp.identity
                     # Create a new 'prev precedes link' constraint
                     if orig_template.hasUpstreamComponent(orig_comp):
-                        old_prev = orig_template.getUpstreamComponent(orig_comp)
+                        old_prev = \
+                            orig_template.getUpstreamComponent(orig_comp)
                         if old_prev.identity in new_parent.components:
                             new_prev = new_parent.components[old_prev.identity]
-                            unique_id = get_unique_displayid(
+                            unique_id = _get_unique_displayid(
                                 new_parent,
                                 None,
                                 new_parent.displayId + "_SequenceConstraint",
@@ -278,13 +280,15 @@ class ParserSBOL:
                                 new_parent.sequenceConstraints.create(unique_id)
                             new_seqconstr.subject = new_prev.identity
                             new_seqconstr.object = link.identity
-                            new_seqconstr.restriction = SBOL_RESTRICTION_PRECEDES
+                            new_seqconstr.restriction = \
+                                SBOL_RESTRICTION_PRECEDES
                     # Create new 'link precedes next' constraint
                     if orig_template.hasDownstreamComponent(orig_comp):
-                        old_next = orig_template.getDownstreamComponent(orig_comp)
+                        old_next = \
+                            orig_template.getDownstreamComponent(orig_comp)
                         if old_next.identity in new_parent.components:
                             new_next = new_parent.components[old_next.identity]
-                            unique_id = get_unique_displayid(
+                            unique_id = _get_unique_displayid(
                                 new_parent,
                                 None,
                                 new_parent.displayId + "_SeqeunceConstraint",
@@ -296,16 +300,17 @@ class ParserSBOL:
                                 new_parent.sequenceConstraints.create(unique_id)
                             new_seqconstr.subject = link.identity
                             new_seqconstr.object = new_next.identity
-                            new_seqconstr.restriction = SBOL_RESTRICTION_PRECEDES
+                            new_seqconstr.restriction = \
+                                SBOL_RESTRICTION_PRECEDES
 
-        def remove_constr_refs(
+        def _remove_constr_refs(
             new_parent: ComponentDefinition,
             new_comp: Component
         ):
             """Remove sequence constraints of the component in the component definition
             Args:
-                new_parent (ComponentDefinition): Component definition containing
-                    the new component.
+                new_parent (ComponentDefinition): Component definition
+                    containing the new component.
                 new_comp (Component): Component to remove sequence
                     constraints from.
             """
@@ -329,7 +334,7 @@ class ParserSBOL:
                     else:
                         new_parent.sequenceConstraints.remove(sc.identity)
 
-        def create_template_copy(
+        def _create_template_copy(
             template: ComponentDefinition,
             displayid: str,
             version: str
@@ -358,7 +363,7 @@ class ParserSBOL:
                 curr.access = c.access
                 curr.definition = c.definition
                 if prev is not None:
-                    unique_id = get_unique_displayid(
+                    unique_id = _get_unique_displayid(
                         template_copy,
                         None,
                         template_copy.displayId + "_SequenceConstraint",
@@ -377,7 +382,7 @@ class ParserSBOL:
                 c.wasDerivedFrom = component.identity
             return template_copy
 
-        def get_unique_displayid(
+        def _get_unique_displayid(
             comp: ComponentDefinition = None,
             derivation: CombinatorialDerivation = None,
             displayid: str = None,
@@ -461,8 +466,9 @@ class ParserSBOL:
                 else:
                     return displayid + str(i)
             elif data_type == "VariableComponent":
-                while displayid + str(i) \
-                        in [vc.displayId for vc in derivation.variableComponents]:
+                var_comps = \
+                    [vc.displayId for vc in derivation.variableComponents]
+                while displayid + str(i) in var_comps:
                     i += 1
                     displayid = displayid + str(i)
                 if i == 1:
@@ -472,7 +478,7 @@ class ParserSBOL:
             else:
                 raise ValueError("Invalid data type.")
 
-        def conc_children_displayid(
+        def _conc_children_displayid(
             children: List[ComponentDefinition]
         ) -> str:
             """Concatenate the names of the variant child components.
@@ -488,7 +494,7 @@ class ParserSBOL:
                 conc_displayid = conc_displayid + child.displayId
             return conc_displayid
 
-        def collect_variants(
+        def _collect_variants(
             vc: VariableComponent
         ) -> List[ComponentDefinition]:
             """Collect all variants within a variable component
@@ -516,7 +522,7 @@ class ParserSBOL:
                 variants.extend(self.enumerator(self.doc.get(derivation)))
             return variants
 
-        def group(
+        def _group(
             variants: List[ComponentDefinition],
             repeat: str
         ) -> List[List[ComponentDefinition]]:
@@ -538,14 +544,14 @@ class ParserSBOL:
                 groups.append([])
                 return groups
             groups.clear()
-            generate_combinations(groups, variants, 0, [])
+            _generate_combinations(groups, variants, 0, [])
             if repeat == "http://sbols.org/v2#oneOrMore":
                 return groups
             if repeat == "http://sbols.org/v2#zeroOrMore":
                 groups.append([])
                 return groups
 
-        def generate_combinations(
+        def _generate_combinations(
             groups: List[List[ComponentDefinition]],
             variants: List[ComponentDefinition],
             i: int,
@@ -564,27 +570,29 @@ class ParserSBOL:
                     groups.add(sets)
                 return
             no = sets.copy()
-            generate_combinations(groups, variants, i + 1, no)
+            _generate_combinations(groups, variants, i + 1, no)
             yes = sets.copy()
             yes.add(variants[i])
-            generate_combinations(groups, variants, i + 1, yes)
+            _generate_combinations(groups, variants, i + 1, yes)
 
         parents = []
         template = self.doc.getComponentDefinition(derivation.masterTemplate)
         template_copy =\
-            create_template_copy(template, template.displayId + "_Var", "1")
+            _create_template_copy(template, template.displayId + "_Var", "1")
         parents.append(template_copy)
         for vc in derivation.variableComponents:
             new_parents = []
             for parent in parents:
-                for children in group(
-                        collect_variants(vc),
+                for children in _group(
+                        _collect_variants(vc),
                         "http://sbols.org/v2#one"):
-                    var_displayid = conc_children_displayid(children)
+                    var_displayid = _conc_children_displayid(children)
+                    compdefs = \
+                        [cd.identity for cd in self.doc.componentDefinitions]
                     if parent.persistentIdentity + "_" + var_displayid + "/1" \
-                            not in [cd.identity for cd in self.doc.componentDefinitions]:
+                            not in compdefs:
                         # Create parent copy
-                        unique_id = get_unique_displayid(
+                        unique_id = _get_unique_displayid(
                             None,
                             None,
                             parent.displayId + "_" + var_displayid,
@@ -592,7 +600,7 @@ class ParserSBOL:
                             "CD",
                             self.doc
                         )
-                        new_parent = create_template_copy(
+                        new_parent = _create_template_copy(
                             parent,
                             unique_id,
                             "1"
@@ -604,7 +612,7 @@ class ParserSBOL:
                             parent.persistentIdentity + "_" + var_displayid + "/1"
                         )
                     # Add children
-                    add_children(
+                    _add_children(
                         template,
                         template.components[vc.variable],
                         new_parent,
@@ -674,7 +682,7 @@ class ParserSBOL:
             List[str]: List of display IDs of parts.
         """
 
-        def get_ext_displayid(
+        def _get_ext_displayid(
             combderiv: CombinatorialDerivation
         ) -> List[str]:
             """Get the display ID extensions of an enumerated combinatorial derivation.
@@ -698,7 +706,7 @@ class ParserSBOL:
                     template = combderiv.masterTemplate
                     ext_displayids.extend(
                         [template.displayId + edi
-                            for edi in get_ext_displayid(combderiv)]
+                            for edi in _get_ext_displayid(combderiv)]
                     )
             return ext_displayids
 
@@ -740,7 +748,7 @@ class ParserSBOL:
                         self.doc.getComponentDefinition(deriv.masterTemplate)
                     parts.extend(
                         [template.displayId + ext_displayid
-                            for ext_displayid in get_ext_displayid(deriv)]
+                            for ext_displayid in _get_ext_displayid(deriv)]
                     )
         parts = list(dict.fromkeys(parts))
         # Get list of linkers from linkerfile
@@ -823,7 +831,8 @@ class ParserSBOL:
             num_plate (int): Number of plates to be generated (default = 1).
             plate_class (plateo.Plate):
                 Class of plateo plate (default = Plate96).
-            max_construct_wells (int): Maximum number of filled wells on a plate.
+            max_construct_wells (int): Maximum number of filled
+                wells on a plate.
             part_info (Dict[str, Dict[str, Union[str, int, float]]]):
                 Dictionary of parts and associated information
         Returns:
@@ -971,121 +980,6 @@ class ParserSBOL:
                 all_content.append(well.data[content_name])
         return all_content
 
-    def get_min_basic_parts(
-        self,
-        all_constructs: List[ComponentDefinition]
-    ) -> int:
-        """Get the minimum number of Part/Linker pairs required to perform
-        BASIC assembly for all constructs.
-        Args:
-            all_constructs (list): List of all constructs as component
-                definitions.
-        Returns:
-            int: Number of Part/Linker paris for BASIC assembly.
-        """
-        min_val = 0
-        num_parts = 0
-        for cd in all_constructs:
-            components = cd.components
-            num_parts = len(components) // 2
-            if min_val < num_parts:
-                min_val = num_parts
-        return min_val
-
-    def get_construct_csv_header(
-        self,
-        min_basic_parts: int
-    ) -> List[str]:
-        """Create header for Construct CSV for DNABot
-        Args:
-            min_basic_parts (int): Minimum number of of Part/Linker
-                pairs required to perform BASIC assembly for all constructs.
-        Returns:
-            List[str]: List of strings describing header for Construct CSV.
-        """
-        header = ["Well"]
-        for i in range(1, min_basic_parts + 1):
-            header.extend(["Linker %d" % i, "Part %d" % i])
-        return header
-
-    def get_comp_dict_from_plate(
-        self,
-        construct_plate: plateo.Plate,
-        assembly: str
-    ) -> Dict[str, List[ComponentDefinition]]:
-        """Get a dictionary of wells containing components comprising
-        the final constructs (as component definitions). Structure of
-        dictionary depends on assembly type.
-        Args:
-            construct_plate (plateo.Plate): Plateo plate containing constructs.
-            assembly (str): Type of assembly.
-        Returns:
-            dict: Dictionary of wells containing components.
-        """
-        # TODO: Perform checks on all constructs instead of sampled?
-        comp_dict = {}
-        for wellname, well in construct_plate.wells.items():
-            for key, value in well.data.items():
-                # Move linker at last position to front of the list
-                pri_struct = value.getPrimaryStructure()
-                if assembly == "basic":
-                    # Check part-linker order
-                    if not self.is_linkers_order_correct(value):
-                        # Shift linker to front
-                        pri_struct.insert(0, pri_struct.pop())
-                    comp_dict[wellname] = pri_struct
-                elif assembly == "moclo":
-                    comp_dict[wellname] = {
-                        'construct': value,
-                        'parts': pri_struct
-                    }
-                elif assembly == "bio_bricks":
-                    # TODO: Confirm whether construct name is needed
-                    # Check if valid biobrick construct
-                    if self.validate_bio_bricks_construct(value):
-                        # Check if first component is a plasmid vector:
-                        plasmid_vector = "http://identifiers.org/so/SO:0000755"
-                        if plasmid_vector in pri_struct[0].roles:
-                            # Shift backbone to last component
-                            pri_struct.insert(2, pri_struct.pop(0))
-                        comp_dict[wellname] = {
-                            'construct': value,
-                            'parts': pri_struct
-                        }
-        return comp_dict
-
-    def get_list_from_comp_dict(
-        self,
-        comp_dict: Dict[str, ComponentDefinition],
-        assembly: str
-    ) -> List[str]:
-        """Get a concatenated list of wellname and components (as display ID)
-        comprising the final construct from the dictionary of wells containing
-        constructs.
-        Args:
-            comp_dict: Dictionary of wells containing constructs.
-            assembly (str): Type of assembly.
-        Returns:
-            List[str]: List of wellnames and components (as display ID).
-        """
-        comp_list = []
-        for k, v in comp_dict.items():
-            if assembly == "bio_bricks":
-                comp_list.append([
-                    v['construct'].displayId,
-                    k,
-                    *(x.displayId for x in v['parts'])
-                ])
-            elif assembly == "basic":
-                comp_list.append([k, *(x.displayId for x in v)])
-            elif assembly == "moclo":
-                comp_list.append([
-                    k,
-                    v['construct'].displayId,
-                    *(x.displayId for x in v['parts'])
-                ])
-        return comp_list
-
     def get_construct_df_from_plate(
         self,
         construct_plate: plateo.Plate,
@@ -1098,18 +992,234 @@ class ParserSBOL:
         Returns:
             pd.DataFrame: Dataframe of constructs.
         """
+
+        def _get_linker_names():
+            """Open standard linker document and extract all displayIds
+            of linkers.
+            """
+            # Get list of linkers from linkerfile
+            linkers = self.get_root_compdefs(self.linker_file)
+            linkers = [linker.displayId for linker in linkers]
+            return linkers
+
+        def _is_linker(
+            comp: ComponentDefinition,
+            linkers: List[str]
+        ):
+            """Compare each part displayId to available linkers.
+            Args:
+                comp (ComponentDefinition): Component definition to check
+                linkers List[str]: List of linker display IDs
+            """
+            if comp.displayId in linkers:
+                return True
+            return False
+
+        def _is_linkers_order_correct(
+            construct: ComponentDefinition,
+        ) -> bool:
+            """Check input construct components has the
+            order of -linker-part-linker...
+            Args:
+                construct (ComponentDefinition): Constructs to check.
+            Returns:
+                bool: True if linker order is correct.
+            Raises:
+                ValueError: If construct does not contain sufficient parts
+                    and linkers or order does not alternate
+            """
+
+            linkers = _get_linker_names()
+
+            # Check if even number of parts
+            if np.mod(len(construct.components), 2) != 0:
+                raise ValueError(
+                    "Construct contains insufficient number"
+                    "of parts or linkers"
+                )
+
+            pri_struct = construct.getPrimaryStructure()
+
+            is_first_comp_linker = False
+            is_prev_comp_linker = False
+            for i, comp in enumerate(pri_struct):
+                is_curr_comp_linker = _is_linker(comp, linkers)
+                # initialise
+                if i == 0:
+                    is_first_comp_linker = is_curr_comp_linker
+                    is_prev_comp_linker = is_curr_comp_linker
+                    continue
+                if is_prev_comp_linker == is_curr_comp_linker:
+                    raise ValueError("Order of components is not alternating")
+                is_prev_comp_linker = is_curr_comp_linker
+            if is_first_comp_linker:
+                return True
+            else:
+                return False
+
+        def _validate_bio_bricks_construct(
+            construct: ComponentDefinition
+        ) -> bool:
+            """Check that biobricks construct has the structure
+            plasmid-prefix-suffix.
+            Args:
+                construct (ComponentDefinition): Construct to check.
+            Returns:
+                bool: True if construct structure is correct.
+            Raises:
+                ValueError: If number of components is not 3,
+                    construct does not contain plasmid vector, or
+                    backbone is between parts.
+            """
+            pri_struct = construct.getPrimaryStructure()
+            # Check that there are only 3 parts in the construct
+            if len(pri_struct) != 3:
+                raise ValueError(
+                    "There can only be 3 components in each construct"
+                )
+            # Check that construct contains a backbone
+            contains_plasmid = False
+            plasmid_vector = "http://identifiers.org/so/SO:0000755"
+            for cd in pri_struct:
+                if plasmid_vector in cd.roles:
+                    contains_plasmid = True
+            if not contains_plasmid:
+                raise ValueError(
+                    "Construct must contain plasmid vector"
+                )
+            # Check that backbone is not between parts
+            mid_comp = pri_struct[1]
+            if plasmid_vector in mid_comp.roles:
+                raise ValueError(
+                    "Backbone should not be between parts"
+                )
+            return True
+
+        def _get_min_basic_parts(
+            all_constructs: List[ComponentDefinition]
+        ) -> int:
+            """Get the minimum number of Part/Linker pairs required to perform
+            BASIC assembly for all constructs.
+            Args:
+                all_constructs (list): List of all constructs as component
+                    definitions.
+            Returns:
+                int: Number of Part/Linker paris for BASIC assembly.
+            """
+            min_val = 0
+            num_parts = 0
+            for cd in all_constructs:
+                components = cd.components
+                num_parts = len(components) // 2
+                if min_val < num_parts:
+                    min_val = num_parts
+            return min_val
+
+        def _get_construct_csv_header(
+            min_basic_parts: int
+        ) -> List[str]:
+            """Create header for Construct CSV for DNABot
+            Args:
+                min_basic_parts (int): Minimum number of of Part/Linker
+                    pairs required to perform BASIC assembly
+                    for all constructs.
+            Returns:
+                List[str]: List of strings describing header for Construct CSV.
+            """
+            header = ["Well"]
+            for i in range(1, min_basic_parts + 1):
+                header.extend(["Linker %d" % i, "Part %d" % i])
+            return header
+
+        def _get_comp_dict_from_plate(
+            construct_plate: plateo.Plate,
+            assembly: str
+        ) -> Dict[str, List[ComponentDefinition]]:
+            """Get a dictionary of wells containing components comprising
+            the final constructs (as component definitions). Structure of
+            dictionary depends on assembly type.
+            Args:
+                construct_plate (plateo.Plate): Plateo plate
+                    containing constructs.
+                assembly (str): Type of assembly.
+            Returns:
+                dict: Dictionary of wells containing components.
+            """
+            # TODO: Perform checks on all constructs instead of sampled?
+            comp_dict = {}
+            for wellname, well in construct_plate.wells.items():
+                for key, value in well.data.items():
+                    # Move linker at last position to front of the list
+                    pri_struct = value.getPrimaryStructure()
+                    if assembly == "basic":
+                        # Check part-linker order
+                        if not _is_linkers_order_correct(value):
+                            # Shift linker to front
+                            pri_struct.insert(0, pri_struct.pop())
+                        comp_dict[wellname] = pri_struct
+                    elif assembly == "moclo":
+                        comp_dict[wellname] = {
+                            'construct': value,
+                            'parts': pri_struct
+                        }
+                    elif assembly == "bio_bricks":
+                        # TODO: Confirm whether construct name is needed
+                        # Check if valid biobrick construct
+                        if _validate_bio_bricks_construct(value):
+                            # Check if first component is a plasmid vector:
+                            plasmid_vector = "http://identifiers.org/so/SO:0000755"
+                            if plasmid_vector in pri_struct[0].roles:
+                                # Shift backbone to last component
+                                pri_struct.insert(2, pri_struct.pop(0))
+                            comp_dict[wellname] = {
+                                'construct': value,
+                                'parts': pri_struct
+                            }
+            return comp_dict
+
+        def _get_list_from_comp_dict(
+            comp_dict: Dict[str, ComponentDefinition],
+            assembly: str
+        ) -> List[str]:
+            """Get a concatenated list of wellname and components (as display ID)
+            comprising the final construct from the dictionary of wells
+            containing constructs.
+            Args:
+                comp_dict: Dictionary of wells containing constructs.
+                assembly (str): Type of assembly.
+            Returns:
+                List[str]: List of wellnames and components (as display ID).
+            """
+            comp_list = []
+            for k, v in comp_dict.items():
+                if assembly == "bio_bricks":
+                    comp_list.append([
+                        v['construct'].displayId,
+                        k,
+                        *(x.displayId for x in v['parts'])
+                    ])
+                elif assembly == "basic":
+                    comp_list.append([k, *(x.displayId for x in v)])
+                elif assembly == "moclo":
+                    comp_list.append([
+                        k,
+                        v['construct'].displayId,
+                        *(x.displayId for x in v['parts'])
+                    ])
+            return comp_list
+
         all_comps = \
             self.get_all_content_from_plate(construct_plate, 'construct')
         comp_dict = \
-            self.get_comp_dict_from_plate(construct_plate, assembly)
+            _get_comp_dict_from_plate(construct_plate, assembly)
         comp_list = \
-            self.get_list_from_comp_dict(comp_dict, assembly)
+            _get_list_from_comp_dict(comp_dict, assembly)
         # Create sparse array from list
         sparr = pd.arrays.SparseArray(comp_list)
         if assembly == "basic":
             min_basic_parts = \
-                self.get_min_basic_parts(all_comps)
-            header = self.get_construct_csv_header(min_basic_parts)
+                _get_min_basic_parts(all_comps)
+            header = _get_construct_csv_header(min_basic_parts)
             # Create df from sparr
             df = pd.DataFrame(data=sparr, columns=header)
         elif assembly == "moclo":
@@ -1151,39 +1261,6 @@ class ParserSBOL:
             )
             self.construct_csv_paths.append(filepath)
 
-    def is_linker(
-        self,
-        part: ComponentDefinition,
-    ) -> bool:
-        """Check whether a part is a linker.
-        Args:
-            part (ComponentDefinition): Part to check.
-        Returns:
-            bool: True if part is a linker. False otherwise.
-        """
-        linkers = self.get_root_compdefs(self.linker_file)
-        if part.identity in [linker.identity for linker in linkers]:
-            return True
-        else:
-            return False
-
-    def get_linker_sp(
-        self,
-        linker: ComponentDefinition,
-    ) -> List[ComponentDefinition]:
-        """Get linker prefixes and suffixes.
-        Args:
-            linker (ComponentDefinition): Linker to get prefix and suffix.
-        Returns:
-            List[ComponentDefinition]: Linker prefix and suffix (as
-                component definitions).
-        """
-        linkersp = []
-        for component in linker.components:
-            linkersp.append(
-                self.doc.getComponentDefinition(component.definition))
-        return linkersp
-
     def convert_linker_to_sp(
         self,
         part_list: List[ComponentDefinition],
@@ -1197,62 +1274,45 @@ class ParserSBOL:
             List[ComponentDefinition]: List of parts with linkers
                 converted into linker prefixes and suffixes.
         """
+
+        def _is_linker(
+            part: ComponentDefinition,
+        ) -> bool:
+            """Check whether a part is a linker.
+            Args:
+                part (ComponentDefinition): Part to check.
+            Returns:
+                bool: True if part is a linker. False otherwise.
+            """
+            linkers = self.get_root_compdefs(self.linker_file)
+            if part.identity in [linker.identity for linker in linkers]:
+                return True
+            else:
+                return False
+
+        def _get_linker_sp(
+            linker: ComponentDefinition,
+        ) -> List[ComponentDefinition]:
+            """Get linker prefixes and suffixes.
+            Args:
+                linker (ComponentDefinition): Linker to get prefix and suffix.
+            Returns:
+                List[ComponentDefinition]: Linker prefix and suffix (as
+                    component definitions).
+            """
+            linkersp = []
+            for component in linker.components:
+                linkersp.append(
+                    self.doc.getComponentDefinition(component.definition))
+            return linkersp
+
         new_part_list = []
         for part in part_list:
-            if self.is_linker(part):
-                new_part_list.extend(self.get_linker_sp(part))
+            if _is_linker(part):
+                new_part_list.extend(_get_linker_sp(part))
             else:
                 new_part_list.append(part)
         return new_part_list
-
-    def get_content_dict_from_plate(
-        self,
-        plate: plateo.Plate,
-        content_name: str
-    ) -> Dict[str, Tuple[ComponentDefinition, float]]:
-        """Get the contents of a well based on well data.
-        Args:
-            plate (plate.Plate): Plate to get well
-                content from.
-            content_name (str): Type of content in well ("construct"
-                or "part).
-        Returns:
-            Dict[str, Tuple[ComponentDefinition, float]]: Dictionary
-                of well content with wellname as keys, and component
-                definition of the part or construct and concentration
-                as values.
-        """
-        # TODO: Add option to include content vol/qty?
-        content_dict = {}
-        for wellname, well in plate.wells.items():
-            if content_name in well.data.keys():
-                cd = well.data[content_name]
-                if "concentration" in well.data.keys():
-                    conc = well.data['concentration']
-                    if conc == 0:
-                        conc = np.nan
-                else:
-                    conc = np.nan
-                content_dict[wellname] = (cd, conc)
-        return content_dict
-
-    def get_list_from_part_dict(
-        self,
-        part_dict: Dict[str, Tuple[ComponentDefinition, float]]
-    ) -> List[str]:
-        """Convert a dictionary of well contents into a list.
-        Args:
-            part_dict (Dict[str, Tuple[ComponentDefinition, float]]):
-                Dictionary of well contents in a plate.
-        Returns:
-            List[str]: Formatted list of well contents.
-        """
-        part_list = []
-        for k, v in part_dict.items():
-            cd = v[0]
-            conc = v[1]
-            part_list.append([cd.displayId, k, conc])
-        return part_list
 
     def get_part_linker_df_from_plate(
         self,
@@ -1266,12 +1326,60 @@ class ParserSBOL:
             pd.DataFrame: Dataframe of part/linkers and their associated
                 wellname and concentration.
         """
+
+        def _get_content_dict_from_plate(
+            plate: plateo.Plate,
+            content_name: str
+        ) -> Dict[str, Tuple[ComponentDefinition, float]]:
+            """Get the contents of a well based on well data.
+            Args:
+                plate (plate.Plate): Plate to get well
+                    content from.
+                content_name (str): Type of content in well ("construct"
+                    or "part).
+            Returns:
+                Dict[str, Tuple[ComponentDefinition, float]]: Dictionary
+                    of well content with wellname as keys, and component
+                    definition of the part or construct and concentration
+                    as values.
+            """
+            # TODO: Add option to include content vol/qty?
+            content_dict = {}
+            for wellname, well in plate.wells.items():
+                if content_name in well.data.keys():
+                    cd = well.data[content_name]
+                    if "concentration" in well.data.keys():
+                        conc = well.data['concentration']
+                        if conc == 0:
+                            conc = np.nan
+                    else:
+                        conc = np.nan
+                    content_dict[wellname] = (cd, conc)
+            return content_dict
+
+        def _get_list_from_part_dict(
+            part_dict: Dict[str, Tuple[ComponentDefinition, float]]
+        ) -> List[str]:
+            """Convert a dictionary of well contents into a list.
+            Args:
+                part_dict (Dict[str, Tuple[ComponentDefinition, float]]):
+                    Dictionary of well contents in a plate.
+            Returns:
+                List[str]: Formatted list of well contents.
+            """
+            part_list = []
+            for k, v in part_dict.items():
+                cd = v[0]
+                conc = v[1]
+                part_list.append([cd.displayId, k, conc])
+            return part_list
+
         header = ["Part/linker", "Well", "Part concentration (ng/uL)"]
-        content_dict = self.get_content_dict_from_plate(
+        content_dict = _get_content_dict_from_plate(
             part_plate,
             "part"
         )
-        part_list = self.get_list_from_part_dict(content_dict)
+        part_list = _get_list_from_part_dict(content_dict)
         sparr = pd.arrays.SparseArray(part_list)
         df = pd.DataFrame(data=sparr, columns=header)
         return df
@@ -1290,7 +1398,14 @@ class ParserSBOL:
             part_info (Dict[str, Dict[str, Union[str, int, float]]]):
                 Dictionary of parts and associated information.
         """
-        def get_part_name(well: plateo.Well) -> str:
+        def _get_part_name(well: plateo.Well) -> str:
+            """Gets name of part contained in well. Used to generate platemap
+            from plateo plates.
+            Args:
+                well (plate.Well): Plateo Well object.
+            Returns:
+                str: DisplayId of part.
+            """
             if "part" in well.data.keys():
                 cd = well.data["part"]
                 name = cd.displayId
@@ -1348,7 +1463,7 @@ class ParserSBOL:
                 # Generate platemap
                 plate_to_platemap_spreadsheet(
                     plate,
-                    get_part_name,
+                    _get_part_name,
                     filepath,
                     headers=False
                 )
@@ -1366,107 +1481,3 @@ class ParserSBOL:
                     index=False
                 )
                 self.part_csv_paths.append(filepath)
-
-    def is_linkers_order_correct(
-        self,
-        construct: ComponentDefinition,
-    ) -> bool:
-        """Check input construct components has the
-        order of -linker-part-linker...
-        Args:
-            construct (ComponentDefinition): Constructs to check.
-        Returns:
-            bool: True if linker order is correct.
-        Raises:
-            ValueError: If construct does not contain sufficient parts
-                and linkers or order does not alternate
-        """
-
-        def _get_linker_names():
-            """Open standard linker document and extract all displayIds
-            of linkers.
-            """
-            # Get list of linkers from linkerfile
-            linkers = self.get_root_compdefs(self.linker_file)
-            linkers = [linker.displayId for linker in linkers]
-            return linkers
-
-        def _is_linker(
-            comp: ComponentDefinition,
-            linkers: List[str]
-        ):
-            """Compare each part displayId to available linkers.
-            Args:
-                comp (ComponentDefinition): Component definition to check
-                linkers List[str]: List of linker display IDs
-            """
-            if comp.displayId in linkers:
-                return True
-            return False
-
-        linkers = _get_linker_names()
-
-        # Check if even number of parts
-        if np.mod(len(construct.components), 2) != 0:
-            raise ValueError(
-                "Construct contains insufficient number"
-                "of parts or linkers"
-            )
-
-        pri_struct = construct.getPrimaryStructure()
-
-        is_first_comp_linker = False
-        is_prev_comp_linker = False
-        for i, comp in enumerate(pri_struct):
-            is_curr_comp_linker = _is_linker(comp, linkers)
-            # initialise
-            if i == 0:
-                is_first_comp_linker = is_curr_comp_linker
-                is_prev_comp_linker = is_curr_comp_linker
-                continue
-            if is_prev_comp_linker == is_curr_comp_linker:
-                raise ValueError("Order of components is not alternating")
-            is_prev_comp_linker = is_curr_comp_linker
-        if is_first_comp_linker:
-            return True
-        else:
-            return False
-
-    def validate_bio_bricks_construct(
-        self,
-        construct: ComponentDefinition
-    ) -> bool:
-        """Check that biobricks construct has the structure
-        plasmid-prefix-suffix.
-        Args:
-            construct (ComponentDefinition): Construct to check.
-        Returns:
-            bool: True if construct structure is correct.
-        Raises:
-            ValueError: If number of components is not 3,
-                construct does not contain plasmid vector, or
-                backbone is between parts.
-        """
-        pri_struct = construct.getPrimaryStructure()
-        # Check that there are only 3 parts in the construct
-        if len(pri_struct) != 3:
-            raise ValueError(
-                "There can only be 3 components in each construct"
-            )
-        # Check that construct contains a backbone
-        contains_plasmid = False
-        plasmid_vector = "http://identifiers.org/so/SO:0000755"
-        for cd in pri_struct:
-            if plasmid_vector in cd.roles:
-                contains_plasmid = True
-        if not contains_plasmid:
-            raise ValueError(
-                "Construct must contain plasmid vector"
-            )
-        # Check that backbone is not between parts
-        mid_comp = pri_struct[1]
-        if plasmid_vector in mid_comp.roles:
-            raise ValueError(
-                "Backbone should not be between parts"
-            )
-        return True

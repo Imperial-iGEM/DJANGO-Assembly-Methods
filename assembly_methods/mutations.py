@@ -84,8 +84,8 @@ class LinkerList(graphene.Mutation):
 
     def mutate(self, info, sbol_file_string):
         sbol_document = get_sbol_document(sbol_file_string)
-        parser = ParserSBOL(sbolDocument=sbol_document)
-        list_of_parts = parser.displayListOfParts()
+        parser = ParserSBOL(sbol_document=sbol_document)
+        list_of_parts = parser.display_parts()
         return LinkerList(linker_list=list_of_parts)
 
 
@@ -119,9 +119,9 @@ class FinalSpec(graphene.Mutation):
         os.makedirs(output_folder)
         part_types_dictionary = convert_part_info(linker_types)
         print('part_types_dictionary=', part_types_dictionary)
-        parser = ParserSBOL(sbolDocument=sbol_document, outdir=output_folder)
+        parser = ParserSBOL(sbol_document=sbol_document, outdir=output_folder)
         if assembly_type == "basic":
-            csv_links = parser.generate_csv(assembly=assembly_type, dictOfParts=part_types_dictionary)
+            csv_links = parser.generate_csv(assembly=assembly_type, part_info=part_types_dictionary)
             labware_dict = specifications_basic.labware_dict
             common_labware = labware_dict.common_labware
             links = dnabot_app.dnabot(output_folder=output_folder,
@@ -145,7 +145,7 @@ class FinalSpec(graphene.Mutation):
         elif assembly_type == "bio_bricks":
             labware_dict = specifications_bio_bricks.labware_dict
             common_labware = labware_dict.common_labware
-            csv_links = parser.generate_csv(assembly=assembly_type, dictOfParts=part_types_dictionary)
+            csv_links = parser.generate_csv(assembly=assembly_type, part_info=part_types_dictionary)
             links = bbinput.biobricks(output_folder=output_folder,
                                       construct_path=csv_links["construct_path"],
                                       part_path=csv_links["part_path"],
@@ -162,7 +162,7 @@ class FinalSpec(graphene.Mutation):
         elif assembly_type == "moclo":
             labware_dict = specifications_mo_clo.labware_dict
             common_labware = labware_dict.common_labware
-            csv_links = parser.generate_csv(assembly=assembly_type, dictOfParts=part_types_dictionary)
+            csv_links = parser.generate_csv(assembly=assembly_type, part_info=part_types_dictionary)
             links = moclo_transform_generator.moclo_function(
                 output_folder=output_folder,
                 construct_path=csv_links["construct_path"],

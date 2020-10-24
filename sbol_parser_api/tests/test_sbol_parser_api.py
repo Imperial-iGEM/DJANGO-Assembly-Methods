@@ -1,6 +1,6 @@
 import sbol2
 from django.test import TestCase
-from sbol_parser_api.sbolParserApi import ParserSBOL
+from sbol_parser_api.sbol_parser_api import ParserSBOL
 import numpy as np
 
 

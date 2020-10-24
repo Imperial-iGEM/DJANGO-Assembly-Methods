@@ -106,42 +106,114 @@ finalSpec(
   specificationsMoClo: InputSpecsMoClo
 ): FinalSpec
 ```
+### AssemblyType
 
-### Basic DNA Assembly 🦠
-You can acess the root of the end point on your local machine when the server is running by navigating to the link
-> http://127.0.0.1:8000/gr
+The first argument specifies the assembly type 'basic','moclo' or 'biobricks'
 
-and click on the `/Basic` end point or alternatively navigate directly to
-> http://127.0.0.1:8000/Basic
+example
+> 'basic'
 
-Whilst here you can post a request to our backend with the test parameters
+### linkerTypes
 
-`ethanol_well_for_stage_2 = "A11"`
+The second argument is a json object specifiying partid, concentration, well and location
 
-`deep_well_plate_stage_4 = "A1"`
+example
+> [{
+    "linkerId": "BBa_J23100",
+    "concentration": 50,
+    "plateNumber": 1,
+    "well": "A1"
+   },
+   {"linkerId": "BBa_J23106",
+    "concentration": 50,
+    "plateNumber": 1,
+    "well": "A2"
+   },
+   {"linkerId": "BBa_J23114",
+    "concentration": 50,
+    "plateNumber": 1,
+    "well": "A3"
+   },
+  }]
 
-`input_construct_path = ...` file can be downloaded from https://cutt.ly/kdF6sHw
+### sbolFileString
 
-`output_sources_paths = ...` file can be downloaded from https://cutt.ly/jdF6k15
+The third argument is the same as the only argument at the linkerList mutation, a stringified SBOL file
 
-Once these four attributes of the GUI's post request are filled we can submit the post request by clicking post in the bottom left corner. The object is returned with 4 additional attributes containing the output OT2 opentrons python API scripts
+example
+> https://github.com/Imperial-iGEM/DJANGO-Assembly-Methods/blob/master/examples/sbol/basic_linkers_standard.xml
 
-### Moclo DNA Assembly 🧑‍🔬
-You can acess the root of the end point on your local machine when the server is running by navigating to the link
-> http://127.0.0.1:8000/
+### specificationsBasic 🦠
 
-and click on the `/Moclo` end point or alternatively navigate directly to
-> http://127.0.0.1:8000/Moclo
+The fourth argument is a object called InputSpecsBASIC which has the format displayed withing the example input
 
-Whilst here you can post a request to our backend with the test parameters
+```python
+"specificationsBasic": {
+    "ethanolWellForStage2": "A1",
+		"deepWellPlateStage4": "A11",
+		"labwareDict": {
+			"commonLabware": {
+        "p10Mount": "right",
+        "p300Mount": "left",
+        "p10Type": "p10_single",
+        "p300Type": "p300_single",
+        "wellPlate": "biorad_96_wellplate_200ul_pcr"
+      },
+      "wellPlate": 1,
+      "reagentPlate": "2",
+      "magPlate": "String",
+      "tubeRack": "String",
+      "aluminumBlock": "String",
+      "beadContainer": "String",
+      "socPlate": "String",
+      "agarPlate": "String"
+    }
+  },
+```
 
-`combinations_limit = "single"`
+### specificationsBioBricks 🧑‍🔬
 
-`dna_plate_map_file = ...` file can be downloaded from https://cutt.ly/kdF59QR
+The fifth argument is a object called InputSpecsBioBricks which has the format displayed withing the example input
 
-`combinations file = ...` file can be downloaded from https://cutt.ly/PdF6qNP
+```python
+"specificationsBioBricks": {
+    "labwareDict": {
+      "commonLabware": {
+        "p10Mount": "right",
+        "p300Mount": "left",
+        "p10Type": "p10_single",
+        "p300Type": "p300_single",
+        "wellPlate": "biorad_96_wellplate_200ul_pcr"
+      },
+      "tubeRack": "opentrons_24_tuberack_nest_1.5ml_snapcap",
+      "socPlate": "usascientific_96_wellplate_2.4ml_deep",
+      "transformationPlate": "corning_96_wellplate_360ul_flat"
+    },
+    "thermocycle": true
+  }
+```
 
-Once these four attributes of the GUI's post request are filled we can submit the post request by clicking post in the bottom left corner. The object is returned with 2 additional attributes containing the output OT2 opentrons python API script as well as agar plate locations csv file
+### specificationsMoClo 🧑‍🔬
+
+The sixth argument is a object called InputSpecsMoClo which has the format displayed withing the example input
+
+```python
+"specificationsMoClo": {
+    "thermocycle": false, 
+    "labwareDict": {
+      "commonLabware": {
+        "p10Mount": "right",
+        "p300Mount": "left",
+        "p10Type": "p10_single",
+        "p300Type": "p300_single",
+        "wellPlate": "4ti_0960_framestar"
+      },
+      "trough": "4ti-0131",
+      "reagentPlate": "4ti_0960_framestar",
+      "agarPlate": "thermofisher_96_wellplate_180ul"
+    } 
+  }
+```
 
 ## Interested in Contributing 🤔💡
 

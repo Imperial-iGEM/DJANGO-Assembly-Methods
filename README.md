@@ -10,6 +10,9 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/Imperial-iGEM/DJANGO-Assembly-Methods)
 ![GitHub search hit counter](https://img.shields.io/github/search/Imperial-iGEM/DJANGO-Assembly-Methods/goto)
 
+hosted and available at:
+http://app.soaplab.io/graphql
+
 A django restframework with 2 endpoints `/Basic` and `/Moclo` to provide OT2 lab automation python scripts for the respective asembly methods from formatted CSV files
 
 ## getting set up 👨‍💻
@@ -48,6 +51,8 @@ Install our repositry dependencies inside requirements.txt
 Run server
 
 `$ python manage.py migrate`
+
+`$ python manage.py collectstatic`
 
 `$ python manage.py runserver`
 

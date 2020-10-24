@@ -79,7 +79,7 @@ class ParserSBOL:
         # Create plateo construct plates
         construct_plates = self.fill_plates(
             sampled,
-            "Construct",
+            "construct",
             num_runs,
             plateo.containers.Plate96,
             max_construct_wells
@@ -192,7 +192,7 @@ class ParserSBOL:
                 constructs.extend(self.enumerator(combderiv))
         else:
             for uri in comb_uris:
-                # Enumerate Combinatorial Derivations and add to allConstructs
+                # Enumerate Combinatorial Derivations and add to all_constructs
                 constructs.extend(self.enumerator(
                     self.doc.combinatorialderivations.get(uri)))
         print("Completed.")
@@ -773,7 +773,7 @@ class ParserSBOL:
                 all constructs to be assembled.
         """
         parts = []
-        # Add components from all component definitions in allConstructs
+        # Add components from all component definitions in all_constructs
         for construct in all_constructs:
             for component in construct.components:
                 parts.append(
@@ -790,8 +790,7 @@ class ParserSBOL:
         """Get a sorted list of parts (str) from the list of parts.
         Sort by sbol2 displayId
         Args:
-            parts (list): List of parts to be sorted. (generated
-                by getListOfConstructs)
+            parts (list): List of parts to be sorted.
         Returns:
             list: List of sorted parts (str)
         """

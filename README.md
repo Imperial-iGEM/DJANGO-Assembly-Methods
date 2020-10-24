@@ -66,7 +66,7 @@ For out unit tests we use Django's built in offering, before making a pull reque
 
 ## Ensure PEP8 Code Style Compatability 📚
 
-befor submitting a pull request to ensure high code quality navigate to the root folder of the project and run
+Before submitting a pull request to ensure high code quality navigate to the root folder of the project and run
 
 ```
 $ cd ..
@@ -74,7 +74,7 @@ $ autopep8 -r --diff DJANGO-Assembly-Methods/
 ```
 ## testing the RESTAPI 🧬
 
-once your server in running as we left our machine in the previous stage, we can use the GUI django rest framework provides to test out our two end points!
+Once your server in running as we left our machine in the previous stage, we can use the GUI django rest framework provides to test out our two end points!
 
 ### Graphql
 
@@ -110,7 +110,7 @@ finalSpec(
 ```
 ### AssemblyType
 
-The first argument specifies the assembly type 'basic','moclo' or 'biobricks'
+The first argument specifies the assembly type 'basic', 'moclo' or 'biobricks'
 
 example
 > 'basic'

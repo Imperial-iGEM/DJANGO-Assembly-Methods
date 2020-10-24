@@ -2,7 +2,7 @@
   <img src="https://github.com/Imperial-iGEM/igem_frontend/blob/master/public/ourlogo.png" height="200"/>
 </p>
 
-# SoapLabs Backend
+# SOAPLab Backend
 
 ## DJANGO-Assembly-Methods 🔬
 

@@ -1,0 +1,996 @@
+<?xml version="1.0" ?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:igem="http://wiki.synbiohub.org/wiki/Terms/igem#" xmlns:sbh="http://wiki.synbiohub.org/wiki/Terms/synbiohub#" xmlns:sbol="http://sbols.org/v2#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:om="http://www.ontology-of-units-of-measure.org/resource/om-2/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3_Prefix"/>
+    <sbol:displayId>L1RBS3_Prefix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>L1RBS3_Prefix</dcterms:title>
+    <dcterms:description>RBS Linkers Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS3_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1"/>
+    <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1_SBOLDesignerActivity/1"/>
+    <dcterms:title>BASIC_L3S2P21_J23101_RiboJ1</dcterms:title>
+    <dcterms:description></dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Pro_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Pro_Component"/>
+        <sbol:displayId>Pro_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="https://synbiohub.org/public/igem/BBa_J23101/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Ins_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Ins_Component"/>
+        <sbol:displayId>Ins_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/RiboJ1/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Ter_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Ter_Component"/>
+        <sbol:displayId>Ter_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="https://synbiohub.org/public/igem/BBa_K1401006/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation1/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation1"/>
+        <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation1</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation1_Range/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation1_Range"/>
+            <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation1_Range</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:start>70</sbol:start>
+            <sbol:end>104</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:Range>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Pro_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation2/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation2"/>
+        <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation2</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:GenericLocation rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation2/GenericLocation/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation2/GenericLocation"/>
+            <sbol:displayId>GenericLocation</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:GenericLocation>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Ins_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation"/>
+        <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation_Range/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation/BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation_Range"/>
+            <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1_SequenceAnnotation_Range</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:start>1</sbol:start>
+            <sbol:end>69</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:Range>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Ter_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceConstraint1/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceConstraint1"/>
+        <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1_SequenceConstraint1</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Pro_Component/1"/>
+        <sbol:object rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Ins_Component/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceConstraint/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/BASIC_L3S2P21_J23101_RiboJ1_SequenceConstraint"/>
+        <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1_SequenceConstraint</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Ter_Component/1"/>
+        <sbol:object rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/Pro_Component/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1Sequence/1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMS">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS"/>
+    <sbol:displayId>LMS</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>LMS</dcterms:title>
+    <dcterms:description>Methylated Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LMS/LMS_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS/LMS_S"/>
+        <sbol:displayId>LMS_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMS_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LMS/LMS_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS/LMS_P"/>
+        <sbol:displayId>LMS_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMS_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/LMS/LMS_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS/LMS_sc"/>
+        <sbol:displayId>LMS_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/LMS/LMS_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/LMS/LMS_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMS"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMS_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS_Suffix"/>
+    <sbol:displayId>LMS_Suffix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>LMS_Suffix</dcterms:title>
+    <dcterms:description>Methylated Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMS_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3_Suffix"/>
+    <sbol:displayId>L1RBS3_Suffix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>L1RBS3_Suffix</dcterms:title>
+    <dcterms:description>RBS Linkers Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS3_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMP_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP_Suffix"/>
+    <sbol:displayId>LMP_Suffix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>LMP_Suffix</dcterms:title>
+    <dcterms:description>Methylated Linker Suffix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMP_Suffix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMP">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP"/>
+    <sbol:displayId>LMP</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>LMP</dcterms:title>
+    <dcterms:description>Methylated Linker</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LMP/LMP_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP/LMP_P"/>
+        <sbol:displayId>LMP_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMP_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/LMP/LMP_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP/LMP_S"/>
+        <sbol:displayId>LMP_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMP_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/LMP/LMP_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP/LMP_sc"/>
+        <sbol:displayId>LMP_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/LMP/LMP_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/LMP/LMP_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMP"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="https://synbiohub.org/public/igem/BBa_J23108/1">
+    <sbol:persistentIdentity rdf:resource="https://synbiohub.org/public/igem/BBa_J23108"/>
+    <sbol:displayId>BBa_J23108</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasDerivedFrom rdf:resource="http://parts.igem.org/Part:BBa_J23108"/>
+    <prov:wasGeneratedBy rdf:resource="https://synbiohub.org/public/igem/igem2sbol/1"/>
+    <dcterms:title>BBa_J23108</dcterms:title>
+    <dcterms:description>constitutive promoter family member</dcterms:description>
+    <dcterms:created>2006-08-16T11:00:00Z</dcterms:created>
+    <dcterms:modified>2015-08-31T04:08:40Z</dcterms:modified>
+    <sbh:mutableProvenance>Later</sbh:mutableProvenance>
+    <sbh:topLevel rdf:resource="https://synbiohub.org/public/igem/BBa_J23108/1"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/james"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/myers"/>
+    <sbh:mutableDescription>Later</sbh:mutableDescription>
+    <igem:discontinued>false</igem:discontinued>
+    <igem:dominant>true</igem:dominant>
+    <igem:experience rdf:resource="http://wiki.synbiohub.org/wiki/Terms/igem#experience/Works"/>
+    <igem:group_u_list>_52_</igem:group_u_list>
+    <igem:m_user_id>0</igem:m_user_id>
+    <igem:owner_id>483</igem:owner_id>
+    <igem:owning_group_id>95</igem:owning_group_id>
+    <igem:sampleStatus>In stock</igem:sampleStatus>
+    <igem:status rdf:resource="http://wiki.synbiohub.org/wiki/Terms/igem#status/Available"/>
+    <sbh:bookmark>true</sbh:bookmark>
+    <sbh:mutableNotes>N/A</sbh:mutableNotes>
+    <sbh:star>true</sbh:star>
+    <dc:creator>John Anderson</dc:creator>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:role rdf:resource="http://wiki.synbiohub.org/wiki/Terms/igem#partType/Regulatory"/>
+    <sbol:sequence rdf:resource="https://synbiohub.org/public/igem/BBa_J23108_sequence/1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/design/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design"/>
+    <sbol:displayId>design</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>design</dcterms:title>
+    <dcterms:description></dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000988"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/design/Cir_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/Cir_Component"/>
+        <sbol:displayId>Cir_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/BASIC_SEVA_36_CmR_p15A1/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/design/Gen2_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/Gen2_Component"/>
+        <sbol:displayId>Gen2_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS3"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/design/Gen_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/Gen_Component"/>
+        <sbol:displayId>Gen_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMP"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/design/Gen_Component1/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/Gen_Component1"/>
+        <sbol:displayId>Gen_Component1</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/LMS"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/design/Gen1_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/Gen1_Component"/>
+        <sbol:displayId>Gen1_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/part1/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/design/Gen3_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/Gen3_Component"/>
+        <sbol:displayId>Gen3_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/part2/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation5/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation5"/>
+        <sbol:displayId>design_SequenceAnnotation5</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:GenericLocation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation5/GenericLocation/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation5/GenericLocation"/>
+            <sbol:displayId>GenericLocation</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:GenericLocation>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/design/Gen_Component1/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation1/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation1"/>
+        <sbol:displayId>design_SequenceAnnotation1</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:GenericLocation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation1/GenericLocation/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation1/GenericLocation"/>
+            <sbol:displayId>GenericLocation</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:GenericLocation>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/design/Gen_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation"/>
+        <sbol:displayId>design_SequenceAnnotation</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:GenericLocation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation/GenericLocation/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation/GenericLocation"/>
+            <sbol:displayId>GenericLocation</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:GenericLocation>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/design/Cir_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation2/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation2"/>
+        <sbol:displayId>design_SequenceAnnotation2</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:GenericLocation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation2/GenericLocation/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation2/GenericLocation"/>
+            <sbol:displayId>GenericLocation</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:GenericLocation>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/design/Gen1_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation3/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation3"/>
+        <sbol:displayId>design_SequenceAnnotation3</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:GenericLocation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation3/GenericLocation/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation3/GenericLocation"/>
+            <sbol:displayId>GenericLocation</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:GenericLocation>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/design/Gen2_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation4/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation4"/>
+        <sbol:displayId>design_SequenceAnnotation4</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:GenericLocation rdf:about="http://www.dummy.org/design/design_SequenceAnnotation4/GenericLocation/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceAnnotation4/GenericLocation"/>
+            <sbol:displayId>GenericLocation</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:GenericLocation>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/design/Gen3_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/design/design_SequenceConstraint3/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceConstraint3"/>
+        <sbol:displayId>design_SequenceConstraint3</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/design/Gen2_Component/1"/>
+        <sbol:object rdf:resource="http://www.dummy.org/design/Gen3_Component/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/design/design_SequenceConstraint1/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceConstraint1"/>
+        <sbol:displayId>design_SequenceConstraint1</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/design/Gen_Component/1"/>
+        <sbol:object rdf:resource="http://www.dummy.org/design/Gen1_Component/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/design/design_SequenceConstraint4/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceConstraint4"/>
+        <sbol:displayId>design_SequenceConstraint4</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/design/Gen3_Component/1"/>
+        <sbol:object rdf:resource="http://www.dummy.org/design/Gen_Component1/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/design/design_SequenceConstraint2/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceConstraint2"/>
+        <sbol:displayId>design_SequenceConstraint2</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/design/Gen1_Component/1"/>
+        <sbol:object rdf:resource="http://www.dummy.org/design/Gen2_Component/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/design/design_SequenceConstraint/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design/design_SequenceConstraint"/>
+        <sbol:displayId>design_SequenceConstraint</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/design/Cir_Component/1"/>
+        <sbol:object rdf:resource="http://www.dummy.org/design/Gen_Component/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMS_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMS_Prefix"/>
+    <sbol:displayId>LMS_Prefix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>LMS_Prefix</dcterms:title>
+    <dcterms:description>Methylated Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMS_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/LMP_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/LMP_Prefix"/>
+    <sbol:displayId>LMP_Prefix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>LMP_Prefix</dcterms:title>
+    <dcterms:description>Methylated Linker Prefix</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/LMP_Prefix"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="https://synbiohub.org/public/igem/BBa_K1401006/1">
+    <sbol:persistentIdentity rdf:resource="https://synbiohub.org/public/igem/BBa_K1401006"/>
+    <sbol:displayId>BBa_K1401006</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasDerivedFrom rdf:resource="http://parts.igem.org/Part:BBa_K1401006"/>
+    <prov:wasGeneratedBy rdf:resource="https://synbiohub.org/public/igem/igem2sbol/1"/>
+    <dcterms:title>BBa_K1401006</dcterms:title>
+    <dcterms:description>MoClo Level 0 part of L3S2P21 terminator</dcterms:description>
+    <dcterms:created>2014-07-20T11:00:00Z</dcterms:created>
+    <dcterms:modified>2015-05-08T01:10:16Z</dcterms:modified>
+    <sbh:mutableProvenance>The sequence for L3S2P21 came from Addgene plasmid 46004.</sbh:mutableProvenance>
+    <sbh:topLevel rdf:resource="https://synbiohub.org/public/igem/BBa_K1401006/1"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/james"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/myers"/>
+    <sbh:mutableDescription>his is a MoClo level 0 part of the L3S2P21 terminator. This terminator is flanked by two MoClo fusion sites, D on the 5' end and F on the 3' side.
+The fusion site letters refer to 4bp fusion sites: D = AGGT;F = CGCT</sbh:mutableDescription>
+    <igem:discontinued>false</igem:discontinued>
+    <igem:dominant>false</igem:dominant>
+    <igem:group_u_list>_1779_</igem:group_u_list>
+    <igem:m_user_id>0</igem:m_user_id>
+    <igem:owner_id>22443</igem:owner_id>
+    <igem:owning_group_id>9</igem:owning_group_id>
+    <igem:sampleStatus>Not in stock</igem:sampleStatus>
+    <igem:status rdf:resource="http://wiki.synbiohub.org/wiki/Terms/igem#status/Unavailable"/>
+    <sbh:bookmark>false</sbh:bookmark>
+    <sbh:mutableNotes>N/A</sbh:mutableNotes>
+    <sbh:star>false</sbh:star>
+    <dc:creator>Kathleen Lewis</dc:creator>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000141"/>
+    <sbol:role rdf:resource="http://wiki.synbiohub.org/wiki/Terms/igem#partType/Terminator"/>
+    <sbol:sequence rdf:resource="https://synbiohub.org/public/igem/BBa_K1401006_sequence/1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/BASIC_SEVA_36_CmR_p15A1/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_SEVA_36_CmR_p15A1"/>
+    <sbol:displayId>BASIC_SEVA_36_CmR_p15A1</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>BASIC_SEVA_36_CmR_p15A1</dcterms:title>
+    <dcterms:description></dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000755"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1"/>
+    <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1_SBOLDesignerActivity/1"/>
+    <dcterms:title>BASIC_L3S2P21_J23108_RiboJ1</dcterms:title>
+    <dcterms:description></dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Ter_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Ter_Component"/>
+        <sbol:displayId>Ter_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="https://synbiohub.org/public/igem/BBa_K1401006/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Pro_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Pro_Component"/>
+        <sbol:displayId>Pro_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="https://synbiohub.org/public/igem/BBa_J23108/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Ins_Component/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Ins_Component"/>
+        <sbol:displayId>Ins_Component</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/RiboJ1/1"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation1/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation1"/>
+        <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation1</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation1_Range/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation1_Range"/>
+            <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation1_Range</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:start>70</sbol:start>
+            <sbol:end>104</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:Range>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Pro_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation2/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation2"/>
+        <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation2</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:GenericLocation rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation2/GenericLocation/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation2/GenericLocation"/>
+            <sbol:displayId>GenericLocation</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:GenericLocation>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Ins_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation"/>
+        <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:Range rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation_Range/1">
+            <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation/BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation_Range"/>
+            <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1_SequenceAnnotation_Range</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:start>1</sbol:start>
+            <sbol:end>69</sbol:end>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:Range>
+        </sbol:location>
+        <sbol:component rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Ter_Component/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceConstraint1/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceConstraint1"/>
+        <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1_SequenceConstraint1</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Pro_Component/1"/>
+        <sbol:object rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Ins_Component/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceConstraint/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/BASIC_L3S2P21_J23108_RiboJ1_SequenceConstraint"/>
+        <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1_SequenceConstraint</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Ter_Component/1"/>
+        <sbol:object rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/Pro_Component/1"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1Sequence/1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="https://synbiohub.org/public/igem/BBa_J23101/1">
+    <sbol:persistentIdentity rdf:resource="https://synbiohub.org/public/igem/BBa_J23101"/>
+    <sbol:displayId>BBa_J23101</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasDerivedFrom rdf:resource="http://parts.igem.org/Part:BBa_J23101"/>
+    <prov:wasGeneratedBy rdf:resource="https://synbiohub.org/public/igem/igem2sbol/1"/>
+    <dcterms:title>BBa_J23101</dcterms:title>
+    <dcterms:description>constitutive promoter family member</dcterms:description>
+    <dcterms:created>2006-08-03T11:00:00Z</dcterms:created>
+    <dcterms:modified>2015-08-31T04:08:40Z</dcterms:modified>
+    <sbh:mutableProvenance>later</sbh:mutableProvenance>
+    <sbh:topLevel rdf:resource="https://synbiohub.org/public/igem/BBa_J23101/1"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/james"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/myers"/>
+    <igem:partStatus>Released HQ 2013</igem:partStatus>
+    <sbh:mutableDescription>later</sbh:mutableDescription>
+    <igem:discontinued>false</igem:discontinued>
+    <igem:dominant>true</igem:dominant>
+    <igem:experience rdf:resource="http://wiki.synbiohub.org/wiki/Terms/igem#experience/Works"/>
+    <igem:group_u_list>_52_</igem:group_u_list>
+    <igem:m_user_id>0</igem:m_user_id>
+    <igem:owner_id>483</igem:owner_id>
+    <igem:owning_group_id>95</igem:owning_group_id>
+    <igem:sampleStatus>In stock</igem:sampleStatus>
+    <igem:status rdf:resource="http://wiki.synbiohub.org/wiki/Terms/igem#status/Available"/>
+    <sbh:bookmark>true</sbh:bookmark>
+    <sbh:mutableNotes>N/A</sbh:mutableNotes>
+    <sbh:star>true</sbh:star>
+    <dc:creator>John Anderson</dc:creator>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:role rdf:resource="http://wiki.synbiohub.org/wiki/Terms/igem#partType/Regulatory"/>
+    <sbol:sequence rdf:resource="https://synbiohub.org/public/igem/BBa_J23101_sequence/1"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/BASIC_sfGFP_ORF1/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_sfGFP_ORF1"/>
+    <sbol:displayId>BASIC_sfGFP_ORF1</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/BASIC_sfGFP_ORF1_SBOLDesignerActivity/1"/>
+    <dcterms:title>BASIC_sfGFP_ORF1</dcterms:title>
+    <dcterms:description></dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/cd/L1RBS3">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3"/>
+    <sbol:displayId>L1RBS3</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>L1RBS3</dcterms:title>
+    <dcterms:description>RBS Linkers</dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000696"/>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS3/L1RBS3_S">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_S"/>
+        <sbol:displayId>L1RBS3_S</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS3_Suffix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:component>
+      <sbol:Component rdf:about="http://www.dummy.org/cd/L1RBS3/L1RBS3_P">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_P"/>
+        <sbol:displayId>L1RBS3_P</sbol:displayId>
+        <sbol:access rdf:resource="http://sbols.org/v2#public"/>
+        <sbol:definition rdf:resource="http://www.dummy.org/cd/L1RBS3_Prefix"/>
+      </sbol:Component>
+    </sbol:component>
+    <sbol:sequenceConstraint>
+      <sbol:SequenceConstraint rdf:about="http://www.dummy.org/cd/L1RBS3/L1RBS3_sc">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_sc"/>
+        <sbol:displayId>L1RBS3_sc</sbol:displayId>
+        <sbol:restriction rdf:resource="http://sbols.org/v2#precedes"/>
+        <sbol:subject rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_S"/>
+        <sbol:object rdf:resource="http://www.dummy.org/cd/L1RBS3/L1RBS3_P"/>
+      </sbol:SequenceConstraint>
+    </sbol:sequenceConstraint>
+    <sbol:sequence rdf:resource="http://www.dummy.org/seq/L1RBS3"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/part1/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/part1"/>
+    <sbol:displayId>part1</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>part1</dcterms:title>
+    <dcterms:description></dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/BASIC_mCherry_ORF1/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_mCherry_ORF1"/>
+    <sbol:displayId>BASIC_mCherry_ORF1</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/BASIC_mCherry_ORF1_SBOLDesignerActivity/1"/>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>BASIC_mCherry_ORF1</dcterms:title>
+    <dcterms:description></dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/RiboJ1/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/RiboJ1"/>
+    <sbol:displayId>RiboJ1</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1_SBOLDesignerActivity/1"/>
+    <dcterms:title>RiboJ1</dcterms:title>
+    <dcterms:description></dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000627"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://www.dummy.org/part2/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/part2"/>
+    <sbol:displayId>part2</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <dcterms:title>part2</dcterms:title>
+    <dcterms:description></dcterms:description>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
+  </sbol:ComponentDefinition>
+  <sbol:Sequence rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1Sequence/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1Sequence"/>
+    <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1Sequence</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1_SBOLDesignerActivity/1"/>
+    <sbol:elements>aggtctcggtaccaaattccagaaaagaggcctcccgaaaggggggccttttttcgttttggtcccgctctgacagctagctcagtcctaggtataatgctagc</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMS_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMS_Suffix"/>
+    <sbol:displayId>LMS_Suffix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <sbol:elements>GGCTCGGGAGACCTATCGGTAATAACAGTCCAATCTGGTGT</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS3_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS3_Suffix"/>
+    <sbol:displayId>L1RBS3_Suffix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <sbol:elements>GGCTCGTTGAACACCGTCTCAGGTAAGTATCAGTTGTAA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMP_Suffix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMP_Suffix"/>
+    <sbol:displayId>LMP_Suffix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <sbol:elements>GGCTCGGGTAAGAACTCGCACTTCGTGGAAACACTATTA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1Sequence/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1Sequence"/>
+    <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1Sequence</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1_SBOLDesignerActivity/1"/>
+    <sbol:elements>aggtctcggtaccaaattccagaaaagaggcctcccgaaaggggggccttttttcgttttggtcccgcttttacagctagctcagtcctaggtattatgctagc</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="https://synbiohub.org/public/igem/BBa_J23108_sequence/1">
+    <sbol:persistentIdentity rdf:resource="https://synbiohub.org/public/igem/BBa_J23108_sequence"/>
+    <sbol:displayId>BBa_J23108_sequence</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasDerivedFrom rdf:resource="http://parts.igem.org/Part:BBa_J23108"/>
+    <prov:wasGeneratedBy rdf:resource="https://synbiohub.org/public/igem/igem2sbol/1"/>
+    <sbh:topLevel rdf:resource="https://synbiohub.org/public/igem/BBa_J23108_sequence/1"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/james"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/myers"/>
+    <sbol:elements>ctgacagctagctcagtcctaggtataatgctagc</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMS_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMS_Prefix"/>
+    <sbol:displayId>LMS_Prefix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <sbol:elements>GGACGATTCCGAAGTTACACCAGATTGGACTGTTATTAC</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="https://synbiohub.org/public/igem/BBa_K1401006_sequence/1">
+    <sbol:persistentIdentity rdf:resource="https://synbiohub.org/public/igem/BBa_K1401006_sequence"/>
+    <sbol:displayId>BBa_K1401006_sequence</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasDerivedFrom rdf:resource="http://parts.igem.org/Part:BBa_K1401006"/>
+    <prov:wasGeneratedBy rdf:resource="https://synbiohub.org/public/igem/igem2sbol/1"/>
+    <sbh:topLevel rdf:resource="https://synbiohub.org/public/igem/BBa_K1401006_sequence/1"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/james"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/myers"/>
+    <sbol:elements>aggtctcggtaccaaattccagaaaagaggcctcccgaaaggggggccttttttcgttttggtcccgct</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/L1RBS3_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/L1RBS3_Prefix"/>
+    <sbol:displayId>L1RBS3_Prefix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <sbol:elements>GGACTATTTCTCCTCTTTTTACAACTGATACTTACCTGA</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="https://synbiohub.org/public/igem/BBa_J23101_sequence/1">
+    <sbol:persistentIdentity rdf:resource="https://synbiohub.org/public/igem/BBa_J23101_sequence"/>
+    <sbol:displayId>BBa_J23101_sequence</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <prov:wasDerivedFrom rdf:resource="http://parts.igem.org/Part:BBa_J23101"/>
+    <prov:wasGeneratedBy rdf:resource="https://synbiohub.org/public/igem/igem2sbol/1"/>
+    <sbh:topLevel rdf:resource="https://synbiohub.org/public/igem/BBa_J23101_sequence/1"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/james"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/myers"/>
+    <sbol:elements>tttacagctagctcagtcctaggtattatgctagc</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <sbol:Sequence rdf:about="http://www.dummy.org/seq/LMP_Prefix">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/seq/LMP_Prefix"/>
+    <sbol:displayId>LMP_Prefix</sbol:displayId>
+    <prov:wasGeneratedBy rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/1"/>
+    <sbol:elements>GGACAGAGACCCACCAGATAATAGTGTTTCCACGAAGTG</sbol:elements>
+    <sbol:encoding rdf:resource="http://www.chem.qmul.ac.uk/iubmb/misc/naseq.html"/>
+  </sbol:Sequence>
+  <prov:Activity rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1_SBOLDesignerActivity/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1_SBOLDesignerActivity"/>
+    <sbol:displayId>BASIC_L3S2P21_J23108_RiboJ1_SBOLDesignerActivity</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <dc:creator></dc:creator>
+    <prov:endedAtTime>2020-10-12T21:49:47.014+01:00</prov:endedAtTime>
+    <prov:qualifiedAssociation>
+      <prov:Association rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1_SBOLDesignerActivity/Association/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1_SBOLDesignerActivity/Association"/>
+        <sbol:displayId>Association</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <prov:hadRole rdf:resource="http://sbols.org/v2#sequenceEditor"/>
+        <prov:agent rdf:resource="https://synbiohub.org/public/SBOL_Software/SBOLDesigner/3.1"/>
+      </prov:Association>
+    </prov:qualifiedAssociation>
+  </prov:Activity>
+  <prov:Activity rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1_SBOLDesignerActivity/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1_SBOLDesignerActivity"/>
+    <sbol:displayId>BASIC_L3S2P21_J23101_RiboJ1_SBOLDesignerActivity</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <dc:creator></dc:creator>
+    <prov:endedAtTime>2020-10-12T21:47:35.486+01:00</prov:endedAtTime>
+    <prov:qualifiedAssociation>
+      <prov:Association rdf:about="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1_SBOLDesignerActivity/Association/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1_SBOLDesignerActivity/Association"/>
+        <sbol:displayId>Association</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <prov:hadRole rdf:resource="http://sbols.org/v2#sequenceEditor"/>
+        <prov:agent rdf:resource="https://synbiohub.org/public/SBOL_Software/SBOLDesigner/3.1"/>
+      </prov:Association>
+    </prov:qualifiedAssociation>
+  </prov:Activity>
+  <prov:Activity rdf:about="http://www.dummy.org/BASIC_mCherry_ORF1_SBOLDesignerActivity/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_mCherry_ORF1_SBOLDesignerActivity"/>
+    <sbol:displayId>BASIC_mCherry_ORF1_SBOLDesignerActivity</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <dc:creator></dc:creator>
+    <prov:endedAtTime>2020-10-12T21:29:53.676+01:00</prov:endedAtTime>
+    <prov:qualifiedAssociation>
+      <prov:Association rdf:about="http://www.dummy.org/BASIC_mCherry_ORF1_SBOLDesignerActivity/Association/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_mCherry_ORF1_SBOLDesignerActivity/Association"/>
+        <sbol:displayId>Association</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <prov:hadRole rdf:resource="http://sbols.org/v2#sequenceEditor"/>
+        <prov:agent rdf:resource="https://synbiohub.org/public/SBOL_Software/SBOLDesigner/3.1"/>
+      </prov:Association>
+    </prov:qualifiedAssociation>
+  </prov:Activity>
+  <prov:Activity rdf:about="http://www.dummy.org/design_SBOLDesignerActivity/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity"/>
+    <sbol:displayId>design_SBOLDesignerActivity</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <dc:creator></dc:creator>
+    <prov:endedAtTime>2020-10-12T21:52:05.693+01:00</prov:endedAtTime>
+    <prov:qualifiedAssociation>
+      <prov:Association rdf:about="http://www.dummy.org/design_SBOLDesignerActivity/Association/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design_SBOLDesignerActivity/Association"/>
+        <sbol:displayId>Association</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <prov:hadRole rdf:resource="http://sbols.org/v2#sequenceEditor"/>
+        <prov:agent rdf:resource="https://synbiohub.org/public/SBOL_Software/SBOLDesigner/3.1"/>
+      </prov:Association>
+    </prov:qualifiedAssociation>
+  </prov:Activity>
+  <prov:Activity rdf:about="http://www.dummy.org/BASIC_sfGFP_ORF1_SBOLDesignerActivity/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_sfGFP_ORF1_SBOLDesignerActivity"/>
+    <sbol:displayId>BASIC_sfGFP_ORF1_SBOLDesignerActivity</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <dc:creator></dc:creator>
+    <prov:endedAtTime>2020-10-12T21:29:31.081+01:00</prov:endedAtTime>
+    <prov:qualifiedAssociation>
+      <prov:Association rdf:about="http://www.dummy.org/BASIC_sfGFP_ORF1_SBOLDesignerActivity/Association/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/BASIC_sfGFP_ORF1_SBOLDesignerActivity/Association"/>
+        <sbol:displayId>Association</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <prov:hadRole rdf:resource="http://sbols.org/v2#sequenceEditor"/>
+        <prov:agent rdf:resource="https://synbiohub.org/public/SBOL_Software/SBOLDesigner/3.1"/>
+      </prov:Association>
+    </prov:qualifiedAssociation>
+  </prov:Activity>
+  <prov:Activity rdf:about="https://synbiohub.org/public/igem/igem2sbol/1">
+    <sbol:persistentIdentity rdf:resource="https://synbiohub.org/public/igem/igem2sbol"/>
+    <sbol:displayId>igem2sbol</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <dcterms:title>iGEM to SBOL conversion</dcterms:title>
+    <dcterms:description>Conversion of the iGEM parts registry to SBOL2.1</dcterms:description>
+    <sbh:topLevel rdf:resource="https://synbiohub.org/public/igem/igem2sbol/1"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/james"/>
+    <sbh:ownedBy rdf:resource="https://synbiohub.org/user/myers"/>
+    <dc:creator>Chris J. Myers</dc:creator>
+    <dc:creator>James Alastair McLaughlin</dc:creator>
+    <prov:endedAtTime>2017-03-06T15:00:00.000Z</prov:endedAtTime>
+  </prov:Activity>
+  <prov:Agent rdf:about="https://synbiohub.org/public/SBOL_Software/SBOLDesigner/3.1">
+    <sbol:persistentIdentity rdf:resource="https://synbiohub.org/public/SBOL_Software/SBOLDesigner"/>
+    <sbol:displayId>SBOLDesigner</sbol:displayId>
+    <sbol:version>3.1</sbol:version>
+    <dcterms:title>SBOLDesigner CAD Tool</dcterms:title>
+    <dcterms:description>SBOLDesigner is a simple, biologist-friendly CAD software tool for creating and manipulating the sequences of genetic constructs using the Synthetic Biology Open Language (SBOL) 2 data model. Throughout the design process, SBOL Visual symbols, a system of schematic glyphs, provide standardized visualizations of individual parts. SBOLDesigner completes a workflow for users of genetic design automation tools. It combines a simple user interface with the power of the SBOL standard and serves as a launchpad for more detailed designs involving simulations and experiments. Some new features in SBOLDesigner are the ability to add variant collections to combinatorial derivations, enumerating those collections, and the ability to view sequence features hierarchically. There are also some small changes to the way that preferences work in regards to saving a design with incomplete sequences.</dcterms:description>
+    <dc:creator>Samuel Bridge</dc:creator>
+    <dc:creator>Michael Zhang</dc:creator>
+    <dc:creator>Chris Myers</dc:creator>
+    <dc:creator>Michal Galdzicki</dc:creator>
+    <dc:creator>Bryan Bartley</dc:creator>
+    <dc:creator>Sean Sleight</dc:creator>
+    <dc:creator>Evren Sirin</dc:creator>
+    <dc:creator>John Gennari</dc:creator>
+  </prov:Agent>
+  <sbol:CombinatorialDerivation rdf:about="http://www.dummy.org/design_CombinatorialDerivation/1">
+    <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design_CombinatorialDerivation"/>
+    <sbol:displayId>design_CombinatorialDerivation</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <sbol:template rdf:resource="http://www.dummy.org/design/1"/>
+    <sbol:variableComponent>
+      <sbol:VariableComponent rdf:about="http://www.dummy.org/design_CombinatorialDerivation/Gen1_Component_VariableComponent/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design_CombinatorialDerivation/Gen1_Component_VariableComponent"/>
+        <sbol:displayId>Gen1_Component_VariableComponent</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:variable rdf:resource="http://www.dummy.org/design/Gen1_Component/1"/>
+        <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
+        <sbol:variant rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23108_RiboJ1/1"/>
+        <sbol:variant rdf:resource="http://www.dummy.org/BASIC_L3S2P21_J23101_RiboJ1/1"/>
+      </sbol:VariableComponent>
+    </sbol:variableComponent>
+    <sbol:variableComponent>
+      <sbol:VariableComponent rdf:about="http://www.dummy.org/design_CombinatorialDerivation/Gen3_Component_VariableComponent/1">
+        <sbol:persistentIdentity rdf:resource="http://www.dummy.org/design_CombinatorialDerivation/Gen3_Component_VariableComponent"/>
+        <sbol:displayId>Gen3_Component_VariableComponent</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:variable rdf:resource="http://www.dummy.org/design/Gen3_Component/1"/>
+        <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
+        <sbol:variant rdf:resource="http://www.dummy.org/BASIC_sfGFP_ORF1/1"/>
+        <sbol:variant rdf:resource="http://www.dummy.org/BASIC_mCherry_ORF1/1"/>
+      </sbol:VariableComponent>
+    </sbol:variableComponent>
+  </sbol:CombinatorialDerivation>
+</rdf:RDF>

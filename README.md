@@ -1,8 +1,17 @@
-# DJANGO-Assembly-Methods 🔬
+<p align="center">
+  <img src="https://github.com/Imperial-iGEM/igem_frontend/blob/master/public/ourlogo.png" height="200"/>
+</p>
+
+# SoapLabs Backend
+
+## DJANGO-Assembly-Methods 🔬
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Imperial-iGEM/DJANGO-Assembly-Methods/Django%20CI)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Imperial-iGEM/DJANGO-Assembly-Methods)
 ![GitHub search hit counter](https://img.shields.io/github/search/Imperial-iGEM/DJANGO-Assembly-Methods/goto)
+
+hosted and available at:
+http://app.soaplab.io/graphql
 
 A django restframework with 2 endpoints `/Basic` and `/Moclo` to provide OT2 lab automation python scripts for the respective asembly methods from formatted CSV files
 
@@ -43,6 +52,8 @@ Run server
 
 `$ python manage.py migrate`
 
+`$ python manage.py collectstatic`
+
 `$ python manage.py runserver`
 
 ## Continuous Intergration and Unittests ✅
@@ -65,9 +76,40 @@ $ autopep8 -r --diff DJANGO-Assembly-Methods/
 
 once your server in running as we left our machine in the previous stage, we can use the GUI django rest framework provides to test out our two end points!
 
+### Graphql
+
+We implemented graphql technologies into our Django Backend with the python library graphene.
+Because of this we only have 1 endpoint "/graphql"
+
+## linkerList
+
+One graphql mutation present at this endpoint is:
+
+```python
+linkerList(sbolFileString: String): LinkerList
+```
+
+The only argument sbolFileString is of type String; contains an SBOL file in string format
+The only output is an array LinkerList; an array containing strings of each Part/Linker name inside the SBOL file
+
+## Final Spec
+
+The only other mutation present at the graphql endpoint is:
+
+```python
+finalSpec(
+  assemblyType: String
+  linkerTypes: [LinkerInType]
+  sbolFileString: String
+  specificationsBasic: InputSpecsBASIC
+  specificationsBioBricks: InputSpecsBioBricks
+  specificationsMoClo: InputSpecsMoClo
+): FinalSpec
+```
+
 ### Basic DNA Assembly 🦠
 You can acess the root of the end point on your local machine when the server is running by navigating to the link
-> http://127.0.0.1:8000/
+> http://127.0.0.1:8000/gr
 
 and click on the `/Basic` end point or alternatively navigate directly to
 > http://127.0.0.1:8000/Basic

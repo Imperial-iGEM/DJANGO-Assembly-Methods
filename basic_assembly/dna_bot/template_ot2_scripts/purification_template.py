@@ -9,7 +9,7 @@ metadata = {'apiLevel': '2.2',
 def run(protocol: protocol_api.ProtocolContext):
     def magbead(
         sample_number,
-        ethanol_well,
+        ethanol_well,  # Default is A11 in DNA-BOT
         elution_buffer_well,
         sample_volume=30,
         bead_ratio=1.8,
@@ -114,11 +114,11 @@ def run(protocol: protocol_api.ProtocolContext):
                 sample_offset+6:sample_offset+6+col_num]]
         else:
             start = sample_offset
-            stop = sample_offset + (col_num + 1)*8
+            stop = start + sample_number
             samples = mag_plate.wells()[start:stop]
             mixing = mix_plate.wells()[start:stop]
             start = sample_offset + 6*8
-            stop = sample_offset + (6 + col_num + 1)*8
+            stop = start + sample_number
             output = mag_plate.wells()[start:stop]
 
         # Define reagents and liquid waste
@@ -136,10 +136,10 @@ def run(protocol: protocol_api.ProtocolContext):
         total_vol = bead_volume + sample_volume + DEAD_TOTAL_VOL
 
         # Mix beads and PCR samples and incubate
-        for target, dest in zip(samples, output):
+        for target, dest in zip(samples, mixing):
             # Aspirate beads
             pipette.pick_up_tip()
-            pipette.mix(5, mix_vol, beads)
+            # pipette.mix(5, mix_vol, beads)
             pipette.transfer(bead_volume, beads, dest, new_tip='never')
             pipette.move_to(target.bottom())
 

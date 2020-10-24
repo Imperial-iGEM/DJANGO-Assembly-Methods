@@ -141,7 +141,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         for no_parts, no_assemblies in no_assemblies_dict.items():
             n_part_mm_dicts = [mm_dict for mm_dict in master_mix_dicts
-                               if mm_dict['no_parts'] == no_parts]
+                               if mm_dict['no_parts'] == int(no_parts)]
             wells_open_assembly = wells_assembly[no_parts]
             protocol.comment("--------------------------------------------")
             protocol.comment(
@@ -150,12 +150,12 @@ def run(protocol: protocol_api.ProtocolContext):
             for i, entries in enumerate(n_part_mm_dicts):
                 mm_vol_per_assembly = entries['vol_per_assembly']
                 p10_single.pick_up_tip()
-                mm_well = reagents_plate.wells()[entries['well']]
+                mm_well = reaction_plate.wells_by_name()[entries['well']]
                 no_assemblies_mm = entries['no_assemblies']
                 if i == len(entries) - 1:
                     dest_wells = wells_open_assembly
                 else:
-                    dest_wells = wells_open_assembly[0:no_assemblies_mm-1]
+                    dest_wells = wells_open_assembly[0:no_assemblies_mm]
                 wells_new = [well for well in wells_open_assembly
                              if (well not in dest_wells)]
                 wells_open_assembly = wells_new

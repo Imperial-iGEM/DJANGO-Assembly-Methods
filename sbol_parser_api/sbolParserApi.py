@@ -212,22 +212,379 @@ class ParserSBOL:
             list: List of component definitions specifying the
                 enumerated constructs.
         """
+
+        def add_children(
+            orig_template: ComponentDefinition,
+            orig_comp: Component,
+            new_parent: ComponentDefinition,
+            children: List[ComponentDefinition]
+        ):
+            """Adds children to new parent component definition based on the
+            original template.
+            Args:
+                orig_template (ComponentDefinition): Original template
+                    describing the design of the new parent
+                orig_comp (Component): Variable component in the
+                    original template to be replaced in new parent
+                new_parent (ComponentDefinition): New component definition
+                    describing an enumerated design
+                children (List[ComponentDefinition]): Children to be added
+                    to the new parent based on the variants
+            """
+            new_comp = new_parent.components[orig_comp.displayId]
+            new_comp.wasDerivedFrom = orig_comp.identity
+            if children is None:
+                remove_constr_refs(new_parent, new_comp)
+                for sa in new_parent.sequenceAnnotations:
+                    if sa.component \
+                            is not None and sa.component == new_comp.identity:
+                        new_parent.sequenceAnnotations.remove(sa.identity)
+                new_parent.components.remove(new_comp.identity)
+                return
+            first = True
+            for child in children:
+                if first:
+                    # Take over definition of
+                    # newParent's version of original component
+                    new_comp.definition = child.identity
+                    first = False
+                else:
+                    # Create new component
+                    unique_id = get_unique_displayid(
+                        new_parent,
+                        None,
+                        child.displayId + "_Component", "1",
+                        "Component",
+                        None)
+                    link = new_parent.components.create(unique_id)
+                    link.definition = child.persistentIdentity
+                    link.access = SBOL_ACCESS_PUBLIC
+                    link.version = child.version
+                    link.wasDerivedFrom = orig_comp.identity
+                    # Create a new 'prev precedes link' constraint
+                    if orig_template.hasUpstreamComponent(orig_comp):
+                        old_prev = orig_template.getUpstreamComponent(orig_comp)
+                        if old_prev.identity in new_parent.components:
+                            new_prev = new_parent.components[old_prev.identity]
+                            unique_id = get_unique_displayid(
+                                new_parent,
+                                None,
+                                new_parent.displayId + "_SequenceConstraint",
+                                None,
+                                "SequenceConstraint",
+                                None
+                            )
+                            new_seqconstr = \
+                                new_parent.sequenceConstraints.create(unique_id)
+                            new_seqconstr.subject = new_prev.identity
+                            new_seqconstr.object = link.identity
+                            new_seqconstr.restriction = SBOL_RESTRICTION_PRECEDES
+                    # Create new 'link precedes next' constraint
+                    if orig_template.hasDownstreamComponent(orig_comp):
+                        old_next = orig_template.getDownstreamComponent(orig_comp)
+                        if old_next.identity in new_parent.components:
+                            new_next = new_parent.components[old_next.identity]
+                            unique_id = get_unique_displayid(
+                                new_parent,
+                                None,
+                                new_parent.displayId + "_SeqeunceConstraint",
+                                None,
+                                "SequenceConstraint",
+                                None
+                            )
+                            new_seqconstr = \
+                                new_parent.sequenceConstraints.create(unique_id)
+                            new_seqconstr.subject = link.identity
+                            new_seqconstr.object = new_next.identity
+                            new_seqconstr.restriction = SBOL_RESTRICTION_PRECEDES
+
+        def remove_constr_refs(
+            new_parent: ComponentDefinition,
+            new_comp: Component
+        ):
+            """Remove sequence constraints of the component in the component definition
+            Args:
+                new_parent (ComponentDefinition): Component definition containing
+                    the new component.
+                new_comp (Component): Component to remove sequence
+                    constraints from.
+            """
+            subj = None
+            obj = None
+            for sc in new_parent.sequenceConstraints:
+                if sc.subject == new_comp.identity:
+                    obj = new_parent.components[sc.object]
+                    if subj is not None:
+                        sc.subject = subj
+                        obj = None
+                        subj = None
+                    else:
+                        new_parent.sequenceConstraints.remove(sc.identity)
+                if sc.object == new_comp.identity:
+                    subj = new_parent.components[sc.subject]
+                    if obj is not None:
+                        sc.object = obj
+                        obj = None
+                        subj = None
+                    else:
+                        new_parent.sequenceConstraints.remove(sc.identity)
+
+        def create_template_copy(
+            template: ComponentDefinition,
+            displayid: str,
+            version: str
+        ) -> ComponentDefinition:
+            """Create a copy of the template of the combinatorial derivation.
+            Args:
+                template (ComponentDefinition): Template of the
+                    combinatorial derivation.
+                displayid (str): Display ID to be assigned to the copy.
+                version (str): Version of the copy.
+            Returns:
+                ComponentDefinition: Copy of template.
+            """
+            new_displayid = URIRef(displayid)
+            template_copy = ComponentDefinition(
+                new_displayid,
+                template.types,
+                version
+            )
+            template_copy.roles = template.roles
+            pri_struct = template.getPrimaryStructureComponents()
+            curr = None
+            prev = None
+            for c in pri_struct:
+                curr = template_copy.components.create(c.displayId)
+                curr.access = c.access
+                curr.definition = c.definition
+                if prev is not None:
+                    unique_id = get_unique_displayid(
+                        template_copy,
+                        None,
+                        template_copy.displayId + "_SequenceConstraint",
+                        None,
+                        "SequenceConstraint",
+                        None
+                    )
+                    sc = template_copy.sequenceConstraints.create(unique_id)
+                    sc.subject = prev.identity
+                    sc.object = curr.identity
+                    sc.restriction = SBOL_RESTRICTION_PRECEDES
+                prev = curr
+            template_copy.wasDerivedFrom = [template.identity]
+            for c in template_copy.components:
+                component = template.components[c.displayId]
+                c.wasDerivedFrom = component.identity
+            return template_copy
+
+        def get_unique_displayid(
+            comp: ComponentDefinition = None,
+            derivation: CombinatorialDerivation = None,
+            displayid: str = None,
+            version: str = None,
+            data_type: str = None,
+            doc: Document = None
+        ) -> str:
+            """Create a unique display ID for an SBOL object.
+            Args:
+                comp (ComponentDefinition): Component definition containing
+                    the SBOL object
+                derivation (CombinatorialDerivation): Combinatorial derivation
+                    containing the SBOL object
+                displayid (str): Base display ID for SBOL object.
+                version (str): Version of SBOL object.
+                data_type (str): Type of SBOL object.
+                doc (str): SBOL Document containing the SBOL object.
+            Returns:
+                str: Unique display ID of SBOL object.
+            Raises:
+                ValueError: Invalid data type.
+            """
+            i = 1
+            if data_type == "CD":
+                unique_uri = getHomespace() + displayid + "/" + version
+                # while doc.find(uniqueUri):
+                while unique_uri \
+                        in [cd.displayId for cd in doc.componentDefinitions]:
+                    i += 1
+                    unique_uri = \
+                        getHomespace() + "%s_%d/%s" % (displayid, i, version)
+                if i == 1:
+                    return displayid
+                else:
+                    return displayid + "_" + str(i)
+            elif data_type == "SequenceAnnotation":
+                while displayid \
+                        in [sa.displayId for sa in comp.sequenceAnnotations]:
+                    i += 1
+                    displayid = displayid + str(i)
+                if i == 1:
+                    return displayid
+                else:
+                    return displayid
+            elif data_type == "SequenceConstraint":
+                while displayid \
+                        in [sc.displayId for sc in comp.sequenceConstraints]:
+                    i += 1
+                    displayid = displayid + str(i)
+                if i == 1:
+                    return displayid
+                else:
+                    return displayid
+            elif data_type == "Component":
+                while displayid in [c.displayId for c in comp.components]:
+                    i += 1
+                    displayid = displayid + str(i)
+                if i == 1:
+                    return displayid
+                else:
+                    return displayid
+            elif data_type == "Sequence":
+                unique_uri = getHomespace() + displayid + "/" + version
+                while doc.find(unique_uri):
+                    i += 1
+                    unique_uri = \
+                        getHomespace() + "%s_%d/%s" % (displayid, i, version)
+                if i == 1:
+                    return displayid
+                else:
+                    return displayid + str(i)
+            # TODO: Range
+            elif data_type == "CombinatorialDerivation":
+                unique_uri = getHomespace() + displayid + "/" + version
+                while doc.find(unique_uri):
+                    i += 1
+                    unique_uri = \
+                        getHomespace() + "%s_%d/%s" % (displayid, i, version)
+                if i == 1:
+                    return displayid
+                else:
+                    return displayid + str(i)
+            elif data_type == "VariableComponent":
+                while displayid + str(i) \
+                        in [vc.displayId for vc in derivation.variableComponents]:
+                    i += 1
+                    displayid = displayid + str(i)
+                if i == 1:
+                    return displayid
+                else:
+                    return displayid
+            else:
+                raise ValueError("Invalid data type.")
+
+        def conc_children_displayid(
+            children: List[ComponentDefinition]
+        ) -> str:
+            """Concatenate the names of the variant child components.
+            Args:
+                children (List[ComponentDefinition]): List of variant
+                    child components of an enumerated design (as
+                    component definition).
+            Returns:
+                str: Concanated names of variant child components.
+            """
+            conc_displayid = ""
+            for child in children:
+                conc_displayid = conc_displayid + child.displayId
+            return conc_displayid
+
+        def collect_variants(
+            vc: VariableComponent
+        ) -> List[ComponentDefinition]:
+            """Collect all variants within a variable component
+            of a combinatorial derivation.
+            Args:
+                vc (VariableComponent): Variable component of a
+                    combinatorial derivation.
+            Returns:
+                List[ComponentDefinition]: List of variants (as
+                    component definitions) contained within a
+                    variable component of a combinatorial derivation.
+            """
+            variants = []
+            # Add all variants
+            for v in vc.variants:
+                variant = self.doc.componentDefinitions.get(v)
+                variants.append(variant)
+            # Add all variants from Variant Collections
+            for c in vc.variantCollections:
+                for m in c.members:
+                    tl = self.doc.get(m)
+                    if type(tl) == ComponentDefinition:
+                        variants.add(tl)
+            for derivation in vc.variantDerivations:
+                variants.extend(self.enumerator(self.doc.get(derivation)))
+            return variants
+
+        def group(
+            variants: List[ComponentDefinition],
+            repeat: str
+        ) -> List[List[ComponentDefinition]]:
+            """Groups variants based on combinatorial strategy.
+            Args:
+                variants (List[ComponentDefintiion]): List of variants
+                    in a variable component.
+            Returns:
+                List[List[ComponentDefinition]]: Groups of variants.
+            """
+            groups = []
+            for cd in variants:
+                group = []
+                group.append(cd)
+                groups.append(group)
+            if repeat == "http://sbols.org/v2#one":
+                return groups
+            if repeat == "http://sbols.org/v2#zeroOrOne":
+                groups.append([])
+                return groups
+            groups.clear()
+            generate_combinations(groups, variants, 0, [])
+            if repeat == "http://sbols.org/v2#oneOrMore":
+                return groups
+            if repeat == "http://sbols.org/v2#zeroOrMore":
+                groups.append([])
+                return groups
+
+        def generate_combinations(
+            groups: List[List[ComponentDefinition]],
+            variants: List[ComponentDefinition],
+            i: int,
+            sets: List[ComponentDefinition]
+        ):
+            """Generate all possible subsets in a set of variants.
+            Args:
+                groups (List[List[ComponentDefintiion]]): Groups of variants.
+                variants (List[ComponentDefinition]): List of variants (as
+                    component definitions).
+                i (int): Iterator.
+                sets (List[ComponentDefinition]): Sets of variants.
+            """
+            if i == len(variants):
+                if not sets:
+                    groups.add(sets)
+                return
+            no = sets.copy()
+            generate_combinations(groups, variants, i + 1, no)
+            yes = sets.copy()
+            yes.add(variants[i])
+            generate_combinations(groups, variants, i + 1, yes)
+
         parents = []
         template = self.doc.getComponentDefinition(derivation.masterTemplate)
         template_copy =\
-            self.create_template_copy(template, template.displayId + "_Var", "1")
+            create_template_copy(template, template.displayId + "_Var", "1")
         parents.append(template_copy)
         for vc in derivation.variableComponents:
             new_parents = []
             for parent in parents:
-                for children in self.group(
-                        self.collect_variants(vc),
+                for children in group(
+                        collect_variants(vc),
                         "http://sbols.org/v2#one"):
-                    var_displayid = self.conc_children_displayid(children)
+                    var_displayid = conc_children_displayid(children)
                     if parent.persistentIdentity + "_" + var_displayid + "/1" \
                             not in [cd.identity for cd in self.doc.componentDefinitions]:
                         # Create parent copy
-                        unique_id = self.get_unique_displayid(
+                        unique_id = get_unique_displayid(
                             None,
                             None,
                             parent.displayId + "_" + var_displayid,
@@ -235,7 +592,7 @@ class ParserSBOL:
                             "CD",
                             self.doc
                         )
-                        new_parent = self.create_template_copy(
+                        new_parent = create_template_copy(
                             parent,
                             unique_id,
                             "1"
@@ -247,7 +604,7 @@ class ParserSBOL:
                             parent.persistentIdentity + "_" + var_displayid + "/1"
                         )
                     # Add children
-                    self.add_children(
+                    add_children(
                         template,
                         template.components[vc.variable],
                         new_parent,
@@ -257,370 +614,6 @@ class ParserSBOL:
                     new_parents.append(new_parent)
             parents = new_parents
         return parents
-
-    def add_children(
-        self,
-        orig_template: ComponentDefinition,
-        orig_comp: Component,
-        new_parent: ComponentDefinition,
-        children: List[ComponentDefinition]
-    ):
-        """Adds children to new parent component definition based on the
-        original template.
-        Args:
-            orig_template (ComponentDefinition): Original template
-                describing the design of the new parent
-            orig_comp (Component): Variable component in the
-                original template to be replaced in new parent
-            new_parent (ComponentDefinition): New component definition
-                describing an enumerated design
-            children (List[ComponentDefinition]): Children to be added
-                to the new parent based on the variants
-        """
-        new_comp = new_parent.components[orig_comp.displayId]
-        new_comp.wasDerivedFrom = orig_comp.identity
-        if children is None:
-            self.remove_constr_refs(new_parent, new_comp)
-            for sa in new_parent.sequenceAnnotations:
-                if sa.component \
-                        is not None and sa.component == new_comp.identity:
-                    new_parent.sequenceAnnotations.remove(sa.identity)
-            new_parent.components.remove(new_comp.identity)
-            return
-        first = True
-        for child in children:
-            if first:
-                # Take over definition of
-                # newParent's version of original component
-                new_comp.definition = child.identity
-                first = False
-            else:
-                # Create new component
-                unique_id = self.get_unique_displayid(
-                    new_parent,
-                    None,
-                    child.displayId + "_Component", "1",
-                    "Component",
-                    None)
-                link = new_parent.components.create(unique_id)
-                link.definition = child.persistentIdentity
-                link.access = SBOL_ACCESS_PUBLIC
-                link.version = child.version
-                link.wasDerivedFrom = orig_comp.identity
-                # Create a new 'prev precedes link' constraint
-                if orig_template.hasUpstreamComponent(orig_comp):
-                    old_prev = orig_template.getUpstreamComponent(orig_comp)
-                    if old_prev.identity in new_parent.components:
-                        new_prev = new_parent.components[old_prev.identity]
-                        unique_id = self.get_unique_displayid(
-                            new_parent,
-                            None,
-                            new_parent.displayId + "_SequenceConstraint",
-                            None,
-                            "SequenceConstraint",
-                            None
-                        )
-                        new_seqconstr = \
-                            new_parent.sequenceConstraints.create(unique_id)
-                        new_seqconstr.subject = new_prev.identity
-                        new_seqconstr.object = link.identity
-                        new_seqconstr.restriction = SBOL_RESTRICTION_PRECEDES
-                # Create new 'link precedes next' constraint
-                if orig_template.hasDownstreamComponent(orig_comp):
-                    old_next = orig_template.getDownstreamComponent(orig_comp)
-                    if old_next.identity in new_parent.components:
-                        new_next = new_parent.components[old_next.identity]
-                        unique_id = self.get_unique_displayid(
-                            new_parent,
-                            None,
-                            new_parent.displayId + "_SeqeunceConstraint",
-                            None,
-                            "SequenceConstraint",
-                            None
-                        )
-                        new_seqconstr = \
-                            new_parent.sequenceConstraints.create(unique_id)
-                        new_seqconstr.subject = link.identity
-                        new_seqconstr.object = new_next.identity
-                        new_seqconstr.restriction = SBOL_RESTRICTION_PRECEDES
-
-    def remove_constr_refs(
-        self,
-        new_parent: ComponentDefinition,
-        new_comp: Component
-    ):
-        """Remove sequence constraints of the component in the component definition
-        Args:
-            new_parent (ComponentDefinition): Component definition containing
-                the new component.
-            new_comp (Component): Component to remove sequence
-                constraints from.
-        """
-        subj = None
-        obj = None
-        for sc in new_parent.sequenceConstraints:
-            if sc.subject == new_comp.identity:
-                obj = new_parent.components[sc.object]
-                if subj is not None:
-                    sc.subject = subj
-                    obj = None
-                    subj = None
-                else:
-                    new_parent.sequenceConstraints.remove(sc.identity)
-            if sc.object == new_comp.identity:
-                subj = new_parent.components[sc.subject]
-                if obj is not None:
-                    sc.object = obj
-                    obj = None
-                    subj = None
-                else:
-                    new_parent.sequenceConstraints.remove(sc.identity)
-
-    def create_template_copy(
-        self,
-        template: ComponentDefinition,
-        displayid: str,
-        version: str
-    ) -> ComponentDefinition:
-        """Create a copy of the template of the combinatorial derivation.
-        Args:
-            template (ComponentDefinition): Template of the
-                combinatorial derivation.
-            displayid (str): Display ID to be assigned to the copy.
-            version (str): Version of the copy.
-        Returns:
-            ComponentDefinition: Copy of template.
-        """
-        new_displayid = URIRef(displayid)
-        template_copy = ComponentDefinition(
-            new_displayid,
-            template.types,
-            version
-        )
-        template_copy.roles = template.roles
-        pri_struct = template.getPrimaryStructureComponents()
-        curr = None
-        prev = None
-        for c in pri_struct:
-            curr = template_copy.components.create(c.displayId)
-            curr.access = c.access
-            curr.definition = c.definition
-            if prev is not None:
-                unique_id = self.get_unique_displayid(
-                    template_copy,
-                    None,
-                    template_copy.displayId + "_SequenceConstraint",
-                    None,
-                    "SequenceConstraint",
-                    None
-                )
-                sc = template_copy.sequenceConstraints.create(unique_id)
-                sc.subject = prev.identity
-                sc.object = curr.identity
-                sc.restriction = SBOL_RESTRICTION_PRECEDES
-            prev = curr
-        template_copy.wasDerivedFrom = [template.identity]
-        for c in template_copy.components:
-            component = template.components[c.displayId]
-            c.wasDerivedFrom = component.identity
-        return template_copy
-
-    def get_unique_displayid(
-        self,
-        comp: ComponentDefinition = None,
-        derivation: CombinatorialDerivation = None,
-        displayid: str = None,
-        version: str = None,
-        data_type: str = None,
-        doc: Document = None
-    ) -> str:
-        """Create a unique display ID for an SBOL object.
-        Args:
-            comp (ComponentDefinition): Component definition containing
-                the SBOL object
-            derivation (CombinatorialDerivation): Combinatorial derivation
-                containing the SBOL object
-            displayid (str): Base display ID for SBOL object.
-            version (str): Version of SBOL object.
-            data_type (str): Type of SBOL object.
-            doc (str): SBOL Document containing the SBOL object.
-        Returns:
-            str: Unique display ID of SBOL object.
-        Raises:
-            ValueError: Invalid data type.
-        """
-        i = 1
-        if data_type == "CD":
-            unique_uri = getHomespace() + displayid + "/" + version
-            # while doc.find(uniqueUri):
-            while unique_uri \
-                    in [cd.displayId for cd in doc.componentDefinitions]:
-                i += 1
-                unique_uri = \
-                    getHomespace() + "%s_%d/%s" % (displayid, i, version)
-            if i == 1:
-                return displayid
-            else:
-                return displayid + "_" + str(i)
-        elif data_type == "SequenceAnnotation":
-            while displayid \
-                    in [sa.displayId for sa in comp.sequenceAnnotations]:
-                i += 1
-                displayid = displayid + str(i)
-            if i == 1:
-                return displayid
-            else:
-                return displayid
-        elif data_type == "SequenceConstraint":
-            while displayid \
-                    in [sc.displayId for sc in comp.sequenceConstraints]:
-                i += 1
-                displayid = displayid + str(i)
-            if i == 1:
-                return displayid
-            else:
-                return displayid
-        elif data_type == "Component":
-            while displayid in [c.displayId for c in comp.components]:
-                i += 1
-                displayid = displayid + str(i)
-            if i == 1:
-                return displayid
-            else:
-                return displayid
-        elif data_type == "Sequence":
-            unique_uri = getHomespace() + displayid + "/" + version
-            while doc.find(unique_uri):
-                i += 1
-                unique_uri = \
-                    getHomespace() + "%s_%d/%s" % (displayid, i, version)
-            if i == 1:
-                return displayid
-            else:
-                return displayid + str(i)
-        # TODO: Range
-        elif data_type == "CombinatorialDerivation":
-            unique_uri = getHomespace() + displayid + "/" + version
-            while doc.find(unique_uri):
-                i += 1
-                unique_uri = \
-                    getHomespace() + "%s_%d/%s" % (displayid, i, version)
-            if i == 1:
-                return displayid
-            else:
-                return displayid + str(i)
-        elif data_type == "VariableComponent":
-            while displayid + str(i) \
-                    in [vc.displayId for vc in derivation.variableComponents]:
-                i += 1
-                displayid = displayid + str(i)
-            if i == 1:
-                return displayid
-            else:
-                return displayid
-        else:
-            raise ValueError("Invalid data type.")
-
-    def conc_children_displayid(
-        self,
-        children: List[ComponentDefinition]
-    ) -> str:
-        """Concatenate the names of the variant child components.
-        Args:
-            children (List[ComponentDefinition]): List of variant
-                child components of an enumerated design (as
-                component definition).
-        Returns:
-            str: Concanated names of variant child components.
-        """
-        conc_displayid = ""
-        for child in children:
-            conc_displayid = conc_displayid + child.displayId
-        return conc_displayid
-
-    def collect_variants(
-        self,
-        vc: VariableComponent
-    ) -> List[ComponentDefinition]:
-        """Collect all variants within a variable component
-        of a combinatorial derivation.
-        Args:
-            vc (VariableComponent): Variable component of a
-                combinatorial derivation.
-        Returns:
-            List[ComponentDefinition]: List of variants (as
-                component definitions) contained within a
-                variable component of a combinatorial derivation.
-        """
-        variants = []
-        # Add all variants
-        for v in vc.variants:
-            variant = self.doc.componentDefinitions.get(v)
-            variants.append(variant)
-        # Add all variants from Variant Collections
-        for c in vc.variantCollections:
-            for m in c.members:
-                tl = self.doc.get(m)
-                if type(tl) == ComponentDefinition:
-                    variants.add(tl)
-        for derivation in vc.variantDerivations:
-            variants.extend(self.enumerator(self.doc.get(derivation)))
-        return variants
-
-    def group(
-        self,
-        variants: List[ComponentDefinition],
-        repeat: str
-    ) -> List[List[ComponentDefinition]]:
-        """Groups variants based on combinatorial strategy.
-        Args:
-            variants (List[ComponentDefintiion]): List of variants
-                in a variable component.
-        Returns:
-            List[List[ComponentDefinition]]: Groups of variants.
-        """
-        groups = []
-        for cd in variants:
-            group = []
-            group.append(cd)
-            groups.append(group)
-        if repeat == "http://sbols.org/v2#one":
-            return groups
-        if repeat == "http://sbols.org/v2#zeroOrOne":
-            groups.append([])
-            return groups
-        groups.clear()
-        self.generate_combinations(groups, variants, 0, [])
-        if repeat == "http://sbols.org/v2#oneOrMore":
-            return groups
-        if repeat == "http://sbols.org/v2#zeroOrMore":
-            groups.append([])
-            return groups
-
-    def generate_combinations(
-        self,
-        groups: List[List[ComponentDefinition]],
-        variants: List[ComponentDefinition],
-        i: int,
-        sets: List[ComponentDefinition]
-    ):
-        """Generate all possible subsets in a set of variants.
-        Args:
-            groups (List[List[ComponentDefintiion]]): Groups of variants.
-            variants (List[ComponentDefinition]): List of variants (as
-                component definitions).
-            i (int): Iterator.
-            sets (List[ComponentDefinition]): Sets of variants.
-        """
-        if i == len(variants):
-            if not sets:
-                groups.add(sets)
-            return
-        no = sets.copy()
-        self.generate_combinations(groups, variants, i + 1, no)
-        yes = sets.copy()
-        yes.add(variants[i])
-        self.generate_combinations(groups, variants, i + 1, yes)
 
     def filter_constructs(
         self,
@@ -799,6 +792,7 @@ class ParserSBOL:
         parts.sort(key=lambda x: x.displayId)
         return parts
 
+    # TODO: Remove? Not used in code
     def get_comp_dict(
         self,
         constructs: List[ComponentDefinition]

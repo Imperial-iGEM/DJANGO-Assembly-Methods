@@ -12,13 +12,15 @@ from collections import deque
 from random import sample
 from plateo.exporters import plate_to_platemap_spreadsheet
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 class ParserSBOL:
     def __init__(
         self,
         sbol_document: Document,
         outdir: str = os.getcwd(),
-        linker_file: Document = Document(os.path.join(os.getcwd(), "sbol_parser_api", "basic_linkers_standard.xml"))
+        linker_file: Document = Document(os.path.join(BASE_DIR, "sbol_parser_api", "basic_linkers_standard.xml"))
     ):
         self.doc = sbol_document
         self.outdir = outdir

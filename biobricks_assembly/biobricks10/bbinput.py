@@ -138,7 +138,7 @@ def biobricks(
             os.path.join(full_output_path, 'bb_metainformation.csv'),
             index=False, PARTS_INFO=parts_df, REAGENTS=reagents,
             MASTER_MIX=mm_df, DIGESTS=digest_loc, CONSTRUCTS=constructs,
-            LABWARE=labwareDf)
+            LABWARE=labwareDf, TRANSFORMS=transform_df)
         output_paths.append(
             os.path.join(full_output_path, 'bb_metainformation.csv'))
 

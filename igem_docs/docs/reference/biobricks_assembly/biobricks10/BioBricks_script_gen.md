@@ -28,7 +28,7 @@ cds_ter_1_Var_BBa_E1010	| A8 |BBa_E1010 | BBa_B0015 | ColE1_AmpR
 
 
 ### `part_path`
-A list of the full path(s) to the construct CSV file(s). Only two plate can be handled - if the list is longer than length 2, only the first two paths will be used. The first path will be assigned the deck position '2', and the second path (if given) the deck position '5'.
+A list of the full path(s) to the parts CSV file(s). Only two plate can be handled - if the list is longer than length 2, only the first two paths will be used. The first path will be assigned the deck position '2', and the second path (if given) the deck position '5'.
 Example: `['C:/Users/yourname/Documents/iGEM/SOAPLab/myDesign/parts.csv']` 
 
 The format of a BioBricks parts CSV is:

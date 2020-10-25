@@ -116,7 +116,7 @@ def biobricks(
         competent_source_to_dest, control_source_to_dest, \
             assembly_source_to_dest, water_source_to_dest, transform_df \
             = create_tranformation_dicts(constructs, water_well='A1',
-                                            controls_per_cons=False)
+                                         controls_per_cons=False)
 
         # Creates and saves transformation protocol
         transform_path = create_transformation_protocol(
@@ -131,14 +131,14 @@ def biobricks(
         output_paths.append(transform_path)
         labwareDf = pd.DataFrame(
             data={'name': list(labware_dict.keys()),
-                    'definition': list(labware_dict.values())})
+                  'definition': list(labware_dict.values())})
 
         # Saves dataframes in metainformation csv
         dfs_to_csv(
             os.path.join(full_output_path, 'bb_metainformation.csv'),
             index=False, PARTS_INFO=parts_df, REAGENTS=reagents,
             MASTER_MIX=mm_df, DIGESTS=digest_loc, CONSTRUCTS=constructs,
-            LABWARE=labwareDf)
+            LABWARE=labwareDf, TRANSFORMS=transform_df)
         output_paths.append(
             os.path.join(full_output_path, 'bb_metainformation.csv'))
 
@@ -341,8 +341,8 @@ def get_reagents_wells(
     total_volumes = [total_water_vol, mm_vol_per_digest*(no_upstream + 2),
                      mm_vol_per_digest*(no_downstream + 2),
                      mm_vol_per_digest*(no_plasmids + 2),
-                     T4_LIGASE_VOL_10X + 10,
-                     T4_LIGASE_VOL + 10,
+                     no_cons*T4_LIGASE_VOL_10X + 10,
+                     no_cons*T4_LIGASE_VOL + 10,
                      ]
     for i in range(len(reagents)):
         reagents_dict = {}

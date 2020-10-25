@@ -57,7 +57,7 @@ For information on the thermocycler module, see:
 
 `p10_type`: `'p10_single'` or `'p20_single_gen2'`, indicating the pipette used for transferring small amounts - needs a minimum transfer volume of 1 μL. Multi-channel pipettes are not permitted. 
 
-`p300_type`: `'p300_single'` or `'p300_single_gen2'`, indicating the pipette used for transferring large amounts. Multi-channel pipettes are not permitted. This is only used in transformation (with an exception that you can see below in Super Secret Parameters!).
+`p300_type`: `'p300_single'` or `'p300_single_gen2'`, indicating the pipette used for transferring large amounts. Multi-channel pipettes are not permitted. This is only used in transformation.
 
 See [Pipettes Python API Reference](https://docs.opentrons.com/v2/new_pipette.html) for more information on pipettes. 
 #### Labware

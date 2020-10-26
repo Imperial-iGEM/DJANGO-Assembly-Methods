@@ -40,7 +40,7 @@
   },
   {
     "items": [
-      "reference/sbol_parser_api/sbolParserApi"
+      "reference/sbol_parser_api/sbol_parser_api"
     ],
     "label": "sbol_parser_api",
     "type": "category"

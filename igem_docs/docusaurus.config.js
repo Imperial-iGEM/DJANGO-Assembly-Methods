@@ -1,17 +1,17 @@
 module.exports = {
   title: 'My Site',
   tagline: 'The tagline of my site',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://github.com/Imperial-iGEM/DJANGO-Assembly-Methods',
+  baseUrl: '/DJANGO-Assembly-Methods/',
   onBrokenLinks: 'throw',
   favicon: 'img/favicon.ico',
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'Imperial-iGEM', // Usually your GitHub org/user name.
+  projectName: 'DJANGO-Assembly-Methods', // Usually your repo name.
   themeConfig: {
     navbar: {
       title: 'SOAP Lab',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'SOAP Lab Logo',
         src: 'img/soaplab.png',
       },
       items: [
@@ -23,7 +23,7 @@ module.exports = {
         },
         {to: 'blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/Imperial-iGEM/DJANGO-Assembly-Methods',
           label: 'GitHub',
           position: 'right',
         },
@@ -46,19 +46,23 @@ module.exports = {
           ],
         },
         {
-          title: 'Community',
+          title: 'SBOL Community',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+              label: 'SBOL',
+              href: 'https://sbolstandard.org/',
             },
             {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
+              label: 'SynBioHub',
+              href: 'https://synbiohub.org/',
             },
             {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
+              label: 'SBOL Stack',
+              href: 'http://ico2s.org/servers/sbol_stack.html',
+            },
+            {
+              label: 'SBOL Canvas',
+              href: 'https://sbolcanvas.org/',
             },
           ],
         },
@@ -66,17 +70,17 @@ module.exports = {
           title: 'More',
           items: [
             {
-              label: 'Blog',
-              to: 'blog',
+              label: 'Twitter',
+              href: 'https://twitter.com/IGem2020',
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/Imperial-iGEM/DJANGO-Assembly-Methods',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Imperial iGEM, Inc. Built with Docusaurus.`,
     },
   },
   presets: [

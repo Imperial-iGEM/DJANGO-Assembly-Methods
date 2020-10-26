@@ -39,7 +39,7 @@ class ParserSBOL:
     ) -> Dict[str, List[str]]:
         """Create construct and parts/linkers CSVs for DNABot input
         Args:
-            assembly(str): Assembly type.
+            assembly (str): Assembly type.
             part_info (Dict[str, Dict[str, Union[str, int, float]]]): 
                 Dictionary of information regarding parts to be assembled.
                 Structure:
@@ -201,7 +201,7 @@ class ParserSBOL:
         self,
         derivation: CombinatorialDerivation
     ) -> List[ComponentDefinition]:
-        """Get the list of constructs enumerated from a combinatorial derivation..
+        """Get the list of constructs enumerated from a combinatorial derivation.
         Args:
             derivation (CombinatorialDerivation): Combinatorial derivation
                 to be enumerated.
@@ -824,9 +824,9 @@ class ParserSBOL:
         Args:
             all_content (list): List of constructs.
             content_name (str): Name of content (construct or part).
-            num_plate (int): Number of plates to be generated (default = 1).
+            num_plate (int): Number of plates to be generated (default: 1).
             plate_class (plateo.Plate):
-                Class of plateo plate (default = Plate96).
+                Class of plateo plate (default: Plate96).
             max_construct_wells (int): Maximum number of filled
                 wells on a plate.
             part_info (Dict[str, Dict[str, Union[str, int, float]]]):
@@ -874,6 +874,7 @@ class ParserSBOL:
 
         # TODO: Infer numPlate or plate_class?
         # TODO: Input well content vol and qty
+        # TODO: Include the sbol doc into the plate
         all_content_copy = all_content.copy()
         num_plate = 1 if num_plate is None else num_plate
         plate_class = (

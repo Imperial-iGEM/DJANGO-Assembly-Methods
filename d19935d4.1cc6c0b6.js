@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[28],{84:function(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome","permalink":"/DJANGO-Assembly-Methods/blog/welcome"},{"title":"Hello","permalink":"/DJANGO-Assembly-Methods/blog/hello-world"},{"title":"Hola","permalink":"/DJANGO-Assembly-Methods/blog/hola"}]}')}}]);

@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[30],{86:function(o){o.exports=JSON.parse('{"allTagsPath":"/DJANGO-Assembly-Methods/blog/tags","slug":"facebook","name":"facebook","count":1,"permalink":"/DJANGO-Assembly-Methods/blog/tags/facebook"}')}}]);

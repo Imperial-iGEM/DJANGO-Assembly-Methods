@@ -1,0 +1,9 @@
+Construct,Well,upstream,downstream,plasmid
+pro_rbs_2_Var_BBa_J23119,A1,BBa_J23119,BBa_B0030,ColE1_AmpR
+pro_rbs_1_Var_BBa_J23119,A2,BBa_J23119,BBa_B0030,ColE1_AmpR
+cds_ter_1_Var_BBa_E1010,A3,BBa_E1010,BBa_B0015,ColE1_AmpR
+pro_rbs_1_Var_BBa_J23108,A4,BBa_J23108,BBa_B0030,ColE1_AmpR
+cds_ter_1_Var_BBa_I746916,A5,BBa_I746916,BBa_B0015,ColE1_AmpR
+pro_rbs_2_Var_BBa_J23108,A6,BBa_J23108,BBa_B0030,ColE1_AmpR
+cds_ter_2_Var_BBa_I746916,A7,BBa_I746916,BBa_B0015,ColE1_AmpR
+cds_ter_2_Var_BBa_E1010,A8,BBa_E1010,BBa_B0015,ColE1_AmpR

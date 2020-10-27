@@ -126,3 +126,5 @@ The reagents dataframe is defined by `reagents_df = create_reagents_df(mm_df)`, 
 
 #### 6. Create assembly and transformation protocols
 `create_protocol()` inserts dictionaries and non-path input parameters into template files, saving them as protocols. The paths of the assembly protocol and transform protocol are returned.
+
+![img](../static/img/danbot.svg)

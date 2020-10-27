@@ -8,32 +8,32 @@ import styles from './styles.module.css';
 
 const features = [
   {
-    title: 'Easy to Use',
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    title: 'Accessible',
+    imageUrl: 'img/iGEM_partnership.svg',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        SOAP Lab was designed from the ground up to be easily accessible and
+        used to get your liquid handlers up and running quickly how you need.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    title: 'Supporting communication',
+    imageUrl: 'img/DBTL_red.svg',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Our entire project is based around the synthetic biology data standard
+        SBOL to promote the sharing of genetic design data.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    title: 'End-to-endValidated',
+    imageUrl: 'img/iGEM_digestion.svg',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        We can vouch that our tool works - head over to our wiki to see how 
+        we created our proof of concept (https://igem.org/Team:Imperial_College).
       </>
     ),
   },
@@ -60,11 +60,11 @@ function Home() {
   return (
     <Layout
       title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      description="Looks like you're reading our html! Description will go into a meta tag in <head />">
       <header className={clsx('hero hero--primary', styles.heroBanner)}>
         <div className="container">
-          <h1 className="hero__title">{siteConfig.title}</h1>
-          <p className="hero__subtitle">{siteConfig.tagline}</p>
+          <h1 className="hero__title">Welcome to SOAP Lab!</h1>
+          <p className="hero__subtitle">Official Imperial College iGEM 2020 Docs</p>
           <div className={styles.buttons}>
             <Link
               className={clsx(
@@ -85,9 +85,9 @@ function Home() {
                 {features.map((props, idx) => (
                   <Feature key={idx} {...props} />
                 ))}
-              </div>
+              </div>              
             </div>
-          </section>
+          </section>  
         )}
       </main>
     </Layout>

@@ -1,6 +1,13 @@
-# SBOLParser
+---
+id: sbol_parser_docs
+title: SBOL Parser
+sidebar_label: SBOL Parser
+slug: /
+---
 
 The SBOL Parser interprets and parses the assembly intent from genetic designs described using the SBOL standard (SBOL Version 2.3), and produces the appropriate data files for downstream script generation softwares. The SBOL Parser primarily utilizes [pySBOL2](https://github.com/SynBioDex/pySBOL2) for the processing of SBOL files, and [Plateo](https://github.com/Edinburgh-Genome-Foundry/Plateo) to plan and simulate the set-up of the laboratory environment for assembly protocols.
+
+![SBOL Logo](https://sbolstandard.org/images/logo.svg 'SBOL New Logo')
 
 The assembly plan is inferred at the highest level of a hierarchical design - the root Component Definition. Each root Component Definition is treated as the construct to be assembled, and their corresponding Components are treated as parts that make up the construct. Currently, the SBOL Parser assumes only one level of assembly, and therefore any Components containing more nested designs are assumed to already be fully assembled beforehand.
 

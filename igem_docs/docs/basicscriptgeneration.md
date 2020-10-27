@@ -1,4 +1,8 @@
-# BASIC Script Generation
+---
+id: basic
+title: BASIC Script Generation
+sidebar_label: BASIC
+---
 
 Script generation file: dnabot_app.py
 Script generation run by `dnabot()` function in dnabot_app.py

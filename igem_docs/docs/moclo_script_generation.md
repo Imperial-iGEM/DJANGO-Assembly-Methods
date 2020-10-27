@@ -1,4 +1,9 @@
-# MoClo Script Generation
+---
+id: moclo_script_generation
+title: MoClo Script Generation
+sidebar_label: MoClo
+---
+
 Script generation file: moclo_transform_generator.py
 Script generation run by `moclo_function()` function in moclo_transform_generator.py
 

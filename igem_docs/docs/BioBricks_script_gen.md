@@ -1,4 +1,9 @@
-# BioBricks Script Generation
+---
+id: biobricks
+title: BioBricks Script Generation
+sidebar_label: BioBricks
+---
+
 Script generation file: bbinput.py
 Script generation run by `biobricks()` function in bbinput.py
 

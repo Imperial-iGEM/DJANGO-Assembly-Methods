@@ -36,12 +36,12 @@ module.exports = {
           title: 'Docs',
           items: [
             {
-              label: 'Style Guide',
+              label: 'SOAP Lab Explained',
               to: 'docs/',
             },
             {
-              label: 'Second Doc',
-              to: 'docs/doc2/',
+              label: 'Script generation',
+              to: 'docs/moclo_script_generation',
             },
           ],
         },

@@ -1,7 +1,8 @@
 module.exports = {
   someSidebar: {
     "API Documentation": require("./docs/reference/sidebar.json"),
-    SOAPLab: ['doc1', 'doc2', 'doc3'],
+    SOAPLab: ['sbol_parser_docs'],
+    "Script Generation": ['moclo_script_generation', 'biobricks', 'basic'],
     // Features: ['mdx'],
   },
 };

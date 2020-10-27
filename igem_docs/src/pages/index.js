@@ -28,7 +28,7 @@ const features = [
     ),
   },
   {
-    title: 'End-to-endValidated',
+    title: 'End-to-end Validated',
     imageUrl: 'img/iGEM_digestion.svg',
     description: (
       <>

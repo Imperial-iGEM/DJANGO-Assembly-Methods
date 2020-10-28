@@ -90,7 +90,7 @@ One graphql mutation present at this endpoint is:
 linkerList(sbolFileString: String): LinkerList
 ```
 
-The only argument sbolFileString is of type String; contains an SBOL file in string format
+The only argument sbolFileString is of type String; contains the contents of the SBOL file base64 Encoded in a string format.
 The only output is an array LinkerList; an array containing strings of each Part/Linker name inside the SBOL file
 
 ## Final Spec
@@ -140,7 +140,7 @@ example
 
 ### sbolFileString
 
-The third argument is the same as the only argument at the linkerList mutation, a stringified SBOL file
+The third argument is the same as the only argument at the linkerList mutation, a string with the contents of the SBOL file base64 Encoded.
 
 example
 > https://github.com/Imperial-iGEM/DJANGO-Assembly-Methods/blob/master/examples/sbol/basic_linkers_standard.xml

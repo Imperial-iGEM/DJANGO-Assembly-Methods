@@ -1,5 +1,7 @@
 # Website
 
+Go to https://imperial-igem.github.io/DJANGO-Assembly-Methods/ for our docs!
+
 This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
 
 ## Installation

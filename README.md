@@ -10,6 +10,8 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/Imperial-iGEM/DJANGO-Assembly-Methods)
 ![GitHub search hit counter](https://img.shields.io/github/search/Imperial-iGEM/DJANGO-Assembly-Methods/goto)
 
+Docs: https://imperial-igem.github.io/DJANGO-Assembly-Methods/
+
 hosted and available at:
 http://app.soaplab.io/graphql
 
